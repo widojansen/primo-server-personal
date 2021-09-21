@@ -1,11 +1,12 @@
 <script>
-  import axios from 'axios'
+  import axios from "axios";
   // import TimeAgo from 'javascript-time-ago'
-  import { fade, slide } from 'svelte/transition'
-  import hosts from '../../stores/hosts'
-  import TextField from '$lib/ui/TextField.svelte'
-  import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
-  import { get, set } from 'idb-keyval'
+  import { fade, slide } from "svelte/transition";
+  import hosts from "../../stores/hosts";
+  import * as actions from "../../actions";
+  import TextField from "$lib/ui/TextField.svelte";
+  import PrimaryButton from "$lib/ui/PrimaryButton.svelte";
+  import { get, set } from "idb-keyval";
   // import { users } from '../../supabase/db'
   // import { getGithubAuthToken } from '../../supabase/middleware'
   // import tokens from '../../stores/tokens'
@@ -13,8 +14,8 @@
 
   // import en from 'javascript-time-ago/locale/en'
 
-  export let showDetails = true
-  export let type = 'deployments'
+  export let showDetails = true;
+  export let type = "deployments";
 
   // TimeAgo.addDefaultLocale(en)
   // const timeAgo = new TimeAgo('en-US')
@@ -23,45 +24,29 @@
 
   async function connectVercel(token) {
     const { data } = await axios
-      .get('https://api.vercel.com/www/user', {
+      .get("https://api.vercel.com/www/user", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .catch((e) => {
-        data: null
-      })
+        data: null;
+      });
     if (data) {
-      hosts.update((h) => {
-        console.log({ h })
-        return [
-          ...h,
-          {
-            type: 'vercel',
-            token,
-            user: data.user,
-          },
-        ]
-      })
-      set('hosts', $hosts)
+      actions.hosts.create({
+        name: "vercel",
+        token,
+      });
     } else {
-      window.alert('Could not connect to host')
+      window.alert("Could not connect to host");
     }
-    // // Update user locally
-    // user.update((u) => ({
-    //   ...u,
-    //   tokens: {
-    //     ...u.tokens,
-    //     ...host,
-    //   },
-    // }))
   }
 
-  let showingHosts = false
-  let errorMessage = null
-  let loading = false
+  let showingHosts = false;
+  let errorMessage = null;
+  let loading = false;
 
-  let hostBeingConnected = null
+  let hostBeingConnected = null;
 
   const svg = (type, width = 6) =>
     ({
@@ -85,20 +70,32 @@
                   />
                 </g>
               </svg>`,
-    }[type])
+    }[type]);
 
-  let accounts = []
+  let accounts = [];
 
   // $: getAccountData($user.tokens)
 
-  let enteredToken
+  let enteredToken;
 </script>
 
 <div class="boxes">
   {#each $hosts as host}
-    <a class="box host-account" href="https://vercel.com/{host.user.username}">
+    <div class="box host-account">
       <div class="user">
-        {@html svg(host.type)}
+        {@html svg(host.name)}
+      </div>
+      <div class="host-user">
+        <span class="sr-only">Go to host</span>
+        <!-- <img
+          src="https://vercel.com/api/www/avatar/{host.user.avatar}?s=256"
+          alt="Hosting account avatar"
+        /> -->
+      </div>
+    </div>
+    <!-- <a class="box host-account" href="https://vercel.com/{host.user.username}">
+      <div class="user">
+        {@html svg(host.name)}
       </div>
       <div class="host-user">
         <span class="sr-only">Go to host</span>
@@ -107,17 +104,17 @@
           alt="Hosting account avatar"
         />
       </div></a
-    >
+    >  -->
   {/each}
-  {#if hostBeingConnected === 'vercel'}
+  {#if hostBeingConnected === "vercel"}
     <div class="box connecting-host">
       <button class="back" on:click={() => (hostBeingConnected = null)}
         >Back to web hosts</button
       >
       <form
         on:submit|preventDefault={() => {
-          connectVercel(enteredToken)
-          hostBeingConnected = null
+          connectVercel(enteredToken);
+          hostBeingConnected = null;
         }}
         in:fade={{ duration: 200 }}
       >
@@ -141,7 +138,7 @@
         {/if}
       </form>
     </div>
-  {:else if hostBeingConnected === 'github'}
+  {:else if hostBeingConnected === "github"}
     <div class="box connecting-host">
       <button class="back" on:click={() => (hostBeingConnected = null)}
         >Back to web hosts</button
@@ -186,15 +183,15 @@
   {:else if showingHosts && !hostBeingConnected}
     <div class="hosts">
       <div class="buttons" in:fade={{ duration: 200 }}>
-        <button on:click={() => (hostBeingConnected = 'vercel')}>
-          {@html svg('vercel')}</button
+        <button on:click={() => (hostBeingConnected = "vercel")}>
+          {@html svg("vercel")}</button
         >
         <button
           disabled
           class="github"
-          on:click={() => (hostBeingConnected = 'github')}
+          on:click={() => (hostBeingConnected = "github")}
         >
-          {@html svg('github')}
+          {@html svg("github")}
         </button>
       </div>
     </div>

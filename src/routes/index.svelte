@@ -1,17 +1,13 @@
 <script lang="ts">
-  import { browser } from "$app/env";
   import { goto } from "$app/navigation";
   import "$lib/assets/reset.css";
   import SignInNav from "$lib/components/SignInNav.svelte";
   import SiteFooter from "$lib/components/SiteFooter.svelte";
   import SiteThumbnail from "$lib/components/SiteThumbnail.svelte";
-  import Modal, { show, hide } from "$lib/components/Modal.svelte";
+  import { show, hide } from "$lib/components/Modal.svelte";
   import sites from "../stores/sites";
+  import * as actions from "../actions";
   // import mixpanel from 'mixpanel-browser'
-  import { html, css } from "../compiler/processors";
-  import { registerProcessors } from "@primo-app/primo";
-
-  browser && registerProcessors({ html, css });
 
   // mixpanel.track('Dashboard')
 
@@ -25,8 +21,9 @@
       id: "SITE_CREATION",
       props: {
         onSuccess: (site) => {
-          $sites = [...$sites, site];
+          actions.sites.create(site);
           goto(site.id);
+          hide();
         },
       },
     });
@@ -38,7 +35,6 @@
     );
     if (!confirm) return;
     $sites = $sites.filter((site) => site.id !== siteID);
-    // window.primo.data.deleteSite(siteID)
   }
 
   let siteBeingEdited;
@@ -47,7 +43,6 @@
   }
 </script>
 
-<Modal />
 <main class="primo-reset">
   <div class="container">
     <SignInNav />
@@ -87,7 +82,7 @@
                   />
                 </form>
               {:else}
-                <a href={site.url}>{site.name}</a>
+                <a href={site.id}>{site.name}</a>
                 <button on:click={() => (siteBeingEdited = site.id)}>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -106,7 +101,7 @@
                 </button>
               {/if}
             </div>
-            <span class="site-url">{site.id} </span>
+            <span class="site-url">{site.id}</span>
             <div class="buttons">
               <div class="button-group">
                 {#if site.collaborators}
@@ -127,21 +122,21 @@
                   </button>
                 {/if}
                 <!-- <button on:click={() => beginInvitation(site)}>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                    />
-                  </svg>
-                  <span>Invite</span>
-                </button> -->
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                  />
+                </svg>
+                <span>Invite</span>
+              </button> -->
               </div>
               <button
                 class="delete-link"

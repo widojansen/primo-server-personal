@@ -1,6 +1,6 @@
 import {get, writable} from 'svelte/store'
 import { browser } from '$app/env'
-import {isEqual} from 'lodash-es'
+import user from '.././stores/user'
 
 const site = {
   id: '',
@@ -9,14 +9,6 @@ const site = {
 }
 
 const store = writable([]);
-
-if (browser) {
-  // const {data} = window.primo
-  // store.set(data.load() || [])
-  // store.subscribe(s => {
-  //   data.save(s) 
-  // })
-}
 
 
 export default {

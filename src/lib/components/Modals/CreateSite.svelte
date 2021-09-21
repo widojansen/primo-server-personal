@@ -1,43 +1,43 @@
 <script>
-  import axios from 'axios'
-  import SiteThumbnail from '$lib/components/SiteThumbnail.svelte'
-  import Spinner from '$lib/ui/Spinner.svelte'
-  import TextField from '$lib/ui/TextField.svelte'
-  import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
-  import { makeValidUrl } from '$lib/utils'
-  import sites from '../../../stores/sites'
-  import { createSite } from '@primo-app/primo/src/const'
-  import { buildStaticPage } from '@primo-app/primo/src/stores/helpers'
+  import axios from "axios";
+  import SiteThumbnail from "$lib/components/SiteThumbnail.svelte";
+  import Spinner from "$lib/ui/Spinner.svelte";
+  import TextField from "$lib/ui/TextField.svelte";
+  import PrimaryButton from "$lib/ui/PrimaryButton.svelte";
+  import { makeValidUrl } from "$lib/utils";
+  import sites from "../../../stores/sites";
+  import { createSite } from "@primo-app/primo/src/const";
+  import { buildStaticPage } from "@primo-app/primo/src/stores/helpers";
 
-  export let onSuccess = (newSite) => {}
-  let loading
-  let siteName = ``
-  let siteID = ``
-  let existingRepo = ``
-  let siteIDFocused = false
-  let message = ''
+  export let onSuccess = (newSite) => {};
+  let loading;
+  let siteName = ``;
+  let siteID = ``;
+  let existingRepo = ``;
+  let siteIDFocused = false;
+  let message = "";
   // $: siteURL = siteID
-  $: canCreateSite = siteName && siteID
+  $: canCreateSite = siteName && siteID;
 
-  let siteData
+  let siteData;
 
   async function createNewSite() {
-    loading = true
+    loading = true;
 
-    loading = false
+    loading = false;
 
-    siteData = createSite({ id: siteID, name: siteName })
+    siteData = createSite({ id: siteID, name: siteName });
 
-    onSuccess(siteData)
+    onSuccess(siteData);
   }
 
   function validateUrl() {
-    siteID = makeValidUrl(siteIDFocused ? siteID : siteName)
+    siteID = makeValidUrl(siteIDFocused ? siteID : siteName);
   }
 
-  let themes = []
+  let themes = [];
 
-  let selectedTheme = { id: null }
+  let selectedTheme = { id: null };
   async function selectTheme(theme) {
     // selectedTheme = theme
     // const res = await downloadSiteData(theme)
@@ -50,15 +50,15 @@
     // }
   }
 
-  let duplicatingSite = false
+  let duplicatingSite = false;
   function readJsonFile({ target }) {
-    var reader = new window.FileReader()
+    var reader = new window.FileReader();
     reader.onload = async function ({ target }) {
-      if (typeof target.result !== 'string') return
-      siteData = JSON.parse(target.result)
-      duplicatingSite = true
-    }
-    reader.readAsText(target.files[0])
+      if (typeof target.result !== "string") return;
+      siteData = JSON.parse(target.result);
+      duplicatingSite = true;
+    };
+    reader.readAsText(target.files[0]);
   }
 </script>
 
@@ -74,7 +74,7 @@
           bind:value={siteName}
         />
         <TextField
-          label="Site URL"
+          label="Site ID"
           bind:value={siteID}
           on:input={validateUrl}
           on:focus={() => (siteIDFocused = true)}
@@ -129,7 +129,7 @@
       <div class="submit">
         <PrimaryButton
           type="submit"
-          label={existingRepo ? 'Clone site from repo' : 'Create site'}
+          label={existingRepo ? "Clone site from repo" : "Create site"}
           disabled={!canCreateSite}
         />
       </div>
@@ -202,7 +202,7 @@
             }
 
             &:after {
-              content: '';
+              content: "";
               width: 100%;
               height: 100vh;
               display: block;

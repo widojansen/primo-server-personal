@@ -1,23 +1,23 @@
 <script>
-  import axios from 'axios'
-  import { flattenDeep } from 'lodash-es'
-  import TimeAgo from 'javascript-time-ago'
-  import en from 'javascript-time-ago/locale/en'
+  import axios from "axios";
+  import { flattenDeep } from "lodash-es";
+  import TimeAgo from "javascript-time-ago";
+  import en from "javascript-time-ago/locale/en";
   // import JSZip from 'jszip'
   // import { saveAs } from 'file-saver'
   // import { getGithubAuthToken } from '../../supabase/middleware'
-  import Hosting from '$lib/components/Hosting.svelte'
-  import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
-  import Spinner from '$lib/ui/Spinner.svelte'
-  import { site, modal, savedSite } from '@primo-app/primo'
-  import { buildStaticPage } from '@primo-app/primo/src/stores/helpers'
-  import { unsaved } from '@primo-app/primo/src/stores/app/misc'
+  import Hosting from "$lib/components/Hosting.svelte";
+  import PrimaryButton from "$lib/ui/PrimaryButton.svelte";
+  import Spinner from "$lib/ui/Spinner.svelte";
+  import { site, modal, savedSite } from "@primo-app/primo";
+  import { buildStaticPage } from "@primo-app/primo/src/stores/helpers";
+  import { unsaved } from "@primo-app/primo/src/stores/app/misc";
   // import { saveSite } from '@primo-app/primo/src/stores/actions'
-  import Preview from '@primo-app/primo/src/components/misc/Preview.svelte'
-  import { makeValidUrl } from '$lib/utils'
+  import Preview from "@primo-app/primo/src/components/misc/Preview.svelte";
+  import { makeValidUrl } from "$lib/utils";
   // import { buildSite, createRepo } from '../../Github.svelte'
-  import hosts from '../stores/hosts'
-  import sites from '../stores/sites'
+  import hosts from "../stores/hosts";
+  import sites from "../stores/sites";
   // import {
   //   tokens,
   //   hosts,
@@ -30,18 +30,18 @@
   // import { repos, sites, users } from '../../supabase/db'
   // import confetti from 'canvas-confetti'
   // import Hosting from '$lib/components/Hosting.svelte'
-  import ModalHeader from '@primo-app/primo/src/views/modal/ModalHeader.svelte'
-  import PageItem from '@primo-app/primo/src/views/modal/PageList/PageItem.svelte'
+  import ModalHeader from "@primo-app/primo/src/views/modal/ModalHeader.svelte";
+  import PageItem from "@primo-app/primo/src/views/modal/PageList/PageItem.svelte";
   // import TimeAgo from 'javascript-time-ago'
   // import en from 'javascript-time-ago/locale/en'
-  import { page } from '$app/stores'
+  import { page } from "$app/stores";
 
-  TimeAgo.addDefaultLocale(en)
-  const timeAgo = new TimeAgo('en-US')
+  TimeAgo.addDefaultLocale(en);
+  const timeAgo = new TimeAgo("en-US");
 
   async function pushToRepo() {
-    feedback = `Pushing site to Github`
-    loading = true
+    feedback = `Pushing site to Github`;
+    loading = true;
     // const success = await buildSiteTree($site, $path)
     // if (success) {
     //   feedback = 'Good to go!'
@@ -71,14 +71,14 @@
     // })
   }
 
-  let repoName = ''
-  $: repoName.replace(' ', '-')
+  let repoName = "";
+  $: repoName.replace(" ", "-");
 
-  let feedback = ''
-  let loading = false
-  let progress = 0
+  let feedback = "";
+  let loading = false;
+  let progress = 0;
 
-  let commitMessage = ''
+  let commitMessage = "";
 
   // if no repo exists for this site
   // If logged into Github
@@ -88,11 +88,11 @@
 
   // get repo from db before this
   // let currentMessage = $user.token
-  let currentMessage = ''
+  let currentMessage = ""
     ? `Your website will get built out to a Github repository. You can publish it from there.`
-    : `Download your website or connect your Github account to save your site to a repository`
+    : `Download your website or connect your Github account to save your site to a repository`;
   async function startCreatingRepo() {
-    loading = true
+    loading = true;
     // const sitePath = $path.split('/')[1]
     // const repoName = `primo-` + makeValidUrl(sitePath)
     // const repoData = await createRepo({ name: repoName })
@@ -122,7 +122,7 @@
   }
 
   async function downloadSite() {
-    loading = true
+    loading = true;
     // const zip = new JSZip()
     // const files = await buildSiteBundle($site, $path)
     // files.forEach((file) => {
@@ -180,8 +180,8 @@
   // 1. Connect repository
   // 2. Connect hosting (deploy with repository)
 
-  let deployments = []
-  let gettingDeployments = true
+  let deployments = [];
+  let gettingDeployments = true;
   // async function getDeployments() {
   //   gettingDeployments = true
   //   axios
@@ -202,31 +202,31 @@
   // }
   // getDeployments()
 
-  let deployment
+  let deployment;
   async function publishToHosts() {
-    loading = true
+    loading = true;
 
-    const siteID = $page.params.site
+    const siteID = $page.params.site;
 
     // const name = window.location.pathname.split('/')[2]
     const files = (await buildSiteBundle($site, siteID)).map((file) => ({
       file: file.path,
       data: file.content,
-    }))
+    }));
 
     await Promise.allSettled(
-      $hosts.map(async ({ token, type }) => {
-        if (type === 'vercel') {
+      $hosts.map(async ({ token, name }) => {
+        if (name === "vercel") {
           const { data } = await axios
             .post(
-              'https://api.vercel.com/v12/now/deployments',
+              "https://api.vercel.com/v12/now/deployments",
               {
                 name: siteID,
                 files,
                 projectSettings: {
                   framework: null,
                 },
-                target: 'production',
+                target: "production",
               },
               {
                 headers: {
@@ -234,81 +234,19 @@
                 },
               }
             )
-            .catch((e) => ({ data: null }))
+            .catch((e) => ({ data: null }));
 
-          deployment = data
-        } else if (type === 'github') {
+          deployment = data;
+        } else if (name === "github") {
           // TODO
           // if no host exists, attempt to publish to new repo
           // is host exists, push to repo
           // enable connecting to existing repo
         }
       })
-    )
+    );
 
-    loading = false
-
-    // $hosts = updatedHosts
-    // sites.update($currentSite, {
-    //   hosts: updatedHosts,
-    // })
-    // loading = false
-
-    // async function publishToHost({
-    //   key,
-    //   endpoint,
-    //   args,
-    //   error = null,
-    //   token,
-    //   onSuccess = (data) => data,
-    // }) {
-    //   const res = await axios
-    //     .post(endpoint, args, {
-    //       headers: {
-    //         Authorization: `Bearer ${token}`,
-    //       },
-    //     })
-    //     .catch((e) => {
-    //       console.error(e)
-    //     })
-    //   if (!res) {
-    //     connectingHost = true
-    //     errorMessage = error
-    //     return null
-    //   } else if (res.data) {
-    //     confetti({
-    //       particleCount: 50,
-    //       startVelocity: 30,
-    //       spread: 180,
-    //       origin: {
-    //         x: 1,
-    //         y: 0,
-    //       },
-    //       zIndex: 99999,
-    //     })
-    //     return {
-    //       ...onSuccess(res.data),
-    //     }
-    //     // published = true
-    //     // domainName.set(res.data.alias[0])
-    //     // const { alias, createdAt } = res.data
-    //     // const updatedHost = {
-    //     //   ...$hosts,
-    //     //   vercel: {
-    //     //     ...$hosts?.vercel,
-    //     //     deployment: {
-    //     //       domain: alias[0],
-    //     //       createdAt,
-    //     //     },
-    //     //   },
-    //     // }
-    //     // $hosts = updatedHost
-    //     // sites.update($currentSite, {
-    //     //   hosts: updatedHost,
-    //     // })
-    //     // loading = false
-    //   }
-    // }
+    loading = false;
 
     async function buildSiteBundle(site, siteName) {
       const primoPage = `
@@ -323,7 +261,7 @@
             <iframe allow="clipboard-read; clipboard-write self https://its.primo.af" border="0" src="https://its.primo.af/${siteName}" style="height:100vh;width:100vw;position:absolute;top:0;left:0;border:0;"></iframe>
           </body>
         </html>
-      `
+      `;
 
       const pages = await Promise.all([
         ...site.pages.map((page) => buildPageTree({ page, site })),
@@ -340,23 +278,23 @@
         //   //   Disallow: /`
         //   // },
         // ],
-      ])
+      ]);
 
-      return buildSiteTree(pages, site)
+      return buildSiteTree(pages, site);
 
       async function buildPageTree({ page, site, isChild = false }) {
-        const { id } = page
+        const { id } = page;
         const { html, modules } = await buildStaticPage({
           page,
           site,
           separateModules: true,
-        })
+        });
         // const formattedHTML = await formatCode(html, 'html')
-        const formattedHTML = html
+        const formattedHTML = html;
 
         return await Promise.all([
           {
-            path: `${id === 'index' ? `index.html` : `${id}/index.html`}`,
+            path: `${id === "index" ? `index.html` : `${id}/index.html`}`,
             content: formattedHTML,
           },
           ...modules.map((module) => ({
@@ -368,11 +306,11 @@
                 buildPageTree({ page: subpage, site, isChild: true })
               )
             : []),
-        ])
+        ]);
       }
 
       async function buildSiteTree(pages, site) {
-        const json = JSON.stringify(site)
+        const json = JSON.stringify(site);
 
         return [
           ...flattenDeep(pages),
@@ -388,34 +326,34 @@
           //   path: 'README.md',
           //   content: `# Built with [primo](https://primo.af)`,
           // },
-        ]
+        ];
 
         function getSiteHTML(site) {
           const symbolHTML = site.symbols
             .map((symbol) => symbol.value.html)
-            .join(' ')
+            .join(" ");
           const componentHTML = flattenDeep(
             site.pages.map((page) =>
               page.content
                 .filter(
-                  (block) => block.type === 'component' && !block.symbolID
+                  (block) => block.type === "component" && !block.symbolID
                 )
                 .map((block) => block.value.html)
             )
-          ).join(' ')
-          return symbolHTML + componentHTML
+          ).join(" ");
+          return symbolHTML + componentHTML;
         }
       }
     }
 
-    pages = []
+    pages = [];
   }
 
-  let published = false
-  let connectingHost = false
-  let errorMessage = null
+  let published = false;
+  let connectingHost = false;
+  let errorMessage = null;
 
-  let pages = []
+  let pages = [];
   async function detectDifferences() {
     // pull in original site and draft
     // const [oldVersions, newVersions] = [
@@ -460,7 +398,7 @@
     // pages = [...deletedPages, ...updatedPages]
     // include pages that are not the same as their original source
   }
-  detectDifferences()
+  detectDifferences();
 
   // save site depolyment in supa
   // show recent deployments only from project
