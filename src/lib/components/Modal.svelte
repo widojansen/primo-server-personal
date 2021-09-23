@@ -4,10 +4,9 @@
   export const type = writable({
     id: null,
     props: {},
-  });
-
-  export const options = writable({
-    disableClose: false,
+    options: {
+      disableClose: false,
+    },
   });
 
   export const visible = writable(false);
@@ -38,11 +37,13 @@
   import CreateSite from "./Modals/CreateSite.svelte";
   import UserSettings from "./Modals/UserSettings.svelte";
   import Authentication from "./Modals/Authentication.svelte";
+  import Collaboration from "./Modals/Collaboration.svelte";
 
   const modals = {
     AUTH: Authentication,
     SITE_CREATION: CreateSite,
     USER_SETTINGS: UserSettings,
+    COLLABORATION: Collaboration,
   };
 
   let activeModal = modals[$type.id];
@@ -53,7 +54,7 @@
   }
 
   async function hideModal() {
-    if ($options.disableClose) return;
+    if ($type.options?.disableClose) return;
     $visible = false;
   }
 </script>
@@ -63,7 +64,7 @@
     <div
       class="modal-background"
       on:click={hideModal}
-      class:disabled={$options.disableClose}
+      class:disabled={$type.options?.disableClose}
     />
     <div class="modal-card">
       <div class="modal-card-body">
@@ -81,7 +82,7 @@
     justify-content: center;
     overflow: hidden;
     position: fixed;
-    z-index: 99999;
+    z-index: 9999999999;
     inset: 0;
   }
 

@@ -22,6 +22,18 @@ export async function uploadPagePreview({ path, preview }) {
   return res
 }
 
+export async function updatePagePreview({ path, preview }) {
+  const blob = new Blob([preview], {type: 'text/plain'});
+  let res = await supabase
+    .storage
+    .from(bucketID)
+    .update(path, blob, {
+      upsert: true
+    })
+
+  return res
+}
+
 export async function uploadSiteData({ id, data }) {
   const json = JSON.stringify(data)
   const blob = new Blob([json], {type: 'text/plain'});
@@ -29,6 +41,18 @@ export async function uploadSiteData({ id, data }) {
     .storage
     .from(bucketID)
     .upload(`${id}/site.json`, blob, {
+      upsert: true
+    })
+  return res
+}
+
+export async function updateSiteData({ id, data }) {
+  const json = JSON.stringify(data)
+  const blob = new Blob([json], {type: 'text/plain'});
+  const res = await supabase
+    .storage
+    .from(bucketID)
+    .update(`${id}/site.json`, blob, {
       upsert: true
     })
   return res

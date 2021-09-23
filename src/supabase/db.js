@@ -1,17 +1,4 @@
 import supabase from './core'
-import {omitBy,isNil} from 'lodash-es'
-
-export async function createSite() {
-  const { data, error } = await supabase
-    .from('sites')
-    .insert([
-      { name: 'Test Name', repository : 'bb8ac5dd-37dd-4503-8ba0-69c55270e86e' }
-    ])
-}
-
-export async function createAccount(userUID) {
-  const user = await users.get(userUID)
-}
 
 export async function acceptInvitation(pass, userID) {
   const {data,error} = await supabase
@@ -204,7 +191,6 @@ export const users = {
     return data
   },
   create: async ({ email }) => {
-
     const { data, error } = await supabase
       .from('users')
       .insert([ { email } ], {

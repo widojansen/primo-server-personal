@@ -1,4 +1,5 @@
 <script>
+  import "$lib/assets/reset.css";
   import { browser } from "$app/env";
   import { goto } from "$app/navigation";
   import { registerProcessors } from "@primo-app/primo";
@@ -34,6 +35,9 @@
   $: if (!$user.signedIn) {
     show({
       id: "AUTH",
+      options: {
+        disableClose: true,
+      },
       props: {
         onSignIn: () => {
           hide();

@@ -75,17 +75,6 @@
     },
   ]);
 
-  let role = "developer";
-
-  // if (!$user.signedIn) {
-  //   modal.show('AUTH', {
-  //     onSignIn: () => {
-  //       modal.hide()
-  //       fetchSite($router.path)
-  //     },
-  //   })
-  // }
-
   // $activeSite = createNewSite({ name: 'Default Site' })
 
   let currentPath;
@@ -154,7 +143,7 @@
 
 <Primo
   {data}
-  {role}
+  role={$user.role}
   {saving}
   on:save={async ({ detail: data }) => saveData(data)}
 />

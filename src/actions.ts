@@ -6,7 +6,7 @@ import { buildStaticPage } from '@primo-app/primo/src/stores/helpers'
 
 export const sites = {
   initialize: async () => {
-    const sites = await supabaseDB.sites.get({query: `id, name, owner`})
+    const sites = await supabaseDB.sites.get({query: `id, name, owner, collaborators, password`})
     if (sites) {
       stores.sites.set(sites)
     }
@@ -25,18 +25,19 @@ export const sites = {
       })
     ])
   },
+  update: async (id, props) => {
+    await supabaseDB.sites.update(id, props)
+  },
   save: async (updatedSite) => {
     stores.sites.update(sites => sites.map(site => site.id === updatedSite.id ? updatedSite : site))
     const homepage = find(updatedSite.pages, ['id', 'index'])
-    console.log({homepage})
     const preview = await buildStaticPage({ page: homepage, site: updatedSite })
-    console.log({preview})
     await Promise.all([
-      supabaseStorage.uploadSiteData({
+      supabaseStorage.updateSiteData({
         id: updatedSite.id,
         data: updatedSite
       }),
-      supabaseStorage.uploadPagePreview({
+      supabaseStorage.updatePagePreview({
         path: `${updatedSite.id}/preview.html`,
         preview
       })
@@ -45,6 +46,10 @@ export const sites = {
   delete: async (id) => {
     stores.sites.update(sites => sites.filter(s => s.id !== id))
     await supabaseDB.sites.delete(id)
+  },
+  validatePassword: async (password, siteID) => {
+    const res = await supabaseDB.sites.get({ id: siteID, query: `password` })
+    return res.password == password
   }
 }
 

@@ -3,10 +3,11 @@
   import { fade } from "svelte/transition";
   import auth from "../../../supabase/auth";
   // import { acceptSiteInvitation } from "../../../supabase/middleware";
-  import { addSiteToUser } from "../../../supabase/helpers";
+  import * as actions from "../../../actions";
+  // import { addSiteToUser } from "../../../supabase/helpers";
   import { createUser } from "../../../supabase/helpers";
   import { stores } from "@primo-app/primo";
-  import { router } from "tinro";
+  import { page } from "$app/stores";
 
   import Spinner from "$lib/ui/Spinner.svelte";
   import PrimaryButton from "$lib/ui/PrimaryButton.svelte";
@@ -17,48 +18,35 @@
 
   let loading;
 
-  let collabPass = $router.query.pass;
-  $: collabPass &&
-    (headerMessage = `You've been invited to collaborate on this site. Sign in or create an account to continue.`);
+  let collaboratorPassword = $page.query.get("password");
+  let collaboratorRole = $page.query.get("role");
+  if (collaboratorPassword) {
+    signInWithPassword();
+  }
 
-  async function handleInvitation() {
-    loading = true;
-    const success = await joinSite(collabPass);
-    if (success) {
-      loginMessage = `Successfully logged in, adding you as a collaborator`;
-      window.history.replaceState(null, null, window.location.pathname); // remove query manually because router.location.query.clear() isn't working
-      setTimeout(() => {
-        collabPass = null;
-      }, 2000);
-    } else {
-      loginMessage = `That link appears to be expired or invalid. Try asking the site owner to send you a fresh one.`;
+  $: if ($user.signedIn) {
+    onSignIn();
+  }
+
+  async function signInWithPassword() {
+    const validated = await actions.sites.validatePassword(
+      collaboratorPassword,
+      $page.params.site
+    );
+    if (validated) {
+      user.update((u) => ({
+        ...u,
+        role: collaboratorRole,
+        signedIn: true,
+        isAnyonymouns: true,
+      }));
     }
   }
-
-  async function joinSite(password) {
-    // TODO
-    // const [owner, url] = $router.path.substring(1).split("/");
-    // const res = await acceptSiteInvitation({
-    //   password,
-    //   uid: $user.uid,
-    //   owner,
-    //   url,
-    // });
-    // if (res) {
-    //   const { role, siteID } = res;
-    //   stores.$userRole = role === "DEV" ? "developer" : "content";
-    //   await addSiteToUser($user.uid, siteID);
-    //   return true;
-    // } else return false;
-  }
-
-  let collaboratorPass;
 
   let loginMessage;
   let headerMessage;
   let loginError;
-  let loadingEmail,
-    loadingProvider = false;
+  let loadingEmail;
 
   let email,
     password = "";
@@ -79,12 +67,6 @@
     loadingEmail = false;
   }
 
-  async function signUpWithProvider() {
-    // window.plausible(`Signing up with Github`)
-    loadingProvider = true;
-    auth.signInWithGithub({ redirectTo: window.location.href });
-  }
-
   async function signIn() {
     // window.plausible(`Signing In`, { props: { email } })
     loginError = "";
@@ -100,8 +82,6 @@
         user.update((u) => ({ ...u, ...res }));
       }
     }
-
-    loadingEmail = false;
   }
 
   async function resetPassword() {
@@ -113,16 +93,8 @@
     }
   }
 
-  $: if ($user.signedIn && collabPass) {
-    handleInvitation();
-  } else if ($user.signedIn) {
-    onSignIn();
-  }
-
   let mounted;
-  onMount(() => {
-    mounted = true;
-  });
+  onMount(() => (mounted = true));
 
   let signingUp = false;
 </script>
@@ -188,31 +160,30 @@
           {#key signInWithMagicLink}
             <PrimaryButton
               disabled={disabled || loadingEmail}
+              loading={loadingEmail}
               on:click={signingUp ? signUp : signIn}
               type="submit"
             >
-              {#if loadingEmail}
-                <Spinner />
-              {:else}
-                <svg
-                  class=""
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                  ><path
-                    d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"
-                  /><path
-                    d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"
-                  /></svg
-                >
-              {/if}
-              {#if signingUp}
-                <span>Sign up with Email</span>
-              {:else if signInWithMagicLink}
-                <span>Sign in with magic link</span>
-              {:else}
-                <span>Sign in</span>
-              {/if}
+              <svg
+                slot="icon"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+                ><path
+                  d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"
+                /><path
+                  d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"
+                /></svg
+              >
+              <span slot="label">
+                {#if signingUp}
+                  <span>Sign up with Email</span>
+                {:else if signInWithMagicLink}
+                  <span>Sign in with magic link</span>
+                {:else}
+                  <span>Sign in</span>
+                {/if}
+              </span>
             </PrimaryButton>
           {/key}
           <div class="secondary">

@@ -15,9 +15,9 @@ export async function createUser({ email, password }) {
   }
 }
 
-export async function addSiteToUser(uid, siteID) {
-  const {websites} = await users.get(uid, 'sites')
-  await users.update(uid, {
-    websites: websites ? [ ...websites, siteID ] : [siteID]
-  })
-}
+// export async function addSiteToUser(uid, siteID) {
+//   const {websites} = await users.get(uid, 'sites')
+//   await users.update(uid, {
+//     websites: websites ? [ ...websites, siteID ] : [siteID]
+//   })
+// }

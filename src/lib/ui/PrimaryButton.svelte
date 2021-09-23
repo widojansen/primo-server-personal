@@ -1,21 +1,26 @@
 <script>
-  import Spinner from '$lib/ui/Spinner.svelte'
+  import Spinner from "$lib/ui/Spinner.svelte";
 
-  export let label = ''
-  export let id = null
-  export let variants = ''
-  export let type = 'button'
-  export let disabled = false
-  export let loading = false
+  export let label = "";
+  export let id = null;
+  export let variants = "";
+  export let type = "button";
+  export let disabled = false;
+  export let loading = false;
 </script>
 
-{#if type === 'input'}
+{#if type === "input"}
   <label for="primo-json" class={variants}>
     {#if loading}
       <Spinner />
-    {:else}
-      <slot>{label}</slot>
     {/if}
+    <span class:hidden={loading}>
+      <slot name="icon" />
+    </span>
+    <slot name="label" />
+    <slot>
+      <span class:hidden={loading}>{label}</span>
+    </slot>
     <input on:change type="file" id="primo-json" accept=".json" />
   </label>
 {:else}
@@ -29,9 +34,14 @@
   >
     {#if loading}
       <Spinner />
-    {:else}
-      <slot>{label}</slot>
     {/if}
+    <span class:hidden={loading}>
+      <slot name="icon" />
+    </span>
+    <slot name="label" />
+    <slot>
+      <span class:hidden={loading}>{label}</span>
+    </slot>
   </button>
 {/if}
 
@@ -65,6 +75,10 @@
   }
 
   label input {
+    display: none;
+  }
+
+  .hidden {
     display: none;
   }
 </style>

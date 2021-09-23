@@ -1,6 +1,5 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import "$lib/assets/reset.css";
   import SignInNav from "$lib/components/SignInNav.svelte";
   import SiteFooter from "$lib/components/SiteFooter.svelte";
   import SiteThumbnail from "$lib/components/SiteThumbnail.svelte";
@@ -12,7 +11,12 @@
   // mixpanel.track('Dashboard')
 
   function beginInvitation(site): void {
-    // modal.show('INVITATION', { site })
+    show({
+      id: "COLLABORATION",
+      props: {
+        site,
+      },
+    });
   }
 
   let loading;
@@ -37,9 +41,15 @@
     $sites = $sites.filter((site) => site.id !== siteID);
   }
 
+  async function editSite(site) {
+    actions.sites.update(site.id, {
+      name: site.name,
+    });
+  }
+
   let siteBeingEdited;
   function showCollaborators(site) {
-    // modal.show('COLLABORATORS', { site })
+    // modal.show("COLLABORATORS", { site });
   }
 </script>
 
@@ -72,7 +82,12 @@
           <div class="site-info">
             <div class="site-name">
               {#if siteBeingEdited === site.id}
-                <form on:submit|preventDefault={() => (siteBeingEdited = null)}>
+                <form
+                  on:submit|preventDefault={() => {
+                    editSite(site);
+                    siteBeingEdited = null;
+                  }}
+                >
                   <input
                     on:blur={() => (siteBeingEdited = null)}
                     autofocus
@@ -104,7 +119,7 @@
             <span class="site-url">{site.id}</span>
             <div class="buttons">
               <div class="button-group">
-                {#if site.collaborators}
+                <!-- {#if site.collaborators}
                   <button
                     class="collaborators"
                     on:click={() => showCollaborators(site)}
@@ -120,23 +135,23 @@
                       />
                     </svg>
                   </button>
-                {/if}
-                <!-- <button on:click={() => beginInvitation(site)}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                  />
-                </svg>
-                <span>Invite</span>
-              </button> -->
+                {/if} -->
+                <button on:click={() => beginInvitation(site)}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                    />
+                  </svg>
+                  <span>Invite</span>
+                </button>
               </div>
               <button
                 class="delete-link"
