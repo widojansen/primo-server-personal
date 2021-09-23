@@ -8,3 +8,4 @@ public/preview/**/*
 public/build
 public/bundle.js
 public/bundle.js.map
+.svelte-kit

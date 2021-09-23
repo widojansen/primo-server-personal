@@ -218,10 +218,9 @@ export const users = {
 
 export const hosts = {
   get: async (id) => {
-    let {data,error} = await supabase
+    const {data,error} = await supabase
       .from('hosts')
       .select('*')
-      // .filter('id', 'eq', id)
     if (error) {
       console.error(error)
       return null
@@ -239,5 +238,30 @@ export const hosts = {
       return null
     }
     return data[0]
+  }
+}
+
+export const config = {
+  get: async (id) => {
+    const {data,error} = await supabase
+      .from('config')
+      .select('*')
+      .eq('id', id)
+    if (error) {
+      console.error(error)
+      return null
+    }
+    return data[0]['value']
+  },
+  update: async (id, value) => {
+    const { data, error } = await supabase
+      .from('config')
+      .update({ value })
+      .eq('id', id)
+    if (error) {
+      console.error(error)
+      return null
+    }
+    return data[0] ? true : false
   }
 }

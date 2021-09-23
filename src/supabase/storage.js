@@ -11,11 +11,10 @@ export async function downloadPagePreview(id) {
 }
 
 export async function uploadPagePreview({ path, preview }) {
-  const blob = new Blob([preview], {type: 'text/plain'});
   let res = await supabase
     .storage
     .from(bucketID)
-    .upload(path, blob, {
+    .upload(path, preview, {
       upsert: true
     })
 
@@ -23,11 +22,10 @@ export async function uploadPagePreview({ path, preview }) {
 }
 
 export async function updatePagePreview({ path, preview }) {
-  const blob = new Blob([preview], {type: 'text/plain'});
   let res = await supabase
     .storage
     .from(bucketID)
-    .update(path, blob, {
+    .update(path, preview, {
       upsert: true
     })
 
@@ -36,11 +34,10 @@ export async function updatePagePreview({ path, preview }) {
 
 export async function uploadSiteData({ id, data }) {
   const json = JSON.stringify(data)
-  const blob = new Blob([json], {type: 'text/plain'});
   const res = await supabase
     .storage
     .from(bucketID)
-    .upload(`${id}/site.json`, blob, {
+    .upload(`${id}/site.json`, json, {
       upsert: true
     })
   return res
@@ -48,11 +45,10 @@ export async function uploadSiteData({ id, data }) {
 
 export async function updateSiteData({ id, data }) {
   const json = JSON.stringify(data)
-  const blob = new Blob([json], {type: 'text/plain'});
   const res = await supabase
     .storage
     .from(bucketID)
-    .update(`${id}/site.json`, blob, {
+    .update(`${id}/site.json`, json, {
       upsert: true
     })
   return res

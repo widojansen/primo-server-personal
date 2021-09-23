@@ -1,45 +1,42 @@
 <script>
-  import { fade, slide } from 'svelte/transition'
+  import { onMount } from "svelte";
+  import { createUniqueID } from "@primo-app/primo/src/utilities";
+  import Tabs from "$lib/ui/Tabs.svelte";
+  import PrimaryButton from "$lib/ui/PrimaryButton.svelte";
+  import CopyButton from "$lib/ui/CopyButton.svelte";
+  import Hosting from "../Hosting.svelte";
+  import * as supabaseDB from "../../../supabase/db";
 
-  import Tabs from '$lib/ui/Tabs.svelte'
-  import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
-  import TextField from '$lib/ui/TextField.svelte'
-  import { makeValidUrl } from '$lib/utils'
-  import config from '../../../stores/config'
-  import Hosting from '../Hosting.svelte'
-
-  let tabs = [
-    // {
-    //   label: 'Profile',
-    //   icon: 'home',
-    // },
+  const tabs = [
     {
-      label: 'Hosting',
-      icon: 'server',
+      label: "Hosting",
+      icon: "globe",
     },
     {
-      label: 'Advanced',
-      icon: 'cog',
+      label: "Server",
+      icon: "server",
     },
-  ]
-  let activeTab = tabs[0]
+  ];
+  let activeTab = tabs[0];
 
-  async function selectDirectory() {
-    // const dir = await window.primo.config.selectDirectory()
-    // if (dir) {
-    //   $config = {
-    //     ...$config,
-    //     saveDir: dir,
-    //   }
-    //   window.location.reload()
-    // }
+  let token = null;
+  async function createToken() {
+    const tokenToSet = createUniqueID(25).toUpperCase();
+    const success = await supabaseDB.config.update("server-token", tokenToSet);
+    if (success) {
+      token = tokenToSet;
+    }
   }
+
+  onMount(async () => {
+    token = await supabaseDB.config.get("server-token");
+  });
 </script>
 
 <main>
   <Tabs {tabs} bind:activeTab />
   <div class="content-container">
-    {#if activeTab.label === 'Hosting'}
+    {#if activeTab.label === "Hosting"}
       <h1 class="primo-heading-lg">
         Hosting <span
           >Connect to your favorite webhost to publish your primo sites to the
@@ -47,14 +44,27 @@
         >
       </h1>
       <Hosting showDetails={false} />
-    {:else if activeTab.label === 'Advanced'}
-      <h1 class="primo-heading-lg">Advanced</h1>
+    {:else if activeTab.label === "Server"}
+      <h1 class="primo-heading-lg">
+        Primo Server
+        {#if token}
+          <span
+            >Paste your token into Primo Desktop to manage your sites from
+            there. Note that creating a new token will invalidate the current
+            one.</span
+          >
+        {:else}
+          <span>Create an token to manage your sites from your desktop</span>
+        {/if}
+      </h1>
       <div>
-        <h2>Save directory</h2>
-        <span>{$config.saveDir}</span>
-        <PrimaryButton on:click={selectDirectory}
-          >Select directory</PrimaryButton
-        >
+        {#if token}
+          <CopyButton label={token} />
+          <button on:click={createToken}>Create New Token</button>
+          <!-- <PrimaryButton on:click={createToken}></PrimaryButton> -->
+        {:else}
+          <PrimaryButton on:click={createToken}>Create Token</PrimaryButton>
+        {/if}
       </div>
     {/if}
   </div>
@@ -72,6 +82,12 @@
       font-size: 0.75rem;
       color: var(--color-gray-4);
     }
+  }
+  button {
+    font-size: 0.75rem;
+    margin: 1rem 0;
+    text-decoration: underline;
+    color: var(--color-gray-4);
   }
   main {
     color: var(--color-gray-1);
