@@ -1,102 +1,102 @@
 <script>
-  import { onMount } from "svelte";
-  import { fade } from "svelte/transition";
-  import auth from "../../../supabase/auth";
+  import { onMount } from 'svelte'
+  import { fade } from 'svelte/transition'
+  import auth from '../../../supabase/auth'
   // import { acceptSiteInvitation } from "../../../supabase/middleware";
-  import * as actions from "../../../actions";
+  import * as actions from '../../../actions'
   // import { addSiteToUser } from "../../../supabase/helpers";
-  import { createUser } from "../../../supabase/helpers";
-  import { stores } from "@primo-app/primo";
-  import { page } from "$app/stores";
+  import { createUser } from '../../../supabase/helpers'
+  import { stores } from '@primo-app/primo'
+  import { page } from '$app/stores'
 
-  import Spinner from "$lib/ui/Spinner.svelte";
-  import PrimaryButton from "$lib/ui/PrimaryButton.svelte";
-  import Logo from "$lib/ui/Logo.svelte";
-  import user from "../../../stores/user";
+  import Spinner from '$lib/ui/Spinner.svelte'
+  import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
+  import Logo from '$lib/ui/Logo.svelte'
+  import user from '../../../stores/user'
 
-  export let onSignIn = () => {};
+  export let onSignIn = () => {}
 
-  let loading;
+  let loading
 
-  let collaboratorPassword = $page.query.get("password");
-  let collaboratorRole = $page.query.get("role");
+  let collaboratorPassword = $page.query.get('password')
+  let collaboratorRole = $page.query.get('role')
   if (collaboratorPassword) {
-    signInWithPassword();
+    signInWithPassword()
   }
 
   $: if ($user.signedIn) {
-    onSignIn();
+    onSignIn()
   }
 
   async function signInWithPassword() {
     const validated = await actions.sites.validatePassword(
       collaboratorPassword,
       $page.params.site
-    );
+    )
     if (validated) {
       user.update((u) => ({
         ...u,
         role: collaboratorRole,
         signedIn: true,
         isAnyonymouns: true,
-      }));
+      }))
     }
   }
 
-  let loginMessage;
-  let headerMessage;
-  let loginError;
-  let loadingEmail;
+  let loginMessage
+  let headerMessage
+  let loginError
+  let loadingEmail
 
   let email,
-    password = "";
-  $: signInWithMagicLink = !signingUp && email && !password;
-  $: disabled = !signInWithMagicLink && (!email || password.length <= 3);
+    password = ''
+  $: signInWithMagicLink = !signingUp && email && !password
+  $: disabled = !signInWithMagicLink && (!email || password.length <= 3)
 
   async function signUp() {
     // window.plausible(`Signing up with Email`, { props: { email } })
-    loadingEmail = true;
-    loginError = null;
-    loginMessage = null;
-    const res = await createUser({ email, password });
+    loadingEmail = true
+    loginError = null
+    loginMessage = null
+    const res = await createUser({ email, password })
     if (res.error) {
-      loginError = res.error;
+      loginError = res.error
     } else {
-      console.log({ res });
+      console.log({ res })
     }
-    loadingEmail = false;
+    loadingEmail = false
   }
 
   async function signIn() {
     // window.plausible(`Signing In`, { props: { email } })
-    loginError = "";
-    loadingEmail = true;
+    loginError = ''
+    loadingEmail = true
 
     if (!$user.signedIn) {
-      const { error, user: res } = await auth.signIn({ email, password });
+      const { error, user: res } = await auth.signIn({ email, password })
       if (error) {
-        loginError = error.message;
+        loginError = error.message
       } else if (signInWithMagicLink) {
-        loginMessage = `A magic link has been sent to <strong>${email}</strong>.<br>When you click on it, you'll be logged into primo.`;
+        loginMessage = `A magic link has been sent to <strong>${email}</strong>.<br>When you click on it, you'll be logged into primo.`
       } else if (res) {
-        user.update((u) => ({ ...u, ...res }));
+        user.set(res)
       }
     }
   }
 
   async function resetPassword() {
-    const { error } = await auth.resetPassword(email);
+    const { error } = await auth.resetPassword(email)
     if (error) {
-      loginError = error.message;
+      loginError = error.message
     } else {
-      loginMessage = `A link has been sent to <strong>${email}</strong> with instructions to reset your password`;
+      loginMessage = `A link has been sent to <strong>${email}</strong> with instructions to reset your password`
     }
   }
 
-  let mounted;
-  onMount(() => (mounted = true));
+  let mounted
+  onMount(() => (mounted = true))
 
-  let signingUp = false;
+  let signingUp = false
 </script>
 
 {#key signingUp}
@@ -194,13 +194,13 @@
             {/if}
             <button
               on:click={() => {
-                signingUp = !signingUp;
-                loginError = ``;
+                signingUp = !signingUp
+                loginError = ``
               }}
               type="button"
               class="switch"
             >
-              {signingUp ? "Sign in" : "Sign up"}
+              {signingUp ? 'Sign in' : 'Sign up'}
             </button>
           </div>
         </form>

@@ -1,4 +1,5 @@
 import preprocess from 'svelte-preprocess';
+import adapter from '@sveltejs/adapter-static';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -8,18 +9,28 @@ const config = {
     postcss: true
   }),
 	kit: {
+		adapter: adapter({
+      fallback: 'index.html'
+    }),
     ssr: false,
 		// hydrate the <div id="svelte"> element in src/app.html
 		target: '#svelte',
     vite: {
       server: {
-        force: true,
-      },
-      build: {
-        sourcemap: true,
-        outDir: 'public'
+        fs: {
+          // throws an error without this when importing Fira font
+          allow: ['..', 'node_modules/@fontsource/fira-code']
+        }
       }
     }
+    // vite: {
+    //   server: {
+    //     force: true,
+    //   },
+    //   build: {
+    //     sourcemap: true
+    //   }
+    // }
 	}
 };
 

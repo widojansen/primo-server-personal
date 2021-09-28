@@ -9,7 +9,6 @@ export const User = (user = {
   githubUsername: null,
   githubID: null,
   hosts: null,
-  role: null,
   signedIn: false
   // domains: []
 }) => ({
@@ -21,7 +20,7 @@ export const User = (user = {
   type: user.type || 'email',
   githubUsername: user.githubUsername,
   githubID: user.githubID,
-  role: user.role,
+  role: ['developer', 'content'].includes(user.role) ? user.role : 'developer',
   signedIn: user.signedIn,
   // domains
 })

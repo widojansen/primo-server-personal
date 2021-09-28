@@ -1,53 +1,51 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
-  import SignInNav from "$lib/components/SignInNav.svelte";
-  import SiteFooter from "$lib/components/SiteFooter.svelte";
-  import SiteThumbnail from "$lib/components/SiteThumbnail.svelte";
-  import { show, hide } from "$lib/components/Modal.svelte";
-  import sites from "../stores/sites";
-  import * as actions from "../actions";
+  import { goto } from '$app/navigation'
+  import SignInNav from '$lib/components/SignInNav.svelte'
+  import SiteFooter from '$lib/components/SiteFooter.svelte'
+  import SiteThumbnail from '$lib/components/SiteThumbnail.svelte'
+  import { show, hide } from '$lib/components/Modal.svelte'
+  import sites from '../stores/sites'
+  import * as actions from '../actions'
   // import mixpanel from 'mixpanel-browser'
 
   // mixpanel.track('Dashboard')
 
   function beginInvitation(site): void {
     show({
-      id: "COLLABORATION",
+      id: 'COLLABORATION',
       props: {
         site,
       },
-    });
+    })
   }
 
-  let loading;
+  let loading
   function createSite(): void {
     show({
-      id: "SITE_CREATION",
+      id: 'SITE_CREATION',
       props: {
         onSuccess: (site) => {
-          actions.sites.create(site);
-          goto(site.id);
-          hide();
+          actions.sites.create(site)
+          goto(site.id)
+          hide()
         },
       },
-    });
+    })
   }
 
   async function deleteSiteItem(siteID: string): Promise<any> {
-    const confirm = window.confirm(
-      "Are you sure you want to delete this site?"
-    );
-    if (!confirm) return;
-    $sites = $sites.filter((site) => site.id !== siteID);
+    const confirm = window.confirm('Are you sure you want to delete this site?')
+    if (!confirm) return
+    $sites = $sites.filter((site) => site.id !== siteID)
   }
 
   async function editSite(site) {
     actions.sites.update(site.id, {
       name: site.name,
-    });
+    })
   }
 
-  let siteBeingEdited;
+  let siteBeingEdited
   function showCollaborators(site) {
     // modal.show("COLLABORATORS", { site });
   }
@@ -84,8 +82,8 @@
               {#if siteBeingEdited === site.id}
                 <form
                   on:submit|preventDefault={() => {
-                    editSite(site);
-                    siteBeingEdited = null;
+                    editSite(site)
+                    siteBeingEdited = null
                   }}
                 >
                   <input

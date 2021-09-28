@@ -1,26 +1,26 @@
 <script>
-  import Spinner from "$lib/ui/Spinner.svelte";
-  import { downloadPagePreview } from "../../supabase/storage";
+  import Spinner from '$lib/ui/Spinner.svelte'
+  import { downloadPagePreview } from '../../supabase/storage'
 
-  export let site = null;
-  export let preview = null;
+  export let site = null
+  export let preview = null
 
-  let container;
-  let scale;
-  let iframe;
-  let iframeLoaded;
+  let container
+  let scale
+  let iframe
+  let iframeLoaded
 
   function resizePreview() {
-    const { clientWidth: parentWidth } = container;
-    const { clientWidth: childWidth } = iframe;
-    scale = parentWidth / childWidth;
+    const { clientWidth: parentWidth } = container
+    const { clientWidth: childWidth } = iframe
+    scale = parentWidth / childWidth
   }
 
   async function getPreview() {
-    preview = await downloadPagePreview(site.id);
+    preview = await downloadPagePreview(site.id)
   }
   if (!preview) {
-    getPreview();
+    getPreview()
   }
 </script>
 
@@ -40,8 +40,8 @@
         title="page preview"
         srcdoc={preview}
         on:load={() => {
-          resizePreview();
-          iframeLoaded = true;
+          resizePreview()
+          iframeLoaded = true
         }}
       />
     {/if}
