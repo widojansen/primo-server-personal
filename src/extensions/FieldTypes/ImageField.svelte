@@ -1,140 +1,315 @@
 <script>
   import axios from 'axios'
-  import { createEventDispatcher, onMount } from 'svelte'
+  import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher()
+  // import { Spinner } from '../../@components/misc'
+  // import Compressor from 'compressorjs'
+  // import { uploadSiteImage, downloadSiteImage } from '../../supabase/storage'
+  // import imageCompression from 'browser-image-compression'
+  // import { user, currentSite } from '../../stores'
+  // import { convertBlobToBase64 } from '../../utils'
 
-  import {saveFileToRepo} from '../../utilities'
-  import {user,repo} from '../../stores'
-  import {Spinner} from '../../@components/misc'
+  const defaultValue = {
+    alt: '',
+    url: '',
+    src: '',
+    size: null,
+  }
 
-  export let field
+  export let field = {
+    value: defaultValue,
+  }
 
-  if (typeof field.value === 'string') {
+  if (typeof field.value === 'string' || !field.value) {
+    field.value = defaultValue
+  }
+
+  function setValue({ url, size }) {
     field.value = {
-      alt: '',
-      url: field.value,
-      size: null,
+      ...field.value,
+      url: url,
+      src: url,
+      size,
     }
   }
 
-  function encodeImageFileAsURL(e) {
-    var filesSelected = imageUploader.files;
-    if (filesSelected.length > 0) {
-      uploading = true
-      const file = filesSelected[0]
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(file);
-      fileReader.onload = async function(fileLoadedEvent) {
-        const dataUrl = fileLoadedEvent.target.result
-        imagePreview = dataUrl
-        
-        const b64 = dataUrl.replace(/data:image\/(png|jpg|jpeg);base64,/,'')
+  async function encodeImageFileAsURL({ target }) {
+    loading = true
+    const { files } = target
+    if (files.length > 0) {
+      const file = files[0]
 
-        const data = await saveFileToRepo({
-          repo: $repo,
-          name: 'assets/'+file.name,
-          content: b64,
-          token: $user.githubToken,
-          message: 'upload image'
+      if (file.type === 'image/svg+xml' && file.size / 1000 <= 250) {
+        // SVGs smaller than 250kb get saved directly
+        // const imageKey = await uploadSiteImage({
+        //   owner: $user.uid,
+        //   id: $currentSite,
+        //   file,
+        // })
+        // const primoImageKey = `primo:${imageKey}`
+        // const dataUri = await convertSvgToDataUri(file)
+        // imagePreview = dataUri
+        // setValue({ url: primoImageKey, size: Math.round(file.size / 1000) })
+      } else {
+        // const compressed = await imageCompression(file, {
+        //   maxSizeMB: 0.25, // (default: Number.POSITIVE_INFINITY)
+        // })
+        // const imageKey = await uploadSiteImage({
+        //   owner: $user.uid,
+        //   id: $currentSite,
+        //   file: compressed,
+        // })
+        // const primoImageKey = `primo:${imageKey}`
+        // const b64 = await convertBlobToBase64(compressed)
+        // imagePreview = b64
+        // setValue({
+        //   url: primoImageKey,
+        //   size: Math.round(compressed.size / 1000),
+        // })
+      }
+
+      loading = false
+      dispatch('input')
+
+      async function convertSvgToDataUri(file) {
+        const reader = new FileReader()
+        return new Promise((resolve, reject) => {
+          reader.readAsDataURL(file)
+          reader.addEventListener(
+            'load',
+            () => {
+              resolve(reader.result)
+            },
+            false
+          )
         })
-
-        // const res = await axios.put(`https://api.github.com/repos/${$repo}/contents/assets/${file.name}?access_token=${$user.githubToken}`, {
-        //   message: `upload image`,
-        //   content: b64
-        // }).catch(e => console.error(e))
-        if (data) {
-          const {download_url:url, sha, size} = data.content
-          field.value = {
-            ...field.value,
-            url,
-            size: Math.round(size / 1000)
-          }
-          dispatch('input')
-        } else {
-          alert('Could not upload image. Ensure it is a png or jpg and another image with the same name does not already exist in the repository.')
-        }
-
-        uploading = false
-
       }
     }
   }
 
-  let imagePreview = field.value.url
-  let uploading = false
-  let imageUploader
-  
+  async function hydratePreview() {
+    // const imageKey = field.value.url.slice(12)
+    // const file = await downloadSiteImage(imageKey)
+    // const b64 = await convertBlobToBase64(file)
+    // imagePreview = b64
+  }
+
+  let imagePreview = field.value.url || ''
+  let loading = false
+
+  $: if (imagePreview.startsWith('primo:')) hydratePreview()
 </script>
 
-<div class="flex flex-col">
-  <span class="text-xl">{field.label}</span>
-  <div class="flex h-24">
-    <div class="image-preview" class:uploading role="img" style="background-image:url('{imagePreview}')" >
-      {#if uploading}
-        <Spinner />
-      {/if}
-      {#if field.value.size}
-        <span class="bg-gray-100 text-gray-500 absolute top-0 right-0 p-1 text-xs font-semibold" style="border-bottom-left-radius: 0.25rem;">
-          {field.value.size}KB
-        </span>
-      {/if}
-    </div>
-    <div class="flex flex-col w-full">
-      <div class="image-upload hover:bg-gray-200">
-        <label for="image-{field.id}" class="cursor-pointer flex flex-col text-gray-800 font-semibold text-center items-center justify-center absolute top-0 bottom-0 left-0 right-0">
-          <i class="fas fa-file-upload"></i>
-          <span>Select an image</span>
-        </label>
-        <input 
-          on:change={encodeImageFileAsURL}
-          class="invisible" 
-          id="image-{field.id}" 
-          bind:this={imageUploader}
-          type="file" 
-          accept="image/*" />
+<div>
+  <span class="field-label">{field.label}</span>
+  <div class="image-info">
+    {#if loading}
+      <div class="spinner-container">
+        <!-- <Spinner /> -->
       </div>
-      <label class="p-2 flex text-sm bg-gray-100 border-t border-gray-200">
-        <span class="px-2">URL</span>
-        <input 
+    {:else}
+      <div class="image-preview">
+        {#if field.value.size}
+          <span class="field-size">
+            {field.value.size}KB
+          </span>
+        {/if}
+        {#if field.value.url}
+          <img src={imagePreview} alt="Image preview" />
+        {/if}
+        <label class="image-upload">
+          <svg
+            version="1.1"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            x="0px"
+            y="0px"
+            viewBox="0 0 512.056 512.056"
+            style="enable-background:new 0 0 512.056 512.056;"
+            xml:space="preserve"
+          >
+            <g>
+              <g>
+                <g>
+                  <path
+                    fill="currentColor"
+                    d="M426.635,188.224C402.969,93.946,307.358,36.704,213.08,60.37C139.404,78.865,85.907,142.542,80.395,218.303
+                  C28.082,226.93-7.333,276.331,1.294,328.644c7.669,46.507,47.967,80.566,95.101,80.379h80v-32h-80c-35.346,0-64-28.654-64-64
+                  c0-35.346,28.654-64,64-64c8.837,0,16-7.163,16-16c-0.08-79.529,64.327-144.065,143.856-144.144
+                  c68.844-0.069,128.107,48.601,141.424,116.144c1.315,6.744,6.788,11.896,13.6,12.8c43.742,6.229,74.151,46.738,67.923,90.479
+                  c-5.593,39.278-39.129,68.523-78.803,68.721h-64v32h64c61.856-0.187,111.848-50.483,111.66-112.339
+                  C511.899,245.194,476.655,200.443,426.635,188.224z"
+                  />
+                  <path
+                    fill="currentColor"
+                    d="M245.035,253.664l-64,64l22.56,22.56l36.8-36.64v153.44h32v-153.44l36.64,36.64l22.56-22.56l-64-64
+                  C261.354,247.46,251.276,247.46,245.035,253.664z"
+                  />
+                </g>
+              </g>
+            </g>
+          </svg>
+          {#if !field.value.url}
+            <span>Upload</span>
+          {/if}
+          <input
+            on:change={encodeImageFileAsURL}
+            type="file"
+            accept="image/*"
+          />
+        </label>
+      </div>
+    {/if}
+    <div class="inputs">
+      <label class="image-input">
+        <span>URL</span>
+        <input
           on:input={(e) => {
-            const {value} = e.target
+            const { value } = e.target
             imagePreview = value
-            field.value = {
-              ...field.value,
+            setValue({
               url: value,
-              size: null
-            }
+              size: null,
+            })
             dispatch('input')
           }}
           value={field.value.url}
-          type="url" 
-          class="flex-1 border-b-2 border-gray-200 bg-gray-100 pl-2 outline-none"
+          type="url"
         />
+      </label>
+      <label class="image-input">
+        <span>Description</span>
+        <input type="text" bind:value={field.value.alt} />
       </label>
     </div>
   </div>
-  <div class="pt-3">
-    <label class="w-full flex text-sm">
-      <span class="font-semibold mr-2">Alt text</span> 
-      <input type="text" class="flex-1 border-b-2 border-gray-200 outline-none" bind:value={field.value.alt}>
-    </label>
-  </div>
-  <!-- <label class="flex items-center flex-1">
-    <span class="font-semibold text-sm mr-2">Image URL</span>
-    <input bind:value={field.value} on:input={() => dispatch('input', field.value)} class="bg-gray-100 p-2 flex-1" type="url" placeholder="https://images.pexels.com/photos/104827/cat-pet-animal-domestic-104827.jpeg">
-  </label> -->
 </div>
-<slot></slot>
+<slot />
 
-<style>
-  .image-preview {
-    @apply relative w-48 mr-2 flex justify-center items-center border-2 border-gray-100 transition-colors duration-200 bg-cover bg-center bg-no-repeat;
+<style lang="postcss">
+  .field-label {
+    font-size: var(--font-size-1);
+    font-weight: 600;
+    display: inline-block;
+    padding-bottom: 0.25rem;
+  }
+  .image-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--primo-color-primored);
+    padding: 0.5rem;
 
-    &.uploading {
-      @apply border-primored;
+    .spinner-container {
+      background: var(--primo-color-primored);
+      height: 100%;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
     }
   }
-  .image-upload {
-    @apply flex-1 p-4 cursor-pointer relative w-full flex items-center justify-center bg-gray-100 transition-colors duration-100;
+  input {
+    background: var(--color-gray-8);
+  }
+  .image-preview {
+    width: 100%;
+    padding-top: 50%;
+    position: relative;
+    margin-bottom: 0.25rem;
+
+    .image-upload {
+      flex: 1 1 0%;
+      padding: 1rem;
+      cursor: pointer;
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-gray-2);
+      background: var(--color-gray-9);
+      font-weight: 600;
+      text-align: center;
+      position: absolute;
+      inset: 0;
+      opacity: 0.5;
+      transition: opacity, background;
+      transition-duration: 0.1s;
+
+      &:hover {
+        opacity: 0.95;
+        background: var(--primo-color-primored);
+      }
+
+      span {
+        margin-top: 0.25rem;
+      }
+
+      input {
+        visibility: hidden;
+        border: 0;
+        width: 0;
+        position: absolute;
+      }
+
+      svg {
+        max-width: 4rem;
+      }
+    }
+
+    .field-size {
+      background: var(--color-gray-8);
+      color: var(--color-gray-3);
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      padding: 0.25rem 0.5rem;
+      font-size: var(--font-size-1);
+      font-weight: 600;
+      border-bottom-right-radius: 0.25rem;
+    }
+
+    &.uploading {
+      border-color: rgba(248, 68, 73, var(--tw-border-opacity));
+    }
+
+    img {
+      position: absolute;
+      inset: 0;
+      object-fit: cover;
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  .inputs {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    .image-input {
+      display: flex;
+      align-items: center;
+      font-size: var(--font-size-1);
+      width: 100%;
+      margin-bottom: 0.25rem;
+
+      span {
+        font-weight: 600;
+        padding: 0 0.5rem;
+      }
+
+      input {
+        font-size: inherit;
+        flex: 1;
+        padding: 0 0.25rem;
+        outline: 0;
+        border: 0;
+      }
+    }
   }
 </style>
