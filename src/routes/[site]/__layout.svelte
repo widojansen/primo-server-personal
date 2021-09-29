@@ -1,4 +1,5 @@
 <script>
+  import { browser } from '$app/env'
   import { onMount } from 'svelte'
   import Primo, {
     modal as primoModal,
@@ -70,7 +71,7 @@
   $: siteID = $page.params.site
 
   let data
-  $: $user.signedIn && fetchSite($page.path)
+  $: $user.signedIn && browser && fetchSite($page.path)
 </script>
 
 <Primo

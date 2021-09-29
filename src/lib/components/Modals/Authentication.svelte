@@ -2,11 +2,8 @@
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
   import auth from '../../../supabase/auth'
-  // import { acceptSiteInvitation } from "../../../supabase/middleware";
   import * as actions from '../../../actions'
-  // import { addSiteToUser } from "../../../supabase/helpers";
   import { createUser } from '../../../supabase/helpers'
-  import { stores } from '@primo-app/primo'
   import { page } from '$app/stores'
 
   import Spinner from '$lib/ui/Spinner.svelte'
@@ -352,10 +349,10 @@
       --Spinner-mr: 0.5rem;
 
       svg {
-        width: 20px;
-        height: 20px;
+        width: 1rem;
+        height: 1rem;
         color: var(--color-white);
-        margin-right: 8px;
+        margin-right: 0.5rem;
       }
     }
 

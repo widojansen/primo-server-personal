@@ -1,15 +1,15 @@
 <script>
-  import Spinner from "$lib/ui/Spinner.svelte";
+  import Spinner from '$lib/ui/Spinner.svelte'
 
-  export let label = "";
-  export let id = null;
-  export let variants = "";
-  export let type = "button";
-  export let disabled = false;
-  export let loading = false;
+  export let label = ''
+  export let id = null
+  export let variants = ''
+  export let type = 'button'
+  export let disabled = false
+  export let loading = false
 </script>
 
-{#if type === "input"}
+{#if type === 'input'}
   <label for="primo-json" class={variants}>
     {#if loading}
       <Spinner />
