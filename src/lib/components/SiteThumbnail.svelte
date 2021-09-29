@@ -1,9 +1,12 @@
 <script>
+  import _find from 'lodash-es/find'
   import Spinner from '$lib/ui/Spinner.svelte'
   import { downloadPagePreview } from '../../supabase/storage'
+  import { buildStaticPage } from '@primo-app/primo/src/stores/helpers'
 
   export let site = null
   export let preview = null
+  export let buildPreview = false
 
   let container
   let scale
@@ -17,8 +20,15 @@
   }
 
   async function getPreview() {
-    preview = await downloadPagePreview(site.id)
+    const page = _find(site.pages, ['id', 'index'])
+    preview = buildPreview
+      ? await buildStaticPage({
+          page,
+          site,
+        })
+      : await downloadPagePreview(site.id)
   }
+
   if (!preview) {
     getPreview()
   }

@@ -13,6 +13,8 @@ export const sites = {
   },
   create: async (newSite) => {
     stores.sites.update(sites => [ ...sites, newSite ])
+    const homepage = find(newSite.pages, ['id', 'index'])
+    const preview = await buildStaticPage({ page: homepage, site: newSite })
     await Promise.all([
       supabaseDB.sites.create({
         name: newSite.name,
@@ -22,6 +24,10 @@ export const sites = {
       supabaseStorage.uploadSiteData({
         id: newSite.id,
         data: newSite
+      }),
+      supabaseStorage.updatePagePreview({
+        path: `${newSite.id}/preview.html`,
+        preview
       })
     ])
   },
