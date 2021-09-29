@@ -34,9 +34,11 @@
   }
 
   async function deleteSiteItem(siteID: string): Promise<any> {
-    const confirm = window.confirm('Are you sure you want to delete this site?')
+    const confirm = window.confirm(
+      `Are you sure you want to delete this site? You won't be able to get it back.`
+    )
     if (!confirm) return
-    $sites = $sites.filter((site) => site.id !== siteID)
+    actions.sites.delete(siteID)
   }
 
   async function editSite(site) {

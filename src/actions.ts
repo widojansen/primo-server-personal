@@ -45,7 +45,10 @@ export const sites = {
   },
   delete: async (id) => {
     stores.sites.update(sites => sites.filter(s => s.id !== id))
-    await supabaseDB.sites.delete(id)
+    await Promise.all([
+      supabaseDB.sites.delete(id),
+      supabaseStorage.deleteSiteData(id)
+    ])
   },
   validatePassword: async (password, siteID) => {
     const res = await supabaseDB.sites.get({ id: siteID, query: `password` })

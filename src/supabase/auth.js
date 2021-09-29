@@ -22,8 +22,7 @@ export function watchForAutoLogin(cb) {
 }
 
 export async function signOut() {
-  const { error } = await supabase.auth.signOut()
-  console.log(error)
+  await supabase.auth.signOut()
 }
 
 export async function signIn({ email, password }) {

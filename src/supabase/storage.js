@@ -25,7 +25,7 @@ export async function updatePagePreview({ path, preview }) {
   let res = await supabase
     .storage
     .from(bucketID)
-    .update(path, preview, {
+    .upload(path, preview, {
       upsert: true
     })
 
@@ -78,4 +78,12 @@ export async function downloadSiteData(id) {
     .download(`${id}/site.json`)
   const json = await data.text()
   return JSON.parse(json)
+}
+
+export async function deleteSiteData(id) {
+  const { data, error } = await supabase
+  .storage
+  .from(bucketID)
+  .remove([id])
+  return data ? true : false
 }
