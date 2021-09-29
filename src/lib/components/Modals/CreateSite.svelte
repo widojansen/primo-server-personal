@@ -19,14 +19,15 @@
   // $: siteURL = siteID
   $: canCreateSite = siteName && siteID
 
-  let siteData
+  let siteData = createSite()
 
   async function createNewSite() {
     loading = true
 
     loading = false
 
-    siteData = createSite({ id: siteID, name: siteName })
+    siteData.id = siteID
+    siteData.name = siteName
 
     onSuccess(siteData)
   }
@@ -107,7 +108,7 @@
             </PrimaryButton>
           </div>
           {#if duplicatingSite}
-            <SiteThumbnail site={siteData} />
+            <SiteThumbnail site={siteData} buildPreview={true} />
           {/if}
         </div>
       </details>
