@@ -1,61 +1,60 @@
 <script context="module">
-  import { writable } from "svelte/store";
+  import { writable } from 'svelte/store'
 
-  export const type = writable({
+  const defaultValue = {
     id: null,
     props: {},
     options: {
       disableClose: false,
     },
-  });
+  }
 
-  export const visible = writable(false);
+  export const type = writable(defaultValue)
+
+  export const visible = writable(false)
 
   export function show(t) {
-    if (typeof t === "string") {
+    if (typeof t === 'string') {
       type.set({
+        ...defaultValue,
         id: t,
-        props: {},
-      });
+      })
     } else {
-      type.set(t);
+      type.set(t)
     }
-    visible.set(true);
+    visible.set(true)
   }
 
   export function hide() {
-    type.set({
-      id: null,
-      props: {},
-    });
-    visible.set(false);
+    type.set(defaultValue)
+    visible.set(false)
   }
 </script>
 
 <script>
-  import { fade } from "svelte/transition";
-  import CreateSite from "./Modals/CreateSite.svelte";
-  import UserSettings from "./Modals/UserSettings.svelte";
-  import Authentication from "./Modals/Authentication.svelte";
-  import Collaboration from "./Modals/Collaboration.svelte";
+  import { fade } from 'svelte/transition'
+  import CreateSite from './Modals/CreateSite.svelte'
+  import UserSettings from './Modals/UserSettings.svelte'
+  import Authentication from './Modals/Authentication.svelte'
+  import Collaboration from './Modals/Collaboration.svelte'
 
   const modals = {
     AUTH: Authentication,
     SITE_CREATION: CreateSite,
     USER_SETTINGS: UserSettings,
     COLLABORATION: Collaboration,
-  };
+  }
 
-  let activeModal = modals[$type.id];
-  $: showModal($type.id);
+  let activeModal = modals[$type.id]
+  $: showModal($type.id)
   async function showModal(typeID) {
-    const modal = modals[typeID];
-    activeModal = modals[typeID];
+    const modal = modals[typeID]
+    activeModal = modals[typeID]
   }
 
   async function hideModal() {
-    if ($type.options?.disableClose) return;
-    $visible = false;
+    if ($type.options?.disableClose) return
+    $visible = false
   }
 </script>
 
