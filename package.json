@@ -20,7 +20,7 @@
   },
   "type": "module",
   "dependencies": {
-    "@primo-app/primo": "^1.3.37",
+    "@primo-app/primo": "^1.3.39",
     "@supabase/supabase-js": "^1.22.6",
     "javascript-time-ago": "^2.3.8",
     "lodash-es": "^4.17.21",
