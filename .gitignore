@@ -10,3 +10,4 @@ public/bundle.js
 public/bundle.js.map
 .svelte-kit/**/*
 .DS_Store
+.vercel_build_output
