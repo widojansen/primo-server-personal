@@ -1,5 +1,7 @@
 # Primo Server
 
+![screenshot](./screenshot.png)
+
 This project lets you run Primo on your own server so you have full control over your own data and can edit your sites from any device, as well as invite others to collaborate. 
 
 At this stage, we're relying heavily on external services (Vercel for hosting, Supabase for backend) to make deployment as easily as possible. But it would also be relatively easy to replace those services with your own infastructure, should you prefer that. 
