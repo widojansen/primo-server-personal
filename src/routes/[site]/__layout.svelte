@@ -5,6 +5,7 @@
     modal as primoModal,
     PrimoFieldTypes,
     fieldTypes,
+    stores,
   } from '@primo-app/primo'
   import Build from '../../extensions/Build.svelte'
   import ImageField from '../../extensions/FieldTypes/ImageField.svelte'
@@ -50,7 +51,8 @@
 
   async function saveData(updatedSite) {
     saving = true
-    await actions.sites.save(updatedSite)
+    const success = await actions.sites.save(updatedSite)
+    stores.saved.set(success)
     saving = false
   }
 
