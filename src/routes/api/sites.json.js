@@ -6,7 +6,7 @@ export async function get({ query }) {
   const storedToken = await supabaseDB.config.get('server-token')
   if (storedToken && token === storedToken) {
     let finalSites = []
-    const sites = await supabaseDB.sites.get({query: `id, name, owner, password`})
+    const sites = await supabaseDB.sites.get({query: `id, name, password`})
     await Promise.all(
       sites.map(async site => {
         const data = await supabaseStorage.downloadSiteData(site.id)

@@ -47,23 +47,7 @@ export async function checkUsernameAvailability(username) {
 const DEFAULT_SITES_QUERY = `
   id,
   name,
-  url,
-  data,
-  repo (
-    owner,
-    name,
-    url,
-    isPublic
-  ),
   password,
-  owner (
-    id,
-    username,
-    tokens
-  ),
-  collaborators,
-  collaborator_data,
-  hosts
 `
 
 export const sites = {
@@ -111,11 +95,11 @@ export const sites = {
     }
     return site
   },
-  create: async ({ id, name, owner }) => {
+  create: async ({ id, name }) => {
     const { data, error } = await supabase
       .from('sites')
       .insert([
-        { id, name, owner }
+        { id, name }
       ])
     if (error) {
       console.error(error)
