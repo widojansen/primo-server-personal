@@ -5,7 +5,7 @@
 
 <footer class="container">
   <span class="disclaimer">
-    <span class="primo">primo</span> desktop alpha
+    <span class="primo">primo</span> server alpha
   </span>
   <div class="footer-links">
     <div>
