@@ -24,8 +24,6 @@
   async function createNewSite() {
     loading = true
 
-    loading = false
-
     siteData.id = siteID
     siteData.name = siteName
 
