@@ -2,7 +2,7 @@
 
 -- Create tables
 CREATE TABLE public.sites (
-    id bigint NOT NULL,
+    id text NOT NULL,
     name text,
     password text,
     created_at timestamp with time zone DEFAULT now()
