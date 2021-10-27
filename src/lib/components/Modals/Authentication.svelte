@@ -51,7 +51,6 @@
   $: disabled = !signInWithMagicLink && (!email || password.length <= 3)
 
   async function signUp() {
-    // window.plausible(`Signing up with Email`, { props: { email } })
     loadingEmail = true
     loginError = null
     loginMessage = null
@@ -65,7 +64,6 @@
   }
 
   async function signIn() {
-    // window.plausible(`Signing In`, { props: { email } })
     loginError = ''
     loadingEmail = true
 
@@ -105,9 +103,6 @@
     </div>
     {#if loginMessage}
       <div in:fade class="login-message">
-        <!-- <div class="spinner">
-          <Spinner />
-        </div> -->
         {@html loginMessage}
       </div>
     {:else if loading}
@@ -310,11 +305,13 @@
         }
 
         .form-group:first-child .primo-input {
-          border-radius: var(--border-radius-1) var(--border-radius-1) 0 0;
+          border-radius: var(--primo-border-radius) var(--primo-border-radius) 0
+            0;
         }
 
         .form-group:last-child .primo-input {
-          border-radius: 0 0 var(--border-radius-1) var(--border-radius-1);
+          border-radius: 0 0 var(--primo-border-radius)
+            var(--primo-border-radius);
         }
 
         .form-group {

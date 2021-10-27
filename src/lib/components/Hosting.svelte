@@ -1,52 +1,36 @@
 <script>
-  import axios from "axios";
-  // import TimeAgo from 'javascript-time-ago'
-  import { fade, slide } from "svelte/transition";
-  import hosts from "../../stores/hosts";
-  import * as actions from "../../actions";
-  import TextField from "$lib/ui/TextField.svelte";
-  import PrimaryButton from "$lib/ui/PrimaryButton.svelte";
-  import { get, set } from "idb-keyval";
-  // import { users } from '../../supabase/db'
-  // import { getGithubAuthToken } from '../../supabase/middleware'
-  // import tokens from '../../stores/tokens'
-  // import { unsaved } from '@primo-app/primo/src/stores/app/misc'
-
-  // import en from 'javascript-time-ago/locale/en'
-
-  export let showDetails = true;
-  export let type = "deployments";
-
-  // TimeAgo.addDefaultLocale(en)
-  // const timeAgo = new TimeAgo('en-US')
-
-  // $: if ($router.query.code) finishConnectingOAuth($router.query.code)
+  import axios from 'axios'
+  import { fade, slide } from 'svelte/transition'
+  import hosts from '../../stores/hosts'
+  import * as actions from '../../actions'
+  import TextField from '$lib/ui/TextField.svelte'
+  import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
 
   async function connectVercel(token) {
     const { data } = await axios
-      .get("https://api.vercel.com/www/user", {
+      .get('https://api.vercel.com/www/user', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .catch((e) => {
-        data: null;
-      });
+        data: null
+      })
     if (data) {
       actions.hosts.create({
-        name: "vercel",
+        name: 'vercel',
         token,
-      });
+      })
     } else {
-      window.alert("Could not connect to host");
+      window.alert('Could not connect to host')
     }
   }
 
-  let showingHosts = false;
-  let errorMessage = null;
-  let loading = false;
+  let showingHosts = false
+  let errorMessage = null
+  let loading = false
 
-  let hostBeingConnected = null;
+  let hostBeingConnected = null
 
   const svg = (type, width = 6) =>
     ({
@@ -70,13 +54,13 @@
                   />
                 </g>
               </svg>`,
-    }[type]);
+    }[type])
 
-  let accounts = [];
+  let accounts = []
 
   // $: getAccountData($user.tokens)
 
-  let enteredToken;
+  let enteredToken
 </script>
 
 <div class="boxes">
@@ -106,15 +90,15 @@
       </div></a
     >  -->
   {/each}
-  {#if hostBeingConnected === "vercel"}
+  {#if hostBeingConnected === 'vercel'}
     <div class="box connecting-host">
       <button class="back" on:click={() => (hostBeingConnected = null)}
         >Back to web hosts</button
       >
       <form
         on:submit|preventDefault={() => {
-          connectVercel(enteredToken);
-          hostBeingConnected = null;
+          connectVercel(enteredToken)
+          hostBeingConnected = null
         }}
         in:fade={{ duration: 200 }}
       >
@@ -138,7 +122,7 @@
         {/if}
       </form>
     </div>
-  {:else if hostBeingConnected === "github"}
+  {:else if hostBeingConnected === 'github'}
     <div class="box connecting-host">
       <button class="back" on:click={() => (hostBeingConnected = null)}
         >Back to web hosts</button
@@ -177,21 +161,21 @@
   {#if !showingHosts}
     <footer>
       <button class="link" on:click={() => (showingHosts = true)}
-        >Connect another host</button
+        >Connect a host</button
       >
     </footer>
   {:else if showingHosts && !hostBeingConnected}
     <div class="hosts">
       <div class="buttons" in:fade={{ duration: 200 }}>
-        <button on:click={() => (hostBeingConnected = "vercel")}>
-          {@html svg("vercel")}</button
+        <button on:click={() => (hostBeingConnected = 'vercel')}>
+          {@html svg('vercel')}</button
         >
         <button
           disabled
           class="github"
-          on:click={() => (hostBeingConnected = "github")}
+          on:click={() => (hostBeingConnected = 'github')}
         >
-          {@html svg("github")}
+          {@html svg('github')}
         </button>
       </div>
     </div>
