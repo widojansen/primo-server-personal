@@ -6,20 +6,16 @@ import { buildStaticPage } from '@primo-app/primo/src/stores/helpers'
 
 export const sites = {
   initialize: async () => {
-    const sites = await supabaseDB.sites.get({query: `id, name, owner, collaborators, password`})
+    const sites = await supabaseDB.sites.get({query: `id, name, password`})
     if (sites) {
       stores.sites.set(sites)
     }
   },
   create: async (newSite) => {
-    stores.sites.update(sites => [ ...sites, newSite ])
-    const homepage = find(newSite.pages, ['id', 'index'])
-    const preview = await buildStaticPage({ page: homepage, site: newSite })
     await Promise.all([
       supabaseDB.sites.create({
         name: newSite.name,
-        id: newSite.id,
-        owner: 1,
+        id: newSite.id
       }),
       supabaseStorage.uploadSiteData({
         id: newSite.id,
@@ -27,9 +23,10 @@ export const sites = {
       }),
       supabaseStorage.updatePagePreview({
         path: `${newSite.id}/preview.html`,
-        preview
+        preview: ''
       })
     ])
+    stores.sites.update(sites => [ ...sites, newSite ])
   },
   update: async (id, props) => {
     await supabaseDB.sites.update(id, props)
@@ -38,7 +35,7 @@ export const sites = {
     stores.sites.update(sites => sites.map(site => site.id === updatedSite.id ? updatedSite : site))
     const homepage = find(updatedSite.pages, ['id', 'index'])
     const preview = await buildStaticPage({ page: homepage, site: updatedSite })
-    await Promise.all([
+    const [ res1, res2 ] = await Promise.all([
       supabaseStorage.updateSiteData({
         id: updatedSite.id,
         data: updatedSite
@@ -48,6 +45,7 @@ export const sites = {
         preview
       })
     ])
+    return res1.error || res2.error ? false : true
   },
   delete: async (id) => {
     stores.sites.update(sites => sites.filter(s => s.id !== id))
