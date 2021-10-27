@@ -17,9 +17,7 @@
 
   let collaboratorPassword = $page.query.get('password')
   let collaboratorRole = $page.query.get('role')
-  if (collaboratorPassword) {
-    signInWithPassword()
-  }
+  $: collaboratorPassword && signInWithPassword()
 
   $: if ($user.signedIn) {
     onSignIn()
@@ -101,7 +99,10 @@
         <Logo />
       </a>
     </div>
-    {#if loginMessage}
+
+    {#if collaboratorPassword}
+      <span class="login-message">Signing you in with the password</span>
+    {:else if loginMessage}
       <div in:fade class="login-message">
         {@html loginMessage}
       </div>
@@ -299,6 +300,13 @@
       .inputs {
         color: var(--color-gray-9);
         font-size: var(--font-size-2);
+
+        label {
+          font-weight: 500;
+          color: white;
+          margin-bottom: 0.5rem;
+          display: block;
+        }
 
         input {
           border: 0;
