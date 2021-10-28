@@ -1,10 +1,9 @@
 import * as supabaseDB from '../../supabase/db'
 import * as supabaseStorage from '../../supabase/storage'
+import { authorizeRequest } from './_utils'
 
-export async function get({ query }) {
-  const token = query.get('token')
-  const storedToken = await supabaseDB.config.get('server-token')
-  if (storedToken && token === storedToken) {
+export async function get({ headers }) {
+  return await authorizeRequest(headers, async () => {
     let finalSites = []
     const sites = await supabaseDB.sites.get({query: `id, name, password`})
     await Promise.all(
@@ -24,6 +23,5 @@ export async function get({ query }) {
         sites: finalSites
       }
     };
-  }
-  // no response for bad requests
+  })
 }

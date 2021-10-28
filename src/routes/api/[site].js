@@ -1,14 +1,14 @@
 import * as actions from '../../actions'
 import * as supabaseDB from '../../supabase/db'
+import { authorizeRequest } from './_utils'
 
-export async function post({ body }) {
-  const { site, token } = body
-  const storedToken = await supabaseDB.config.get('server-token')
-  if (storedToken && token === storedToken) {
-    await actions.sites.save(site)
+export async function post({ body, headers }) {
+
+  return await authorizeRequest(headers, async () => {
+    await actions.sites.save(body.site)
     return {
       body: 'ok'
     }
-  }
-  // no response for bad requests
+  })
+
 }
