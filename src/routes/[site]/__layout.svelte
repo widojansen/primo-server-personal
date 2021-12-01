@@ -76,12 +76,14 @@
   $: $user.signedIn && browser && fetchSite($page.path)
 </script>
 
-<Primo
-  {data}
-  role={$user.role}
-  {saving}
-  on:save={async ({ detail: data }) => saveData(data)}
-/>
+{#if mounted}
+  <Primo
+    {data}
+    role={$user.role}
+    {saving}
+    on:save={async ({ detail: data }) => saveData(data)}
+  />
+{/if}
 
 <style global lang="postcss">
   .primo-reset {
