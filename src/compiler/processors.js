@@ -110,7 +110,7 @@ export async function html({ code, data, buildStatic = true, format = 'esm'}) {
 }
 
 
-export async function css(raw, options = {}) {
+export async function css(raw) {
   const processed = await cssPromiseWorker.postMessage({
     css: raw
   })
