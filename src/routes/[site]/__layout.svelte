@@ -13,6 +13,7 @@
   import * as supabaseStorage from '../../supabase/storage'
   import user from '../../stores/user'
   import { page } from '$app/stores'
+  import * as primo from '@primo-app/primo/package.json'
 
   primoModal.register([
     {
@@ -83,6 +84,10 @@
     {saving}
     on:save={async ({ detail: data }) => saveData(data)}
   />
+  <div id="app-version">
+    <span>primo v{primo.version}</span>
+    <span>server v{__SERVER_VERSION__}</span>
+  </div>
 {/if}
 
 <style global lang="postcss">
@@ -98,5 +103,18 @@
 
   body {
     margin: 0;
+  }
+
+  #app-version {
+    font-family: 'Satoshi', sans-serif;
+    font-size: 0.75rem;
+    color: var(--color-gray-4);
+    position: fixed;
+    bottom: 0.5rem;
+    left: 0.5rem;
+
+    span:first-child {
+      margin-right: 0.5rem;
+    }
   }
 </style>

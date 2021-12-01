@@ -211,7 +211,6 @@
     }
 
     .sites-container {
-      flex: 1;
       display: grid;
       gap: 1rem;
 

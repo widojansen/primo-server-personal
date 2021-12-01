@@ -1,11 +1,14 @@
 <script>
+  import * as primo from '@primo-app/primo/package.json'
+
   const date = new Date()
   const month = date.toLocaleString('default', { month: 'long' })
 </script>
 
 <footer class="container">
   <span class="disclaimer">
-    <span class="primo">primo</span> server alpha
+    <span>primo v{primo.version}</span>
+    <span>server v{__SERVER_VERSION__}</span>
   </span>
   <div class="footer-links">
     <div>
@@ -42,6 +45,7 @@
     align-items: center;
     width: 100%;
     padding: 1rem 2rem;
+    margin-top: auto;
   }
 
   a {

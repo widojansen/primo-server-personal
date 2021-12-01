@@ -20,16 +20,11 @@ const config = {
           // throws an error without this when importing Fira font
           allow: ['..', 'node_modules/@fontsource/fira-code']
         }
+      },
+      define: {
+          '__SERVER_VERSION__': JSON.stringify(process.env.npm_package_version),
       }
     }
-    // vite: {
-    //   server: {
-    //     force: true,
-    //   },
-    //   build: {
-    //     sourcemap: true
-    //   }
-    // }
 	}
 };
 
