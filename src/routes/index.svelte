@@ -5,7 +5,6 @@
   import SiteThumbnail from '$lib/components/SiteThumbnail.svelte'
   import Modal, { show, hide } from '$lib/components/Modal.svelte'
   import sites from '../stores/sites'
-  import config from '../stores/config'
   import user from '../stores/user'
   import * as actions from '../actions'
   // import mixpanel from 'mixpanel-browser'
@@ -118,7 +117,26 @@
                   <span class="site-url">{site.id}</span>
                   <div class="buttons">
                     <button
-                      class="delete-link"
+                      on:click={() => beginInvitation(site)}
+                      class="site-button"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                        />
+                      </svg>
+                      <span>Invite</span>
+                    </button>
+                    <button
+                      class="site-button"
                       on:click={() => (siteBeingEdited = site.id)}
                     >
                       <svg
@@ -138,7 +156,7 @@
                       <span>Rename</span>
                     </button>
                     <button
-                      class="delete-link"
+                      class="site-button"
                       on:click={() => deleteSiteItem(site.id)}
                     >
                       <svg
@@ -360,7 +378,7 @@
     }
   }
 
-  .delete-link {
+  .site-button {
     display: flex;
     align-items: center;
     font-size: 0.75rem;

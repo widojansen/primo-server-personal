@@ -10,7 +10,6 @@ const site = {
 
 const store = writable([]);
 
-
 export default {
   update: store.update,
   set: store.set,

@@ -68,16 +68,13 @@
 
   let saving = false
 
-  let mounted = false
-  onMount(() => (mounted = true))
-
   $: siteID = $page.params.site
 
   let data
   $: $user.signedIn && browser && fetchSite($page.path)
 </script>
 
-{#if mounted}
+{#if browser}
   <Primo
     {data}
     role={$user.role}

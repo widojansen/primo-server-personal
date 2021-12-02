@@ -1,6 +1,15 @@
-import {getServerToken} from '../../supabase/admin'
+import {getServerToken, validateSitePassword} from '../../supabase/admin'
 
-export async function get({headers}) {
+export async function get({headers, query}) {
+  
+  const password = query.get('password')
+  if (password) {
+    const valid = await validateSitePassword(password)
+    return {
+      body: valid ? 'true' : 'false'
+    }
+  }
+
   if (!headers.authorization) return { body: 'Must authorize request' }
   
   const token = headers.authorization.replace('Basic ', '')

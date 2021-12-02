@@ -25,7 +25,7 @@ export async function updatePagePreview({ path, preview }) {
   let res = await supabase
     .storage
     .from(bucketID)
-    .upload(path, preview, {
+    .update(path, preview, {
       upsert: true
     })
 

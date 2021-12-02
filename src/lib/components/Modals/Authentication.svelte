@@ -24,6 +24,7 @@
   }
 
   async function signInWithPassword() {
+    loginMessage = `Signing you in...`
     const validated = await actions.sites.validatePassword(
       collaboratorPassword,
       $page.params.site
@@ -33,8 +34,9 @@
         ...u,
         role: collaboratorRole,
         signedIn: true,
-        isAnyonymouns: true,
       }))
+    } else {
+      loginMessage = `Could not validate your password, please ask the site admin for a new collaboration link`
     }
   }
 
@@ -100,9 +102,7 @@
       </a>
     </div>
 
-    {#if collaboratorPassword}
-      <span class="login-message">Signing you in with the password</span>
-    {:else if loginMessage}
+    {#if loginMessage}
       <div in:fade class="login-message">
         {@html loginMessage}
       </div>

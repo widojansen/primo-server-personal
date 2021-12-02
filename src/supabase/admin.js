@@ -9,3 +9,11 @@ export async function getServerToken() {
     .eq('id', 'server-token')
   return data[0]['value']
 }
+
+export async function validateSitePassword(password) {
+  const {data,error} = await supabaseAdmin
+    .from('sites')
+    .select('*')
+    .eq('password', password)
+  return !!data[0]
+}

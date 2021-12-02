@@ -1,3 +1,4 @@
+import axios from 'axios'
 import {find} from 'lodash-es'
 import * as supabaseDB from './supabase/db'
 import * as supabaseStorage from './supabase/storage'
@@ -55,8 +56,8 @@ export const sites = {
     ])
   },
   validatePassword: async (password, siteID) => {
-    const res = await supabaseDB.sites.get({ id: siteID, query: `password` })
-    return res.password == password
+    const {data} = await axios.get(`http://localhost:3000/api.json?password=${password}`)
+    return data
   }
 }
 

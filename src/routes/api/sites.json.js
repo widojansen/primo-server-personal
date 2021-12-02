@@ -2,8 +2,8 @@ import * as supabaseDB from '../../supabase/db'
 import * as supabaseStorage from '../../supabase/storage'
 import { authorizeRequest } from './_utils'
 
-export async function get({ headers }) {
-  return await authorizeRequest(headers, async () => {
+export async function get(req) {
+  return await authorizeRequest(req, async () => {
     let finalSites = []
     const sites = await supabaseDB.sites.get({query: `id, name, password`})
     await Promise.all(
