@@ -1,6 +1,5 @@
 <script>
   import { browser } from '$app/env'
-  import { onMount } from 'svelte'
   import Primo, {
     modal as primoModal,
     PrimoFieldTypes,
