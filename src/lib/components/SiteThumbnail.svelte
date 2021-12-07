@@ -1,5 +1,5 @@
 <script>
-  import _find from 'lodash-es/find'
+  import { find as _find } from 'lodash-es'
   import Spinner from '$lib/ui/Spinner.svelte'
   import { downloadPagePreview } from '../../supabase/storage'
   import { buildStaticPage } from '@primo-app/primo/src/stores/helpers'

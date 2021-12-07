@@ -1,6 +1,6 @@
 import {createClient} from '@supabase/supabase-js'
 import { buildStaticPage } from '@primo-app/primo/src/stores/helpers'
-import _find from 'lodash-es/find'
+import {find as _find} from 'lodash-es'
 
 const supabaseAdmin = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ADMIN_KEY);
 
