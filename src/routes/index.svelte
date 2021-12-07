@@ -71,11 +71,11 @@
             >
               <a
                 class="site-link"
-                href={site.valid ? site.id : '/'}
+                href={site.id}
                 on:mouseenter={() => (hoveredItem = i)}
                 on:mouseleave={() => (hoveredItem = null)}
               >
-                <SiteThumbnail bind:valid={site.valid} {site} />
+                <SiteThumbnail {site} />
               </a>
               <div class="site-info">
                 <div>
