@@ -6,7 +6,6 @@ const store = writable({})
 
 if (browser) {
   get('deployments').then(res => {
-    console.log({res})
     store.set(res || {})
   })
 

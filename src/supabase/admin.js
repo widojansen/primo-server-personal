@@ -33,7 +33,6 @@ export async function saveSite(updatedSite) {
       preview
     })
   ])
-  console.log({res1, res2})
   return res1.error || res2.error ? false : true
 
   async function updateSiteData({ id, data }) {
