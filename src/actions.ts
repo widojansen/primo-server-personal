@@ -62,7 +62,7 @@ export const sites = {
     ])
   },
   validatePassword: async (password, siteID) => {
-    const {data} = await axios.get(`http://localhost:3000/api.json?password=${password}`)
+    const {data} = await axios.get(`/api.json?password=${password}`)
     return data
   }
 }
