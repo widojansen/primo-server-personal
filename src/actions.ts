@@ -36,7 +36,7 @@ export const sites = {
     stores.sites.update(sites => sites.map(site => site.id === updatedSite.id ? updatedSite : site))
 
     if (password) {
-      const {data:success} = await axios.post(`http://localhost:3000/api/${updatedSite.id}.json?password=${password}`, updatedSite)
+      const {data:success} = await axios.post(`/api/${updatedSite.id}.json?password=${password}`, updatedSite)
       return success
     } else {
       const homepage = find(updatedSite.pages, ['id', 'index'])
