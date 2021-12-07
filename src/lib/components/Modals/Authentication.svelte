@@ -10,14 +10,15 @@
   import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
   import Logo from '$lib/ui/Logo.svelte'
   import user from '../../../stores/user'
+  import { sitePassword } from '../../../stores/misc'
 
   export let onSignIn = () => {}
 
   let loading
 
-  let collaboratorPassword = $page.query.get('password')
+  $sitePassword = $page.query.get('password')
   let collaboratorRole = $page.query.get('role')
-  $: collaboratorPassword && signInWithPassword()
+  $: $sitePassword && signInWithPassword()
 
   $: if ($user.signedIn) {
     onSignIn()
@@ -26,7 +27,7 @@
   async function signInWithPassword() {
     loginMessage = `Signing you in...`
     const validated = await actions.sites.validatePassword(
-      collaboratorPassword,
+      $sitePassword,
       $page.params.site
     )
     if (validated) {

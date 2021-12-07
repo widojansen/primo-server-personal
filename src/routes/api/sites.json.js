@@ -1,6 +1,6 @@
 import * as supabaseDB from '../../supabase/db'
 import * as supabaseStorage from '../../supabase/storage'
-import { authorizeRequest } from './_utils'
+import { authorizeRequest } from './_auth'
 
 export async function get(req) {
   return await authorizeRequest(req, async () => {

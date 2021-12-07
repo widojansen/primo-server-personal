@@ -11,6 +11,7 @@
   import * as actions from '../../actions'
   import * as supabaseStorage from '../../supabase/storage'
   import user from '../../stores/user'
+  import { sitePassword } from '../../stores/misc'
   import { page } from '$app/stores'
   import * as primo from '@primo-app/primo/package.json'
 
@@ -32,8 +33,6 @@
     },
   ])
 
-  // $activeSite = createNewSite({ name: 'Default Site' })
-
   let currentPath
   async function fetchSite(fullPath) {
     if (currentPath === fullPath) return
@@ -51,7 +50,7 @@
 
   async function saveData(updatedSite) {
     saving = true
-    const success = await actions.sites.save(updatedSite)
+    const success = await actions.sites.save(updatedSite, $sitePassword)
     stores.saved.set(success)
     saving = false
   }

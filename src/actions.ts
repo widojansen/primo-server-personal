@@ -22,7 +22,7 @@ export const sites = {
         id: newSite.id,
         data: newSite
       }),
-      supabaseStorage.updatePagePreview({
+      supabaseStorage.uploadPagePreview({
         path: `${newSite.id}/preview.html`,
         preview: ''
       })
@@ -32,21 +32,27 @@ export const sites = {
   update: async (id, props) => {
     await supabaseDB.sites.update(id, props)
   },
-  save: async (updatedSite) => {
+  save: async (updatedSite, password) => {
     stores.sites.update(sites => sites.map(site => site.id === updatedSite.id ? updatedSite : site))
-    const homepage = find(updatedSite.pages, ['id', 'index'])
-    const preview = await buildStaticPage({ page: homepage, site: updatedSite })
-    const [ res1, res2 ] = await Promise.all([
-      supabaseStorage.updateSiteData({
-        id: updatedSite.id,
-        data: updatedSite
-      }),
-      supabaseStorage.updatePagePreview({
-        path: `${updatedSite.id}/preview.html`,
-        preview
-      })
-    ])
-    return res1.error || res2.error ? false : true
+
+    if (password) {
+      const {data:success} = await axios.post(`http://localhost:3000/api/${updatedSite.id}.json?password=${password}`, updatedSite)
+      return success
+    } else {
+      const homepage = find(updatedSite.pages, ['id', 'index'])
+      const preview = await buildStaticPage({ page: homepage, site: updatedSite })
+      const [ res1, res2 ] = await Promise.all([
+        supabaseStorage.updateSiteData({
+          id: updatedSite.id,
+          data: updatedSite
+        }),
+        supabaseStorage.updatePagePreview({
+          path: `${updatedSite.id}/preview.html`,
+          preview
+        })
+      ])
+      return res1.error || res2.error ? false : true
+    }
   },
   delete: async (id) => {
     stores.sites.update(sites => sites.filter(s => s.id !== id))

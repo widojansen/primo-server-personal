@@ -2,9 +2,10 @@ import {getServerToken, validateSitePassword} from '../../supabase/admin'
 
 export async function authorizeRequest(req, callback) {
   const { headers, query } = req
+  const password = query.get('password')
 
-  if (query.password) {
-    const valid = await validateSitePassword(query.password)
+  if (password) {
+    const valid = await validateSitePassword(password)
     return valid ? callback() : {
       body: null
     }
