@@ -1,5 +1,5 @@
 import * as idb from 'idb-keyval';
-import _cloneDeep from 'lodash-es/cloneDeep'
+import {clone as _cloneDeep} from 'lodash-es'
 import PromiseWorker from 'promise-worker';
 import svelteWorker from './workers/worker?worker'
 
