@@ -38,7 +38,7 @@ Before deploying your Primo Server, you'll need to sign up for [Supabase](https:
 1. Click this nice button and follow the prompts 
 1. Under 'Configure Project', enter your Supabase project **URL**, **Public Key**, and **Admin Key** (which you can find in the Supabase project dashboard > Settings > API https://app.supabase.io/project/---yourprojectid---/settings/api)
 1. Click 'Deploy'
-1. Sign up with an email address and password (this will be the admin account).
+1. Sign up with an email address and password (this will be the admin account). For now, the server has a single email/password account which can send invitation URLs to collaborators. 
 
 ### Loose Ends
 1. Disable Signups (Authentication > Settings > Email Auth) to keep internet strangers away from your sites.
