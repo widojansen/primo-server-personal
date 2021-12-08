@@ -27,8 +27,8 @@
   async function signInWithPassword() {
     loginMessage = `Signing you in...`
     const validated = await actions.sites.validatePassword(
-      $sitePassword,
-      $page.params.site
+      $page.params.site,
+      $sitePassword
     )
     if (validated) {
       user.update((u) => ({

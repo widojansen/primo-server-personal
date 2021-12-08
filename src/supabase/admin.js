@@ -12,11 +12,12 @@ export async function getServerToken() {
   return data[0]['value']
 }
 
-export async function validateSitePassword(password) {
+export async function validateSitePassword(siteID, password) {
   const {data,error} = await supabaseAdmin
     .from('sites')
     .select('*')
     .eq('password', password)
+    .eq('id', siteID)
   return !!data[0]
 }
 
@@ -54,3 +55,5 @@ export async function saveSite(updatedSite) {
     })
   }
 }
+
+export default supabaseAdmin

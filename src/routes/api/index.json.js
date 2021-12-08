@@ -1,33 +1,9 @@
-import {getServerToken, validateSitePassword} from '../../supabase/admin'
+import { authorizeRequest } from './_auth'
 
-export async function get({headers, query}) {
-  
-  const password = query.get('password')
-  if (password) {
-    const valid = await validateSitePassword(password)
-    return {
-      body: valid ? 'true' : 'false'
+export async function get(req) {
+  return await authorizeRequest(req, () => ({
+    body: {
+      success: true
     }
-  }
-
-  if (!headers.authorization) return { body: 'Must authorize request' }
-  
-  const token = headers.authorization.replace('Basic ', '')
-  const storedToken = await getServerToken()
-
-  if (!storedToken) {
-    return {
-      body: "Could not read server token"
-    };
-  } else if (token !== storedToken){
-    return {
-      body: "Passed token does not match server token"
-    };
-  } else if (token === storedToken) {
-    return {
-      body: {
-        success: true
-      }
-    };
-  }
+  }))
 }

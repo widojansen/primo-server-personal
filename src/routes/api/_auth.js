@@ -5,7 +5,7 @@ export async function authorizeRequest(req, callback) {
   const password = query.get('password')
 
   if (password) {
-    const valid = await validateSitePassword(password)
+    const valid = await validateSitePassword(req.params.site, password)
     return valid ? callback() : {
       body: null
     }

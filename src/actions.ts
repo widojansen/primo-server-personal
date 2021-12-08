@@ -6,6 +6,14 @@ import * as stores from './stores'
 import { buildStaticPage } from '@primo-app/primo/src/stores/helpers'
 
 export const sites = {
+  get: async (siteID, password) => {
+    if (password) {
+      const {data} = await axios.get(`/api/${siteID}.json?password=${password}`)
+      return JSON.parse(data)
+    } else {
+      return await supabaseStorage.downloadSiteData(siteID)
+    }
+  },
   initialize: async () => {
     const sites = await supabaseDB.sites.get({query: `id, name, password`})
     if (sites) {
@@ -61,9 +69,15 @@ export const sites = {
       supabaseStorage.deleteSiteData(id)
     ])
   },
-  validatePassword: async (password, siteID) => {
-    const {data} = await axios.get(`/api.json?password=${password}`)
-    return data
+  validatePassword: async (siteID, password) => {
+    try {
+      const {data:json} = await axios.get(`/api/${siteID}.json?password=${password}`)
+      const data = JSON.parse(json)
+      return data ? true : false
+    } catch(e) {
+      return false
+    }
+    // return !!data.id
   }
 }
 

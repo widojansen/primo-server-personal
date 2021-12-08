@@ -36,7 +36,9 @@
   let currentPath
   async function fetchSite(fullPath) {
     if (currentPath === fullPath) return
-    const res = await supabaseStorage.downloadSiteData(siteID)
+
+    const res = await actions.sites.get(siteID, $sitePassword)
+
     if (res) {
       data = res
       // stores.$unsaved = false
