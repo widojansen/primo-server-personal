@@ -7,6 +7,7 @@
   import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
 
   async function connectVercel(token) {
+    showingHosts = false
     const { data } = await axios
       .get('https://api.vercel.com/www/user', {
         headers: {
@@ -70,6 +71,11 @@
         {@html svg(host.name)}
       </div>
       <div class="host-user">
+        <button
+          on:click={() => {
+            actions.hosts.delete(host.name)
+          }}>Remove</button
+        >
         <span class="sr-only">Go to host</span>
         <!-- <img
           src="https://vercel.com/api/www/avatar/{host.user.avatar}?s=256"
@@ -158,7 +164,7 @@
       </div>
     </div>
   {/if}
-  {#if !showingHosts}
+  {#if !showingHosts && $hosts.length === 0}
     <footer>
       <button class="link" on:click={() => (showingHosts = true)}
         >Connect a host</button
@@ -263,7 +269,7 @@
       margin-bottom: 0.5rem;
 
       &:hover {
-        box-shadow: var(--primo-ring-primored);
+        /* box-shadow: var(--primo-ring-primored); */
       }
       &:not(:last-child) {
         padding-bottom: 1rem;

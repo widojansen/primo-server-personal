@@ -222,6 +222,17 @@ export const hosts = {
       return null
     }
     return data[0]
+  },
+  delete: async (name) => {
+    const { data, error } = await supabase
+      .from('hosts')
+      .delete()
+      .match({ name })
+    if (error) {
+      console.error(error)
+      return null
+    }
+    return data
   }
 }
 

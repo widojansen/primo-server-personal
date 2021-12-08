@@ -92,11 +92,8 @@ export const hosts = {
     stores.hosts.update(hosts => [ ...hosts, provider ])
     await supabaseDB.hosts.create(provider)
   },
-  save: async (updatedSite) => {
-
-  },
-  delete: async (id) => {
-    stores.hosts.update(hosts => hosts.filter(p => p.id !== id))
-    await supabaseDB.hosts.delete(id)
+  delete: async (name) => {
+    stores.hosts.update(hosts => hosts.filter(p => p.name !== name))
+    await supabaseDB.hosts.delete(name)
   }
 }
