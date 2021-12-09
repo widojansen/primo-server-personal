@@ -3,6 +3,9 @@
   import { uploadSiteImage } from '../../supabase/storage'
   const dispatch = createEventDispatcher()
   import Spinner from '$lib/ui/Spinner.svelte'
+  import { page } from '$app/stores'
+
+  const siteID = $page.params.site
 
   const defaultValue = {
     alt: '',
@@ -37,7 +40,7 @@
       let size = new Blob([file]).size
 
       const url = await uploadSiteImage({
-        id: 'public-library',
+        id: siteID,
         file,
       })
 
