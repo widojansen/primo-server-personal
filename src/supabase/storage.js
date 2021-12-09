@@ -58,9 +58,18 @@ export async function uploadSiteImage({ id, file }) {
   const {data,error} = await supabase
     .storage
     .from(bucketID)
-    .upload(`${id}/assets/${Date.now() + '---' + file.name}`, file)
-  if (error) return null
-  return data.Key
+    .upload(`${id}/assets/${file.name}`, file)
+
+  const { publicURL } = await supabase
+    .storage
+    .from(bucketID)
+    .getPublicUrl(`${id}/assets/${file.name}`)
+
+  if (error) {
+    console.warn(error)
+  }
+
+  return publicURL 
 }
 
 export async function downloadSiteImage(key) {

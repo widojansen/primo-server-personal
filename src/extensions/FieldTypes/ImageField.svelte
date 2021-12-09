@@ -1,13 +1,8 @@
 <script>
-  import axios from 'axios'
   import { createEventDispatcher } from 'svelte'
+  import { uploadSiteImage } from '../../supabase/storage'
   const dispatch = createEventDispatcher()
-  // import { Spinner } from '../../@components/misc'
-  // import Compressor from 'compressorjs'
-  // import { uploadSiteImage, downloadSiteImage } from '../../supabase/storage'
-  // import imageCompression from 'browser-image-compression'
-  // import { user, currentSite } from '../../stores'
-  // import { convertBlobToBase64 } from '../../utils'
+  import Spinner from '$lib/ui/Spinner.svelte'
 
   const defaultValue = {
     alt: '',
@@ -33,71 +28,33 @@
     }
   }
 
-  async function encodeImageFileAsURL({ target }) {
+  async function uploadImage({ target }) {
     loading = true
     const { files } = target
     if (files.length > 0) {
       const file = files[0]
 
-      if (file.type === 'image/svg+xml' && file.size / 1000 <= 250) {
-        // SVGs smaller than 250kb get saved directly
-        // const imageKey = await uploadSiteImage({
-        //   owner: $user.uid,
-        //   id: $currentSite,
-        //   file,
-        // })
-        // const primoImageKey = `primo:${imageKey}`
-        // const dataUri = await convertSvgToDataUri(file)
-        // imagePreview = dataUri
-        // setValue({ url: primoImageKey, size: Math.round(file.size / 1000) })
-      } else {
-        // const compressed = await imageCompression(file, {
-        //   maxSizeMB: 0.25, // (default: Number.POSITIVE_INFINITY)
-        // })
-        // const imageKey = await uploadSiteImage({
-        //   owner: $user.uid,
-        //   id: $currentSite,
-        //   file: compressed,
-        // })
-        // const primoImageKey = `primo:${imageKey}`
-        // const b64 = await convertBlobToBase64(compressed)
-        // imagePreview = b64
-        // setValue({
-        //   url: primoImageKey,
-        //   size: Math.round(compressed.size / 1000),
-        // })
-      }
+      let size = new Blob([file]).size
+
+      const url = await uploadSiteImage({
+        id: 'public-library',
+        file,
+      })
+
+      imagePreview = url
+
+      setValue({
+        url: url,
+        size: Math.round(size / 1000),
+      })
 
       loading = false
       dispatch('input')
-
-      async function convertSvgToDataUri(file) {
-        const reader = new FileReader()
-        return new Promise((resolve, reject) => {
-          reader.readAsDataURL(file)
-          reader.addEventListener(
-            'load',
-            () => {
-              resolve(reader.result)
-            },
-            false
-          )
-        })
-      }
     }
-  }
-
-  async function hydratePreview() {
-    // const imageKey = field.value.url.slice(12)
-    // const file = await downloadSiteImage(imageKey)
-    // const b64 = await convertBlobToBase64(file)
-    // imagePreview = b64
   }
 
   let imagePreview = field.value.url || ''
   let loading = false
-
-  $: if (imagePreview.startsWith('primo:')) hydratePreview()
 </script>
 
 <div>
@@ -105,17 +62,32 @@
   <div class="image-info">
     {#if loading}
       <div class="spinner-container">
-        <!-- <Spinner /> -->
+        <Spinner />
       </div>
     {:else}
       <div class="image-preview">
         {#if field.value.size}
           <span class="field-size">
+            {#if field.value.size > 1000}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+            {/if}
             {field.value.size}KB
           </span>
         {/if}
         {#if field.value.url}
-          <img src={imagePreview} alt="Image preview" />
+          <img src={imagePreview} alt="Preview" />
         {/if}
         <label class="image-upload">
           <svg
@@ -152,11 +124,7 @@
           {#if !field.value.url}
             <span>Upload</span>
           {/if}
-          <input
-            on:change={encodeImageFileAsURL}
-            type="file"
-            accept="image/*"
-          />
+          <input on:change={uploadImage} type="file" accept="image/*" />
         </label>
       </div>
     {/if}
@@ -261,6 +229,8 @@
     }
 
     .field-size {
+      display: flex;
+      gap: 0.25rem;
       background: var(--color-gray-8);
       color: var(--color-gray-3);
       position: absolute;
@@ -271,10 +241,10 @@
       font-size: var(--font-size-1);
       font-weight: 600;
       border-bottom-right-radius: 0.25rem;
-    }
 
-    &.uploading {
-      border-color: rgba(248, 68, 73, var(--tw-border-opacity));
+      svg {
+        width: 1rem;
+      }
     }
 
     img {
