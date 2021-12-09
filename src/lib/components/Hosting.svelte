@@ -31,6 +31,7 @@
   }
 
   async function connectNetlify(token) {
+    showingHosts = false
     const { data } = await axios
       .get('https://api.netlify.com/api/v1/user', {
         headers: {
@@ -42,11 +43,10 @@
       })
     if (data) {
       hosts.update((h) => {
-        console.log({ h })
         return [
           ...h,
           {
-            type: 'netlify',
+            name: 'netlify',
             token,
             user: data,
           },

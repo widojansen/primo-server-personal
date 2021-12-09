@@ -119,7 +119,7 @@
           } else {
             deployment = {
               id: data.deploy_id,
-              url: data.url,
+              url: `https://${data.subdomain}.netlify.app`,
               created: Date.now(),
             }
           }
@@ -214,20 +214,6 @@
         //   content: `# Built with [primo](https://primo.af)`,
         // },
       ]
-
-      function getSiteHTML(site) {
-        const symbolHTML = site.symbols
-          .map((symbol) => symbol.value.html)
-          .join(' ')
-        const componentHTML = flattenDeep(
-          site.pages.map((page) =>
-            page.content
-              .filter((block) => block.type === 'component' && !block.symbolID)
-              .map((block) => block.value.html)
-          )
-        ).join(' ')
-        return symbolHTML + componentHTML
-      }
     }
   }
 
