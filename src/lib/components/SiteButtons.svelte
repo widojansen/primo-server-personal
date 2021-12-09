@@ -1,6 +1,5 @@
 <script>
   import { createEventDispatcher } from 'svelte'
-  import { goto } from '$app/navigation'
   import sites from '../../stores/sites'
   import { stores } from '@primo-app/primo'
   import SiteThumbnail from '$lib/components/SiteThumbnail.svelte'

@@ -27,7 +27,8 @@
       props: {
         onSuccess: async (site) => {
           await actions.sites.create(site)
-          goto(site.id)
+          // goto(site.id) // broken in production
+          window.location.href = site.id
           hide()
         },
       },
