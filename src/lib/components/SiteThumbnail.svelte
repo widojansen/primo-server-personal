@@ -1,4 +1,5 @@
 <script>
+  import { browser } from '$app/env'
   import { find as _find } from 'lodash-es'
   import Spinner from '$lib/ui/Spinner.svelte'
   import { downloadPagePreview } from '../../supabase/storage'
@@ -6,8 +7,9 @@
 
   export let site = null
   export let preview = null
-  export let buildPreview = false
   export let valid = true
+
+  let generatedPreview
 
   let container
   let scale
@@ -20,20 +22,31 @@
     scale = parentWidth / childWidth
   }
 
-  async function getPreview() {
-    const page = _find(site.pages, ['id', 'index'])
-    preview = buildPreview
-      ? await buildStaticPage({
-          page,
-          site,
-        })
-      : await downloadPagePreview(site.id)
+  async function getPreview(site) {
+    generatedPreview =
+      (await downloadPagePreview(site.id)) ||
+      (await buildStaticPage({
+        page: _find(site.pages, ['id', 'index']),
+        site,
+      }))
+
+    if (!generatedPreview) {
+      valid = false
+    } else {
+      valid = true
+    }
   }
 
-  if (!preview) {
-    getPreview()
-  }
+  // wait for processor to load before building preview
+  let processorLoaded = false
+  setTimeout(() => {
+    processorLoaded = true
+  }, 500)
+
+  $: !preview && browser && processorLoaded && getPreview(site)
 </script>
+
+<svelte:window on:resize={resizePreview} />
 
 <div class="iframe-root">
   <div bind:this={container} class="iframe-container">
@@ -42,14 +55,14 @@
         <Spinner />
       </div>
     {/if}
-    {#if preview || preview}
+    {#if preview || generatedPreview}
       <iframe
         tabindex="-1"
         bind:this={iframe}
         style="transform: scale({scale})"
         class:fadein={iframeLoaded}
         title="page preview"
-        srcdoc={preview || preview}
+        srcdoc={preview || generatedPreview}
         on:load={() => {
           resizePreview()
           iframeLoaded = true

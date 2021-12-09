@@ -1,31 +1,34 @@
 <script>
-  import axios from 'axios'
   import SiteThumbnail from '$lib/components/SiteThumbnail.svelte'
   import Spinner from '$lib/ui/Spinner.svelte'
   import TextField from '$lib/ui/TextField.svelte'
   import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
   import { makeValidUrl } from '$lib/utils'
-  import sites from '../../../stores/sites'
   import { createSite } from '@primo-app/primo/src/const'
-  import { buildStaticPage } from '@primo-app/primo/src/stores/helpers'
 
   export let onSuccess = (newSite) => {}
   let loading
   let siteName = ``
   let siteID = ``
-  let existingRepo = ``
   let siteIDFocused = false
   let message = ''
   // $: siteURL = siteID
   $: canCreateSite = siteName && siteID
 
-  let siteData = createSite()
+  let siteData
 
   async function createNewSite() {
     loading = true
 
-    siteData.id = siteID
-    siteData.name = siteName
+    // overwrite the site id & name if it's been cloned
+    // otherwise create one from scratch
+    siteData = siteData
+      ? {
+          ...siteData,
+          id: siteID,
+          name: siteName,
+        }
+      : createSite({ id: siteID, name: siteName })
 
     onSuccess(siteData)
   }
@@ -35,9 +38,12 @@
   }
 
   let duplicatingSite = false
+  let duplicateFileIsValid = true
   function readJsonFile({ target }) {
+    console.log('reading')
     var reader = new window.FileReader()
     reader.onload = async function ({ target }) {
+      console.log('loaded')
       if (typeof target.result !== 'string') return
       siteData = JSON.parse(target.result)
       duplicatingSite = true
@@ -64,63 +70,46 @@
           on:focus={() => (siteIDFocused = true)}
         />
       </div>
-      <!-- {#if duplicatingSite}
-        <details open>
-          <summary>Themes</summary>
-          <ul>
-            {#each themes as theme}
-              <li>
-                <button
-                  class:selected={theme.id === selectedTheme.id ||
-                    (!theme.id && !selectedTheme)}
-                  on:click={() => selectTheme(theme)}
-                  type="button"
-                >
-                  <span>{theme.name}</span>
-                </button>
-                <div class="thumbnail-container">
-                  <SiteThumbnail site={theme} preview={theme.preview} />
-                </div>
-              </li>
-            {/each}
-          </ul>
-        </details>
-      {/if} -->
-      <details id="advanced-options">
-        <summary>Advanced options</summary>
-        <div>
-          <div class="file">
-            <PrimaryButton type="input" on:change={readJsonFile}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-              <span>Duplicate from primo.json</span>
-            </PrimaryButton>
-          </div>
-          {#if duplicatingSite}
-            <SiteThumbnail site={siteData} buildPreview={true} />
-          {/if}
+      {#if duplicatingSite}
+        <div class="site-thumbnail">
+          <SiteThumbnail bind:valid={duplicateFileIsValid} site={siteData} />
         </div>
-      </details>
-      <div class="submit">
-        <PrimaryButton
-          type="submit"
-          label={existingRepo ? 'Clone site from repo' : 'Create site'}
-          disabled={!canCreateSite}
-        />
+      {/if}
+      <div id="upload-json">
+        <label>
+          <input
+            on:change={readJsonFile}
+            type="file"
+            id="primo-json"
+            accept=".json"
+          />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span>Duplicate from primo.json</span>
+        </label>
       </div>
+      {#if duplicateFileIsValid}
+        <div class="submit">
+          <PrimaryButton
+            type="submit"
+            label={duplicatingSite ? 'Duplicate' : 'Create'}
+            disabled={!canCreateSite}
+          />
+        </div>
+      {/if}
     </form>
   {:else}
     <div class="creating-site">
-      <span>Creating {siteName}</span>
+      <span>{duplicatingSite ? 'Creating' : 'Duplicating'} {siteName}</span>
       {#key message}
         <p>{message}</p>
       {/key}
@@ -135,9 +124,6 @@
 
     form {
       .name-url {
-        /* & > * {
-          margin-bottom: 0.5rem;
-        } */
         margin-bottom: 1.5rem;
       }
 
@@ -157,71 +143,42 @@
           font-size: var(--font-size-2);
         }
       }
+    }
+  }
+  #upload-json {
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: flex-start;
 
-      ul {
-        display: grid;
-        grid-template-columns: auto auto;
-        gap: 1rem;
+    label {
+      cursor: pointer;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
 
-        li {
-          display: flex;
-          flex-direction: column;
-          position: relative;
-          overflow: hidden;
-          border-radius: var(--primo-border-radius);
+      input {
+        display: none;
+      }
 
-          &:hover {
-            opacity: 0.9;
-          }
+      span {
+        color: var(--color-gray-3);
+        font-size: 0.75rem;
+        text-decoration: underline;
+      }
 
-          button {
-            width: 100%;
-            position: absolute;
-            background: var(--color-gray-8);
-            transition: background 0.1s;
-
-            span {
-              display: block;
-              padding: 0.25rem;
-            }
-
-            &:after {
-              content: '';
-              width: 100%;
-              height: 100vh;
-              display: block;
-              background: transparent;
-            }
-
-            &:focus {
-              outline: 0;
-            }
-          }
-          button.selected {
-            background: var(--color-primored);
-          }
-
-          .thumbnail-container {
-            margin-top: 2rem;
-          }
-        }
+      svg {
+        height: 0.75rem;
+        width: 0.75rem;
       }
     }
   }
-  #advanced-options {
-    margin-bottom: 1.5rem;
 
-    .file {
-      margin-bottom: 1rem;
-      display: flex;
-      flex-direction: column;
-
-      svg {
-        height: 1.25rem;
-        width: 1.25rem;
-        margin-right: 0.25rem;
-      }
-    }
+  .site-thumbnail {
+    margin: 1rem 0;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    border: 1px solid var(--color-gray-8);
   }
 
   .creating-site {
