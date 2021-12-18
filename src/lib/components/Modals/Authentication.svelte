@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
   import { find } from 'lodash'
+  import axios from 'axios'
   import auth from '../../../supabase/auth'
   import { users } from '../../../supabase/db'
   import * as actions from '../../../actions'
@@ -15,6 +16,12 @@
   import { sitePassword } from '../../../stores/misc'
 
   export let onSignIn = () => {}
+
+  axios.get('/api/auth.json').then(({ data }) => {
+    if (!data.initialized) {
+      signingUp = true
+    }
+  })
 
   let loading
 
@@ -87,6 +94,7 @@
 
     if (!$user.signedIn) {
       const { error, user: res } = await auth.signIn({ email, password })
+      user.update((u) => ({ ...u, signedIn: true }))
       const role = find(await users.get(), ['email', email])['role']
       if (error) {
         loginError = error.message
@@ -96,7 +104,6 @@
         user.update((u) => ({
           ...u,
           role,
-          signedIn: true,
         }))
       }
     }
@@ -118,7 +125,7 @@
 </script>
 
 {#key signingUp}
-  <main class="primo-modal primo-reset">
+  <main class="primo-modal primo-reset" in:fade>
     <div class="logo">
       <a href="https://primo.af" target="blank" xyz="fade">
         <Logo />
@@ -208,16 +215,6 @@
                 Forgot your password?
               </button>
             {/if}
-            <button
-              on:click={() => {
-                signingUp = !signingUp
-                loginError = ``
-              }}
-              type="button"
-              class="switch"
-            >
-              {signingUp ? 'Sign in' : 'Sign up'}
-            </button>
           </div>
         </form>
         <!-- <hr />
