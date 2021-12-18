@@ -22,7 +22,7 @@
   },
   "type": "module",
   "dependencies": {
-    "@primo-app/primo": "^1.3.78",
+    "@primo-app/primo": "^1.3.79",
     "@supabase/supabase-js": "^1.22.6",
     "file-saver": "^2.0.5",
     "javascript-time-ago": "^2.3.8",
