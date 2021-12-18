@@ -5,7 +5,7 @@ import {users, config} from '../../supabase/db'
 export async function post(req) {
   const nUsers = (await users.get()).length
   if (nUsers === 0) {
-    await createUser()
+    await createUser(true)
     return {
       body: {
         success: true
@@ -23,9 +23,13 @@ export async function post(req) {
     }
   })
 
-  async function createUser() {
+  async function createUser(admin = false) {
     await signUp(req.body)
-    await users.create(req.body)
+    await users.create( admin ? 
+    {
+      ...req.body,
+      role: 'admin'
+    } : req.body)
   }
 }
 
