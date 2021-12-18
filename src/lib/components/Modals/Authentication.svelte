@@ -1,7 +1,9 @@
 <script>
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
+  import { find } from 'lodash'
   import auth from '../../../supabase/auth'
+  import { users } from '../../../supabase/db'
   import * as actions from '../../../actions'
   import { createUser } from '../../../supabase/helpers'
   import { page } from '$app/stores'
@@ -16,15 +18,23 @@
 
   let loading
 
+  $: newSignup = $page.query.get('signup') === ''
+  $: invitationKey = $page.query.get('key')
   $sitePassword = $page.query.get('password')
   let collaboratorRole = $page.query.get('role')
-  $: $sitePassword && signInWithPassword()
+  $: newSignup && invitationKey && signUpWithPassword()
+  $: !newSignup && $sitePassword && signIntoPageWithPassword()
 
   $: if ($user.signedIn) {
     onSignIn()
   }
 
-  async function signInWithPassword() {
+  async function signUpWithPassword() {
+    loginError = `You've been invited to collaborate on this server. Sign up with any email address and password to continue.`
+    signingUp = true
+  }
+
+  async function signIntoPageWithPassword() {
     loginMessage = `Signing you in...`
     const validated = await actions.sites.validatePassword(
       $page.params.site,
@@ -55,11 +65,18 @@
     loadingEmail = true
     loginError = null
     loginMessage = null
-    const res = await createUser({ email, password })
-    if (res.error) {
-      loginError = res.error
+    const res = await createUser({
+      email,
+      password,
+      role: collaboratorRole,
+      invitationKey,
+    })
+    if (!res) {
+      loginMessage =
+        'Could not sign up. Ask the server Admin to send you a new invitation link.'
     } else {
       console.log({ res })
+      signIn()
     }
     loadingEmail = false
   }
@@ -70,12 +87,17 @@
 
     if (!$user.signedIn) {
       const { error, user: res } = await auth.signIn({ email, password })
+      const role = find(await users.get(), ['email', email])['role']
       if (error) {
         loginError = error.message
       } else if (signInWithMagicLink) {
         loginMessage = `A magic link has been sent to <strong>${email}</strong>.<br>When you click on it, you'll be logged into primo.`
       } else if (res) {
-        user.set(res)
+        user.update((u) => ({
+          ...u,
+          role,
+          signedIn: true,
+        }))
       }
     }
   }

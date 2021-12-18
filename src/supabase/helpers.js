@@ -1,23 +1,11 @@
-import {signUp} from './auth'
-import {users} from './db'
+import axios from 'axios'
 
-export async function createUser({ email, password }) {
-  const { user, error } = await signUp({ email, password })
-  if (error) {
-    return { error: error.message }
-  }
-  const success = await users.create({
-    email: user.email
+export async function createUser({ email, password, role, invitationKey }) {
+  const {data} = await axios.post(`/api/auth.json?key=${invitationKey}`, {
+    email, 
+    password,
+    role
   })
-  return {
-    success,
-    error: null
-  }
-}
 
-// export async function addSiteToUser(uid, siteID) {
-//   const {websites} = await users.get(uid, 'sites')
-//   await users.update(uid, {
-//     websites: websites ? [ ...websites, siteID ] : [siteID]
-//   })
-// }
+  return data
+}

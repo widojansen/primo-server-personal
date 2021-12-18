@@ -1,15 +1,21 @@
-import {getServerToken, validateSitePassword} from '../../supabase/admin'
+import {getServerToken, validateSitePassword, validateInvitationKey} from '../../supabase/admin'
 
 export async function authorizeRequest(req, callback) {
   const { headers, query } = req
   const password = query.get('password')
+  const key = query.get('key')
 
-  if (password) {
+  if (key) {
+    const valid = await validateInvitationKey(key)
+    return valid ? callback() : {
+      body: null
+    }
+  } else if (password) {
     const valid = await validateSitePassword(req.params.site, password)
     return valid ? callback() : {
       body: null
     }
-  }
+  } 
 
   if (!headers.authorization) return { body: 'Must authorize request' }
   

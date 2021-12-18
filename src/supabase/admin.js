@@ -21,6 +21,16 @@ export async function validateSitePassword(siteID, password) {
   return !!data[0]
 }
 
+export async function validateInvitationKey(key) {
+  console.log({key})
+  const {data,error} = await supabaseAdmin
+    .from('config')
+    .select('*')
+    .eq('id', 'invitation-key')
+    .eq('value', key)
+  return !!data[0]
+}
+
 export async function saveSite(updatedSite) {
   const homepage = _find(updatedSite.pages, ['id', 'index'])
   const preview = await buildStaticPage({ page: homepage, site: updatedSite })

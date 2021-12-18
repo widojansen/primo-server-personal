@@ -155,29 +155,36 @@ export const sites = {
 }
 
 export const users = {
-  get: async (uid, select = '*') => {
-    let {data,error} = await supabase
+  get: async (uid = null, select = '*') => {
+    let data
+    let error
+
+    if (uid) {
+      const res = await supabase
+        .from('users')
+        .select(select)
+        .eq('id', uid)
+      data = res.data
+      error = res.error
+    } else {
+      const res = await supabase
       .from('users')
       .select(select)
-      .eq('id', uid)
+      data = res.data
+      error = res.error
+    }
+  
 
     if (error) {
       console.error(error)
       return null
     }
-    data = data[0]
-    // if (data.websites) {
-    //   data.websites = data.websites.map(site => ({
-    //     ...site,
-    //     collaborators: site.collaborators && site.collaborators.length > 0 ? JSON.parse(site.collaborators) : []
-    //   }))
-    // }
     return data
   },
-  create: async ({ email }) => {
+  create: async ({ email, role = 'developer' }) => {
     const { data, error } = await supabase
       .from('users')
-      .insert([ { email } ], {
+      .insert([ { email, role } ], {
         returning: 'minimal'
       })
     if (error) {
@@ -186,11 +193,11 @@ export const users = {
     }
     return true
   },
-  update: async (id, props) => {
+  update: async (email, props) => {
     const { data, error } = await supabase
       .from('users')
       .update(props)
-      .eq('id', id)
+      .eq('email', email)
 
     if (error) {
       console.error(error)
