@@ -21,6 +21,7 @@
   let key = ''
   config.get('invitation-key').then((res) => {
     key = res
+    if (!key) resetKey()
   })
 
   $: link = `${window.location.href}?signup&role=${role}&key=${key}`
