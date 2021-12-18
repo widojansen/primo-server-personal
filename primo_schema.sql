@@ -32,7 +32,8 @@ CREATE TABLE public.config (
 
 INSERT INTO public.config (id, value, created_at, updated_at) VALUES
     ('server-token', null, now(), now());
-
+INSERT INTO public.config (id, value, created_at, updated_at) VALUES
+    ('invitation-key', null, now(), now());
 
 -- Set owner
 ALTER TABLE public.sites OWNER TO supabase_admin;
