@@ -103,7 +103,7 @@
       } else if (res) {
         user.update((u) => ({
           ...u,
-          role,
+          role: role === 'admin' ? 'developer' : role,
         }))
       }
     }
