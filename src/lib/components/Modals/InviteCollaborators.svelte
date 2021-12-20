@@ -128,6 +128,7 @@
 
 <style lang="postcss">
   .primo-modal {
+    color: var(--color-gray-1);
     max-width: 40rem;
     display: grid;
     gap: 2rem;
@@ -143,8 +144,8 @@
       align-items: center;
       font-weight: 500;
       border-bottom: 1px solid #333;
-      margin-bottom: 1rem;
-      padding-bottom: 0.25rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
 
       svg {
         width: 1rem;
@@ -160,7 +161,7 @@
     div.copy-link {
       background: #333;
       border-radius: 0.25rem;
-      padding: 0.25rem;
+      padding: 6px;
       display: flex;
       justify-content: space-between;
       margin-bottom: 0.25rem;
@@ -168,7 +169,7 @@
       input {
         flex: 1;
         background: transparent;
-        padding-left: 0.5rem;
+        padding: 0 0.5rem;
         background: #4d4d4d;
         border-radius: 0.25rem;
       }
@@ -190,6 +191,7 @@
       font-size: 0.75rem;
       display: flex;
       justify-content: space-between;
+      padding-top: 0.25rem;
 
       button {
         text-decoration: underline;
