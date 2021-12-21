@@ -17,7 +17,7 @@
 
   let siteData
 
-  async function createNewSite() {
+  async function createSite() {
     loading = true
 
     // overwrite the site id & name if it's been cloned
@@ -55,7 +55,7 @@
 <main class="primo-modal">
   {#if !loading}
     <h1 class="primo-heading-xl">Create a site</h1>
-    <form on:submit|preventDefault={createNewSite}>
+    <form on:submit|preventDefault={createSite}>
       <div class="name-url">
         <TextField
           autofocus={true}
