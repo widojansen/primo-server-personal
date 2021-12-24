@@ -2,8 +2,8 @@
   import axios from 'axios'
   import { flattenDeep, uniqBy } from 'lodash-es'
   import JSZip from 'jszip'
-  import { saveAs } from 'file-saver'
-  import { html as beautifyHTML } from 'js-beautify'
+  import fileSaver from 'file-saver'
+  import beautify from 'js-beautify'
   import Hosting from '$lib/components/Hosting.svelte'
   import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
   import { site, modal } from '@primo-app/primo'
@@ -32,7 +32,7 @@
   async function downloadSite() {
     loading = true
     const toDownload = await createSiteZip()
-    saveAs(toDownload, `${siteID}.zip`)
+    fileSaver.saveAs(toDownload, `${siteID}.zip`)
     modal.hide()
   }
 
@@ -142,7 +142,7 @@
           </head>
 
           <body class="primo-page">   
-            <iframe allow="clipboard-read; clipboard-write self https://its.primo.af" border="0" src="https://its.primo.af/${siteName}" style="height:100vh;width:100vw;position:absolute;top:0;left:0;border:0;"></iframe>
+            <iframe allow="clipboard-read; clipboard-write self ${window.location.origin}" border="0" src="${window.location.origin}/${siteName}" style="height:100vh;width:100vw;position:absolute;top:0;left:0;border:0;"></iframe>
           </body>
         </html>
       `
@@ -152,6 +152,18 @@
       {
         path: `primo.json`,
         content: JSON.stringify(site),
+      },
+      ...Object.entries(site.content).map((item) => ({
+        path: `${item[0]}.json`,
+        content: JSON.stringify(item[1]),
+      })),
+      {
+        path: `primo.json`,
+        content: JSON.stringify(site),
+      },
+      {
+        path: `edit/index.html`,
+        content: primoPage,
       },
       // [
       //   {
@@ -177,7 +189,7 @@
         site,
         separateModules: true,
       })
-      const formattedHTML = await beautifyHTML(html)
+      const formattedHTML = await beautify.html(html)
 
       return await Promise.all([
         {
@@ -185,7 +197,7 @@
           content: formattedHTML,
         },
         ...modules.map((module) => ({
-          path: `_modules/${module.symbol}.js`,
+          path: `_modules/${module.id}.js`,
           content: module.content,
         })),
         ...(page.pages
