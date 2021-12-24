@@ -21,6 +21,13 @@ export async function validateSitePassword(siteID, password) {
   return !!data[0]
 }
 
+export async function getNumberOfUsers() {
+  const {data,error} = await supabaseAdmin
+    .from('users')
+    .select('*')
+  return data.length
+}
+
 export async function validateInvitationKey(key) {
   console.log({key})
   const {data,error} = await supabaseAdmin

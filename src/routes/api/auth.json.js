@@ -1,6 +1,7 @@
 import { authorizeRequest } from './_auth'
 import {signUp} from '../../supabase/auth'
 import {users, config} from '../../supabase/db'
+import {getNumberOfUsers} from '../../supabase/admin'
 
 export async function post(req) {
   const nUsers = (await users.get()).length
@@ -34,7 +35,7 @@ export async function post(req) {
 }
 
 export async function get(req) {
-  const nUsers = (await users.get()).length
+  const nUsers = await getNumberOfUsers()
   return {
     body: {
       initialized: nUsers > 0 ? true : false
