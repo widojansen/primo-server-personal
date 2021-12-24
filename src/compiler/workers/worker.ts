@@ -1,7 +1,8 @@
-import PromiseWorker from 'promise-worker';
 import {rollup} from "../lib/rollup-browser";
 import registerPromiseWorker from 'promise-worker/register'
 import * as svelte from 'svelte/compiler'
+import _find from 'lodash-es/find'
+import {locales} from '@primo-app/primo/src/const'
 
 const CDN_URL = "https://cdn.jsdelivr.net/npm";
 
@@ -9,7 +10,7 @@ async function fetch_package(url) {
     return (await fetch(url)).text();
 }
 
-registerPromiseWorker(async function ({code,hydrated,buildStatic = true, format = 'esm'}) {
+registerPromiseWorker(async function ({code,site,hydrated,buildStatic = true, format = 'esm'}) {
 
     const final = {
         ssr: '',
@@ -21,6 +22,34 @@ registerPromiseWorker(async function ({code,hydrated,buildStatic = true, format 
 
     function generate_lookup(code) {
         component_lookup.set(`./App.svelte`, code);
+        component_lookup.set('./LanguageSelector.svelte', `
+            <script>
+                let locale = getUrlQuery() || 'en'
+                $: {
+                    if (locale) {
+                        document.documentElement.lang = locale
+                    }
+                }
+
+                function getUrlQuery() {
+                  var searchParams = new URLSearchParams(window.location.search);
+                  return searchParams.get('lang') 
+                }
+                
+                function setUrlQuery() {
+                  var searchParams = new URLSearchParams(window.location.search);
+                  searchParams.set("lang", locale);
+                  window.location.search = searchParams.toString();
+                }
+            </script>
+            <select bind:value={locale} on:change={setUrlQuery}>
+                ${
+                    Object.keys(site.content).map(locale => `
+                        <option value="${locale}">${_find(locales, ['key', locale])['name']}</option>
+                    `).join('')
+                }
+            </select>
+        `)
         component_lookup.set(`./H.svelte`, `
             <script>
                 import {onMount} from 'svelte'
