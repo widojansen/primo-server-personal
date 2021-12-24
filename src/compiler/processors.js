@@ -2,6 +2,8 @@ import * as idb from 'idb-keyval';
 import {clone as _cloneDeep} from 'lodash-es'
 import PromiseWorker from 'promise-worker';
 import svelteWorker from './workers/worker?worker'
+import {get} from 'svelte/store'
+import {site} from '@primo-app/primo/src/stores/data/draft'
 
 import postCSSWorker from './workers/postcss.worker?worker'
 const PostCSSWorker = new postCSSWorker
@@ -15,9 +17,7 @@ const htmlPromiseWorker = new PromiseWorker(SvelteWorker);
 
 export async function html({ code, data, buildStatic = true, format = 'esm'}) {
 
-  const finalData = _cloneDeep(data)
-
-  let finalRequest = buildFinalRequest(finalData)
+  let finalRequest = buildFinalRequest(data)
 
   const cached = await idb.get(JSON.stringify(finalRequest))
   if (cached) {
@@ -25,9 +25,8 @@ export async function html({ code, data, buildStatic = true, format = 'esm'}) {
   }
 
   // const newData = await replaceImagesWithBase64(data)
-  const newData = data
 
-  finalRequest = buildFinalRequest(newData)
+  finalRequest = buildFinalRequest(data)
 
   let res
   try {
@@ -74,12 +73,11 @@ export async function html({ code, data, buildStatic = true, format = 'esm'}) {
   await idb.set(JSON.stringify(finalRequest), final)
   return final
 
-  function buildFinalRequest(finalData) {
+  function buildFinalRequest(data) {
 
-    // export const primo = ${JSON.stringify(finalData)}
 
     const dataAsVariables = `\
-    ${Object.entries(finalData)
+    ${Object.entries(data)
       .filter(field => field[0])
       .map(field => `export let ${field[0]} = ${JSON.stringify(field[1])};`)
       .join(` \n`)
@@ -103,7 +101,8 @@ export async function html({ code, data, buildStatic = true, format = 'esm'}) {
       code: finalCode,
       hydrated,
       buildStatic,
-      format
+      format,
+      site: get(site)
     }
   }
 

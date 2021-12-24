@@ -9,7 +9,6 @@
   import Build from '../../extensions/Build.svelte'
   import ImageField from '../../extensions/FieldTypes/ImageField.svelte'
   import * as actions from '../../actions'
-  import * as supabaseStorage from '../../supabase/storage'
   import user from '../../stores/user'
   import { sitePassword } from '../../stores/misc'
   import { page } from '$app/stores'
@@ -41,12 +40,6 @@
 
     if (res) {
       data = res
-      // stores.$unsaved = false
-      // // set collaborator role
-      // if (owner.id !== $user.uid) {
-      //   const collaborator = find(collaborator_data, ['uid', $user.uid])
-      //   role = collaborator.role === 'DEV' ? 'developer' : 'content'
-      // }
     }
   }
 
