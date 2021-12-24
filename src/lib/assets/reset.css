@@ -1,6 +1,7 @@
 .primo-reset {
   @tailwind base;
   font-family: 'Satoshi', sans-serif !important;
+  direction: ltr;
 }
 
 body {
@@ -114,6 +115,3 @@ white-space: nowrap;
 border-width: 0;
 }
 
-.primo-reset {
-font-family: 'Satoshi', sans-serif !important;
-}
