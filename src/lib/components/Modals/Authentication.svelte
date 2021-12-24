@@ -8,6 +8,7 @@
   import * as actions from '../../../actions'
   import { createUser } from '../../../supabase/helpers'
   import { page } from '$app/stores'
+  import { browser } from '$app/env'
 
   import Spinner from '$lib/ui/Spinner.svelte'
   import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
@@ -17,11 +18,13 @@
 
   export let onSignIn = () => {}
 
-  axios.get('/api/auth.json').then(({ data }) => {
-    if (!data.initialized) {
-      signingUp = true
-    }
-  })
+  if (browser) {
+    axios.get('/api/auth.json').then(({ data }) => {
+      if (!data.initialized) {
+        signingUp = true
+      }
+    })
+  }
 
   let loading
 
