@@ -10,7 +10,8 @@ export const User = (user = {
   githubID: null,
   hosts: null,
   signedIn: false,
-  role: null
+  role: null,
+  admin: false
 }) => ({
   id: user.id,
   uid: user.uid,
@@ -20,7 +21,8 @@ export const User = (user = {
   type: user.type || 'email',
   githubUsername: user.githubUsername,
   githubID: user.githubID,
-  role: user.role
+  role: user.role,
+  admin: user.admin
 })
 
 

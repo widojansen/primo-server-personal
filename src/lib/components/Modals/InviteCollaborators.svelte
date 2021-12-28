@@ -111,7 +111,7 @@
             </div>
             <span>{collaborator.email}</span>
           </div>
-          {#if $user.role === 'admin'}
+          {#if $user.admin}
             <select
               bind:value={collaborator.role}
               disabled={collaborator.role === 'admin'}
@@ -119,7 +119,7 @@
             >
               <option value="developer" selected>Developer</option>
               <option value="content">Content Editor</option>
-              {#if collaborator.role === 'admin'}
+              {#if $user.admin}
                 <option value="admin">Admin</option>
               {/if}
             </select>

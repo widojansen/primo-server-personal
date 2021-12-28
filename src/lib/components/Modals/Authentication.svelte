@@ -28,10 +28,11 @@
 
   let loading
 
+  let collaboratorRole = $page.query.get('role')
+  $sitePassword = $page.query.get('password')
+
   $: newSignup = $page.query.get('signup') === ''
   $: invitationKey = $page.query.get('key')
-  $sitePassword = $page.query.get('password')
-  let collaboratorRole = $page.query.get('role')
   $: newSignup && invitationKey && signUpWithPassword()
   $: !newSignup && $sitePassword && signIntoPageWithPassword()
 
@@ -106,6 +107,7 @@
       } else if (res) {
         user.update((u) => ({
           ...u,
+          admin: role === 'admin',
           role: role === 'admin' ? 'developer' : role,
         }))
       }

@@ -1,42 +1,42 @@
 <script>
-  import { onMount } from "svelte";
-  import { createUniqueID } from "@primo-app/primo/src/utilities";
-  import Tabs from "$lib/ui/Tabs.svelte";
-  import PrimaryButton from "$lib/ui/PrimaryButton.svelte";
-  import CopyButton from "$lib/ui/CopyButton.svelte";
-  import Hosting from "../Hosting.svelte";
-  import * as supabaseDB from "../../../supabase/db";
+  import { onMount } from 'svelte'
+  import { createUniqueID } from '@primo-app/primo/src/utilities'
+  import Tabs from '$lib/ui/Tabs.svelte'
+  import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
+  import CopyButton from '$lib/ui/CopyButton.svelte'
+  import Hosting from '../Hosting.svelte'
+  import * as supabaseDB from '../../../supabase/db'
 
   const tabs = [
     {
-      label: "Hosting",
-      icon: "globe",
+      label: 'Hosting',
+      icon: 'globe',
     },
     {
-      label: "Server",
-      icon: "server",
+      label: 'Server',
+      icon: 'server',
     },
-  ];
-  let activeTab = tabs[0];
+  ]
+  let activeTab = tabs[0]
 
-  let token = null;
+  let token = null
   async function createToken() {
-    const tokenToSet = createUniqueID(25).toUpperCase();
-    const success = await supabaseDB.config.update("server-token", tokenToSet);
+    const tokenToSet = createUniqueID(25).toUpperCase()
+    const success = await supabaseDB.config.update('server-token', tokenToSet)
     if (success) {
-      token = tokenToSet;
+      token = tokenToSet
     }
   }
 
   onMount(async () => {
-    token = await supabaseDB.config.get("server-token");
-  });
+    token = await supabaseDB.config.get('server-token')
+  })
 </script>
 
 <main>
   <Tabs {tabs} bind:activeTab />
   <div class="content-container">
-    {#if activeTab.label === "Hosting"}
+    {#if activeTab.label === 'Hosting'}
       <h1 class="primo-heading-lg">
         Hosting <span
           >Connect to your favorite webhost to publish your primo sites to the
@@ -44,7 +44,7 @@
         >
       </h1>
       <Hosting showDetails={false} />
-    {:else if activeTab.label === "Server"}
+    {:else if activeTab.label === 'Server'}
       <h1 class="primo-heading-lg">
         Primo Server
         {#if token}
@@ -54,7 +54,7 @@
             one.</span
           >
         {:else}
-          <span>Create an token to manage your sites from your desktop</span>
+          <span>Create a token to manage your sites from your desktop</span>
         {/if}
       </h1>
       <div>
