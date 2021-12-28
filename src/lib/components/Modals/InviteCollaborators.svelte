@@ -1,6 +1,7 @@
 <script>
   import { fade } from 'svelte/transition'
   import { createUniqueID } from '@primo-app/primo/src/utilities'
+  import supabase from '../../../supabase/core'
   import { config, users } from '../../../supabase/db'
   import user from '../../../stores/user'
 
@@ -16,7 +17,13 @@
   $: roleName = RoleLabel(role)
 
   let collaborators = []
-  users.get().then((users) => (collaborators = users))
+
+  fetchServerUsers()
+  supabase.from('users').on('*', fetchServerUsers).subscribe()
+  async function fetchServerUsers() {
+    const data = await users.get()
+    collaborators = data
+  }
 
   let key = ''
   config.get('invitation-key').then((res) => {
@@ -29,6 +36,7 @@
   async function resetKey() {
     key = createUniqueID(15)
     config.update('invitation-key', key)
+    copied = false
   }
 
   let copied = false
@@ -91,7 +99,7 @@
     <h2>Existing Collaborators</h2>
     <ul>
       {#each collaborators as collaborator}
-        <li>
+        <li in:fade>
           <div>
             <div
               class="profile"
