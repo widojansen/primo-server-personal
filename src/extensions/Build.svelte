@@ -182,7 +182,7 @@
 
     return buildSiteTree(pages, site)
 
-    async function buildPageTree({ page, site, isChild = false }) {
+    async function buildPageTree({ page, site }) {
       const { id } = page
       const { html, modules } = await buildStaticPage({
         page,
@@ -201,9 +201,7 @@
           content: module.content,
         })),
         ...(page.pages
-          ? page.pages.map((subpage) =>
-              buildPageTree({ page: subpage, site, isChild: true })
-            )
+          ? page.pages.map((subpage) => buildPageTree({ page: subpage, site }))
           : []),
       ])
     }

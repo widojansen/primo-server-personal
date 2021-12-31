@@ -204,6 +204,17 @@ export const users = {
       return null
     }
     return data[0]
+  },
+  delete: async (email) => {
+    const { data, error } = await supabase
+      .from('users')
+      .delete()
+      .match({ email })
+    if (error) {
+      console.error(error)
+      return null
+    }
+    return data
   }
 }
 

@@ -53,9 +53,13 @@
   }
 
   async function updateUserRole(user) {
-    users.update(user.email, {
-      role: user.role,
-    })
+    if (user.role === 'remove') {
+      users.delete(user.email)
+    } else {
+      users.update(user.email, {
+        role: user.role,
+      })
+    }
   }
 </script>
 
@@ -117,11 +121,11 @@
               disabled={collaborator.role === 'admin'}
               on:change={() => updateUserRole(collaborator)}
             >
+              <option value="admin">Admin</option>
               <option value="developer" selected>Developer</option>
               <option value="content">Content Editor</option>
-              {#if $user.admin}
-                <option value="admin">Admin</option>
-              {/if}
+              <option disabled>───────</option>
+              <option value="remove">Remove</option>
             </select>
           {:else}
             <span>
