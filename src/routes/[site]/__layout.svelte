@@ -79,7 +79,7 @@
   $: siteID = $page.params.site
 
   let data
-  $: if ($user.signedIn && browser) fetchSite($page.path)
+  $: if ($user.signedIn && browser) fetchSite($page.url.pathname)
 </script>
 
 {#if browser}
