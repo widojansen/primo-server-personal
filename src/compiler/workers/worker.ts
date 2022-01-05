@@ -2,7 +2,8 @@ import {rollup} from "../lib/rollup-browser";
 import registerPromiseWorker from 'promise-worker/register'
 import * as svelte from 'svelte/compiler'
 import _find from 'lodash-es/find'
-import {locales} from '@primo-app/primo/src/const'
+// import {locales} from '@primo-app/primo/src/const'
+const locales = []
 
 const CDN_URL = "https://cdn.jsdelivr.net/npm";
 
