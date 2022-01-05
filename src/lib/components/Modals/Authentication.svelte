@@ -28,11 +28,11 @@
 
   let loading
 
-  let collaboratorRole = $page.query.get('role')
-  $sitePassword = $page.query.get('password')
+  let collaboratorRole = $page.url.searchParams.get('role')
+  $sitePassword = $page.url.searchParams.get('password')
 
-  $: newSignup = $page.query.get('signup') === ''
-  $: invitationKey = $page.query.get('key')
+  $: newSignup = $page.url.searchParams.get('signup') === ''
+  $: invitationKey = $page.url.searchParams.get('key')
   $: newSignup && invitationKey && signUpWithPassword()
   $: !newSignup && $sitePassword && signIntoPageWithPassword()
 
