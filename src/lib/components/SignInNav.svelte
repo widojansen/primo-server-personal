@@ -35,7 +35,7 @@
     margin-bottom: 1rem;
 
     .logo {
-      width: 5rem;
+      width: 7rem;
     }
 
     .link {

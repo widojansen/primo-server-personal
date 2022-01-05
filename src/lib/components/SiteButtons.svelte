@@ -4,18 +4,19 @@
   import { stores } from '@primo-app/primo'
   import SiteThumbnail from '$lib/components/SiteThumbnail.svelte'
   import Spinner from '$lib/ui/Spinner.svelte'
-
+  import { setActiveEditor } from '../../supabase/helpers'
   const dispatch = createEventDispatcher()
 
   const { saved } = stores
 
-  function warn(e) {
+  function warn(e, site) {
     if (!$saved) {
       window.alert(
         `Save your site before navigating away so you don't lose your changes`
       )
       e.preventDefault()
     } else {
+      setActiveEditor(site.id, false)
       dispatch('toggle')
     }
   }
@@ -26,7 +27,12 @@
 <ul class="primo-reset" xyz="fade stagger stagger-2">
   {#each featuredSites as site (site.id)}
     <li class="site-item xyz-in">
-      <a on:click={warn} href="/{site.id}">
+      <a
+        on:click={(e) => {
+          warn(e, site)
+        }}
+        href="/{site.id}"
+      >
         <div class="thumbnail">
           <SiteThumbnail {site} />
         </div>

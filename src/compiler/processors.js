@@ -12,9 +12,6 @@ const cssPromiseWorker = new PromiseWorker(PostCSSWorker);
 const SvelteWorker = new svelteWorker()
 const htmlPromiseWorker = new PromiseWorker(SvelteWorker);
 
-// Clear out storage to avoid mucking it up
-// idb.clear()
-
 export async function html({ code, data, buildStatic = true, format = 'esm'}) {
 
   let finalRequest = buildFinalRequest(data)
@@ -23,8 +20,6 @@ export async function html({ code, data, buildStatic = true, format = 'esm'}) {
   if (cached) {
     return cached
   }
-
-  // const newData = await replaceImagesWithBase64(data)
 
   finalRequest = buildFinalRequest(data)
 

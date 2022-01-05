@@ -1,5 +1,7 @@
 import supabase from './core'
 
+const subscriptions = {}
+
 export async function acceptInvitation(pass, userID) {
   const {data,error} = await supabase
     .from('sites')
@@ -48,6 +50,7 @@ const DEFAULT_SITES_QUERY = `
   id,
   name,
   password,
+  active_editor
 `
 
 export const sites = {
@@ -146,11 +149,17 @@ export const sites = {
     return true
   },
   subscribe: async (id, fn) => {
-    const mySubscription = supabase
-      // .from('countries:id=eq.200')
-      .from(`websites:id=eq.${id}`)
-      .on('UPDATE', fn)
-      .subscribe()
+    const existingSubscription = subscriptions[id]
+    if (existingSubscription) { // prevent duplicating subscriptions (also prevents reassigning fwiw)
+      return existingSubscription
+    } else {
+      const subscription = supabase
+        .from(`sites:id=eq.${id}`)
+        .on('UPDATE', fn)
+        .subscribe()
+      subscriptions[id] = subscription
+      return subscription
+    }
   }
 }
 

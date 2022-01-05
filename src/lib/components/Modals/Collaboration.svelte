@@ -75,8 +75,8 @@
             {:else if role === 'developer'}
               <p>
                 Developers have full access to the site's code and content. They
-                can create new components and connect fields for Content Editors
-                to easily edit.
+                can create new components and connect fields that Content
+                Editors can edit.
               </p>
             {/if}
           </div>

@@ -1,4 +1,5 @@
 <script>
+  import { onDestroy } from 'svelte'
   import { browser } from '$app/env'
   import Primo, {
     modal as primoModal,
@@ -6,6 +7,7 @@
     fieldTypes,
     stores,
   } from '@primo-app/primo'
+  import modal from '@primo-app/primo/src/stores/app/modal'
   import Build from '../../extensions/Build.svelte'
   import ImageField from '../../extensions/FieldTypes/ImageField.svelte'
   import * as actions from '../../actions'
@@ -13,6 +15,8 @@
   import { sitePassword } from '../../stores/misc'
   import { page } from '$app/stores'
   import * as primo from '@primo-app/primo/package.json'
+  import { setActiveEditor } from '../../supabase/helpers'
+  import LockAlert from '$lib/components/LockAlert.svelte'
 
   primoModal.register([
     {
@@ -35,10 +39,21 @@
   let currentPath
   async function fetchSite(fullPath) {
     if (currentPath === fullPath) return
-
+    currentPath = fullPath
     const res = await actions.sites.get(siteID, $sitePassword)
-
-    if (res) {
+    if (res?.active_editor && res.active_editor !== $user.email) {
+      modal.show('DIALOG', {
+        component: LockAlert,
+        componentProps: {
+          email: res.active_editor,
+          canGoToDashboard: false,
+        },
+        options: {
+          disableClose: true,
+        },
+      })
+    } else if (res) {
+      setActiveEditor(siteID)
       data = res
     }
   }
@@ -64,7 +79,7 @@
   $: siteID = $page.params.site
 
   let data
-  $: $user.signedIn && browser && fetchSite($page.path)
+  $: if ($user.signedIn && browser) fetchSite($page.path)
 </script>
 
 {#if browser}

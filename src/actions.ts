@@ -1,6 +1,7 @@
 import axios from 'axios'
 import {find} from 'lodash-es'
 import * as supabaseDB from './supabase/db'
+import {sites as dbSites} from './supabase/db'
 import * as supabaseStorage from './supabase/storage'
 import * as stores from './stores'
 import { buildStaticPage } from '@primo-app/primo/src/stores/helpers'
@@ -8,10 +9,25 @@ import { buildStaticPage } from '@primo-app/primo/src/stores/helpers'
 export const sites = {
   get: async (siteID, password) => {
     if (password) {
-      const {data} = await axios.get(`/api/${siteID}.json?password=${password}`)
-      return JSON.parse(data)
+      const [ dbRes, apiRes ] = await Promise.all([
+        dbSites.get({id: siteID}), 
+        axios.get(`/api/${siteID}.json?password=${password}`)
+      ])
+      return {
+        ...dbRes,
+        ...JSON.parse(apiRes.data)
+      }
     } else {
-      return await supabaseStorage.downloadSiteData(siteID)
+      // const res = await dbSites.get({id: siteID})
+      const [ dbRes, storageRes ] = await Promise.all([
+        dbSites.get({id: siteID}),
+        supabaseStorage.downloadSiteData(siteID)
+      ]) 
+
+      return {
+        ...dbRes,
+        ...storageRes
+      }
     }
   },
   initialize: async () => {
@@ -41,6 +57,7 @@ export const sites = {
     await supabaseDB.sites.update(id, props)
   },
   save: async (updatedSite, password) => {
+    console.log({updatedSite, password})
     stores.sites.update(sites => sites.map(site => site.id === updatedSite.id ? updatedSite : site))
 
     if (password) {
