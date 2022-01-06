@@ -4,14 +4,12 @@
 
 This project lets you run Primo on your own server so you have full control over your own data and can edit your sites from any device, as well as invite others to collaborate. 
 
-If you're just building websites for yourself, you may prefer just using Primo Desktop. But this project allows you to run Primo in the cloud so that you can access and edit your sites from any device and collaborate with other developers/content editors*, as well as edit them from Primo Desktop. 
+If you're just building websites for yourself, you may prefer just using Primo Desktop. But this project allows you to run Primo in the cloud so that you can access and edit your sites from any device and collaborate with other developers/content editors (not at the same time), as well as edit them from Primo Desktop. 
 
 ### Features
 * Multiple users
 * Image uploads
 * Use from anywhere
-
-*not at the same time
 
 ## Project Status
 
