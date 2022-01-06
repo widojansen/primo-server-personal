@@ -153,10 +153,10 @@
         path: `primo.json`,
         content: JSON.stringify(site),
       },
-      ...Object.entries(site.content).map((item) => ({
-        path: `${item[0]}.json`,
-        content: JSON.stringify(item[1]),
-      })),
+      // ...Object.entries(site.content).map((item) => ({
+      //   path: `${item[0]}.json`,
+      //   content: JSON.stringify(item[1]),
+      // })),
       {
         path: `primo.json`,
         content: JSON.stringify(site),

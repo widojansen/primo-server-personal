@@ -86,7 +86,6 @@
       loginMessage =
         'Could not sign up. Ask the server Admin to send you a new invitation link.'
     } else {
-      console.log({ res })
       signIn()
     }
     loadingEmail = false
