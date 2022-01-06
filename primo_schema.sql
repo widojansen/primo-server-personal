@@ -5,6 +5,7 @@ CREATE TABLE public.sites (
     id text NOT NULL,
     name text,
     password text,
+    active_user text,
     created_at timestamp with time zone DEFAULT now()
 );
 
@@ -119,7 +120,7 @@ GRANT ALL ON SEQUENCE public.hosts_id_seq TO authenticated;
 GRANT ALL ON SEQUENCE public.hosts_id_seq TO service_role;
 
 
--- STORAGE
+-- STORAGE (for saving site data & images)
 INSERT INTO storage.buckets (id, name, created_at, updated_at, public) VALUES
     ('sites', 'sites', now(), now(), true);
 
@@ -128,3 +129,24 @@ CREATE POLICY "Public access to view sites" ON storage.objects FOR SELECT USING 
 CREATE POLICY "Give Authenticated users access to upload new sites" ON storage.objects FOR INSERT WITH CHECK (((bucket_id = 'sites'::text) AND (auth.role() = 'authenticated'::text)));
 CREATE POLICY "Give Authenticated users access to update sites" ON storage.objects FOR UPDATE USING (((bucket_id = 'sites'::text) AND (auth.role() = 'authenticated'::text)));
 CREATE POLICY "Give Authenticated users access to delete sites" ON storage.objects FOR DELETE USING (((bucket_id = 'sites'::text) AND (auth.role() = 'authenticated'::text)));
+
+
+
+-- Function (for setting active user)
+CREATE FUNCTION "public"."remove_active_editor"("site" "text") RETURNS smallint
+    LANGUAGE "plv8"
+    AS $_$
+
+    var num_affected = plv8.execute( 
+        'select pg_sleep(10); update sites set active_editor = NULL where id = $1;', 
+        [site]
+    );
+
+    return num_affected;
+$_$;
+
+ALTER FUNCTION "public"."remove_active_editor"("site" "text") OWNER TO "supabase_admin";
+GRANT ALL ON FUNCTION "public"."remove_active_editor"("site" "text") TO "postgres";
+GRANT ALL ON FUNCTION "public"."remove_active_editor"("site" "text") TO "anon";
+GRANT ALL ON FUNCTION "public"."remove_active_editor"("site" "text") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."remove_active_editor"("site" "text") TO "service_role";
