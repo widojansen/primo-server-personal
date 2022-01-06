@@ -23,34 +23,34 @@ registerPromiseWorker(async function ({code,site,hydrated,buildStatic = true, fo
 
     function generate_lookup(code) {
         component_lookup.set(`./App.svelte`, code);
-        component_lookup.set('./LanguageSelector.svelte', `
-            <script>
-                let locale = getUrlQuery() || 'en'
-                $: {
-                    if (locale) {
-                        document.documentElement.lang = locale
-                    }
-                }
+        // component_lookup.set('./LanguageSelector.svelte', `
+        //     <script>
+        //         let locale = getUrlQuery() || 'en'
+        //         $: {
+        //             if (locale) {
+        //                 document.documentElement.lang = locale
+        //             }
+        //         }
 
-                function getUrlQuery() {
-                  var searchParams = new URLSearchParams(window.location.search);
-                  return searchParams.get('lang') 
-                }
+        //         function getUrlQuery() {
+        //           var searchParams = new URLSearchParams(window.location.search);
+        //           return searchParams.get('lang') 
+        //         }
                 
-                function setUrlQuery() {
-                  var searchParams = new URLSearchParams(window.location.search);
-                  searchParams.set("lang", locale);
-                  window.location.search = searchParams.toString();
-                }
-            </script>
-            <select bind:value={locale} on:change={setUrlQuery}>
-                ${
-                    Object.keys(site.content).map(locale => `
-                        <option value="${locale}">${_find(locales, ['key', locale])['name']}</option>
-                    `).join('')
-                }
-            </select>
-        `)
+        //         function setUrlQuery() {
+        //           var searchParams = new URLSearchParams(window.location.search);
+        //           searchParams.set("lang", locale);
+        //           window.location.search = searchParams.toString();
+        //         }
+        //     </script>
+        //     <select bind:value={locale} on:change={setUrlQuery}>
+        //         ${
+        //             Object.keys(site.content).map(locale => `
+        //                 <option value="${locale}">${_find(locales, ['key', locale])['name']}</option>
+        //             `).join('')
+        //         }
+        //     </select>
+        // `)
         component_lookup.set(`./H.svelte`, `
             <script>
                 import {onMount} from 'svelte'
