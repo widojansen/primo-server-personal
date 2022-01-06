@@ -6,6 +6,11 @@ This project lets you run Primo on your own server so you have full control over
 
 If you're just building websites for yourself, you may prefer just using Primo Desktop. But this project allows you to run Primo in the cloud so that you can access and edit your sites from any device and collaborate with other developers/content editors*, as well as edit them from Primo Desktop. 
 
+### Features
+* Multiple users
+* Image uploads
+* Use from anywhere
+
 *not at the same time
 
 ## Project Status
@@ -15,7 +20,7 @@ Primo Server is in Alpha. Features may break from version to version, but _proba
 Until we ge to Beta, we can't recommend using primo in production (but it's good enough for personal projects).
 
 ## How it works
-This repo deploys primo to [Vercel](https://vercel.com) and uses [Supabase](https://supabase.co) for authentication, database (PostgresSQL), and storage. 
+This repo deploys primo to [Vercel](https://vercel.com) and uses [Supabase](https://supabase.co) for authentication, database (PostgreSQL), and storage. 
 
 ## Setup 
 Primo can be run on the free tier of both services (Vercel & Supabase), but you'll need to sign in with Github. 
@@ -39,9 +44,6 @@ Before deploying your Primo Server, you'll need to sign up for [Supabase](https:
 1. Under 'Configure Project', enter your Supabase project **URL**, **Public Key (anon public)**, and **Admin Key (service_role secret)** (which you can find in the Supabase project dashboard > Settings > API https://app.supabase.io/project/---yourprojectid---/settings/api)
 1. Click 'Deploy'
 1. Sign up with an email address and password (this will be the admin account). For now, the server has a single email/password account which can send invitation URLs to collaborators. 
-
-### Loose Ends
-1. Disable Signups (Authentication > Settings > Email Auth) to keep internet strangers away from your sites.
 
 ## Contributing
 Feel free to look for open issues in this repo and the [primo repo](https://github.com/primo-af/primo). If you find a bug or find yourself needing something from primo that it can't do, please open an issue to start discussion. 
