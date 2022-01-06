@@ -1,9 +1,9 @@
 import {getServerToken, validateSitePassword, validateInvitationKey} from '../../supabase/admin'
 
 export async function authorizeRequest(req, callback) {
-  const { headers, query } = req
-  const password = query.get('password')
-  const key = query.get('key')
+  const { headers, url } = req
+  const password = url.searchParams.get('password')
+  const key = url.searchParams.get('key')
 
   if (key) {
     const valid = await validateInvitationKey(key)
