@@ -5,7 +5,7 @@ CREATE TABLE public.sites (
     id text NOT NULL,
     name text,
     password text,
-    active_user text,
+    active_editor text,
     created_at timestamp with time zone DEFAULT now()
 );
 
@@ -131,8 +131,11 @@ CREATE POLICY "Give Authenticated users access to update sites" ON storage.objec
 CREATE POLICY "Give Authenticated users access to delete sites" ON storage.objects FOR DELETE USING (((bucket_id = 'sites'::text) AND (auth.role() = 'authenticated'::text)));
 
 
-
 -- Function (for setting active user)
+-- Setup
+CREATE EXTENSION IF NOT EXISTS "plv8" WITH SCHEMA "pg_catalog";
+COMMENT ON EXTENSION "plv8" IS 'PL/JavaScript (v8) trusted procedural language';
+
 CREATE FUNCTION "public"."remove_active_editor"("site" "text") RETURNS smallint
     LANGUAGE "plv8"
     AS $_$
