@@ -43,6 +43,13 @@ Before deploying your Primo Server, you'll need to sign up for [Supabase](https:
 1. Click 'Deploy'
 1. Sign up with an email address and password (this will be the admin account). For now, the server has a single email/password account which can send invitation URLs to collaborators. 
 
+### Updating
+
+At the moment, the only way to update your server instance to a newer version of primo is to re-deploy it. It takes a few steps, but doesn't require migrating your database or anything dangerous like that. 
+
+1. Delete the existing repository and Vercel project (the data will be unaffected since it's in Supabase)
+1. Click 'Deploy' and follow the instillation steps, using your existing Supabase project's details
+
 ## Contributing
 Feel free to look for open issues in this repo and the [primo repo](https://github.com/primo-af/primo). If you find a bug or find yourself needing something from primo that it can't do, please open an issue to start discussion. 
 
