@@ -66,11 +66,7 @@
     margin: var(--space-y, 0) var(--space-x, 0);
 
     &:hover {
-      background: var(--primo-color-primored);
-    }
-    &[disabled] {
-      opacity: 0.5;
-      pointer-events: none;
+      background: var(--primo-color-primogreen);
     }
   }
 

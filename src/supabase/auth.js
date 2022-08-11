@@ -6,7 +6,6 @@ export async function signUp({ email, password }) {
 }
 
 export async function signInWithGithub({ redirectTo = '/dashboard' }) {
-  console.log({redirectTo})
   const { user, session, error } = await supabase.auth.signIn({
     // provider can be 'github', 'google', 'gitlab', or 'bitbucket'
     provider: 'github'
@@ -14,7 +13,6 @@ export async function signInWithGithub({ redirectTo = '/dashboard' }) {
     scopes: 'public_repo',
     redirectTo
   })
-  console.log({user,session,error})
 }
 
 export function watchForAutoLogin(cb) {

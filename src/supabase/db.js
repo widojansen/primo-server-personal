@@ -1,4 +1,6 @@
+import {get} from 'svelte/store'
 import supabase from './core'
+import user from '../stores/user'
 
 const subscriptions = {}
 
@@ -50,7 +52,9 @@ const DEFAULT_SITES_QUERY = `
   id,
   name,
   password,
-  active_editor
+  active_editor,
+  host,
+  active_deployment
 `
 
 export const sites = {
@@ -88,10 +92,19 @@ export const sites = {
         site = data[0]
       }
     } else {
+
+      // fetch all sites
+
       const {data,error} = await supabase
         .from('sites')
         .select(query)
-      site = data
+
+      // filter ones which user is allowed to see
+      const filtered = data.filter(site => {
+        return true
+      })
+
+      site = filtered
     }
     if (site && typeof site.data === 'string') {
       site.data = JSON.parse(site.data)
@@ -164,15 +177,21 @@ export const sites = {
 }
 
 export const users = {
-  get: async (uid = null, select = '*') => {
+  get: async (uid = null, select = '*', email = null) => {
     let data
     let error
-
     if (uid) {
       const res = await supabase
         .from('users')
         .select(select)
         .eq('id', uid)
+      data = res.data
+      error = res.error
+    } else if (email) {
+      const res = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
       data = res.data
       error = res.error
     } else {

@@ -1,11 +1,13 @@
 <script>
   import axios from 'axios'
-  import { find as _find } from 'lodash-es'
+  import { find as _find, flattenDeep } from 'lodash-es'
+  import beautify from 'js-beautify'
   import { fade, slide } from 'svelte/transition'
   import hosts from '../../stores/hosts'
   import * as actions from '../../actions'
   import TextField from '$lib/ui/TextField.svelte'
-  import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
+  import {sitePassword} from '../../stores/misc'
+  import { id as siteID, site } from '@primo-app/primo/src/stores/data/draft'
 
   export let buttons = []
 
@@ -25,6 +27,12 @@
         name: 'vercel',
         token,
       })
+      actions.sites.update({
+        id: $siteID,
+        props: {
+          host: 'vercel'
+        }
+      })
     } else {
       window.alert('Could not connect to host')
     }
@@ -42,24 +50,47 @@
         data: null
       })
     if (data) {
-      hosts.update((h) => {
-        return [
-          ...h,
-          {
-            name: 'netlify',
-            token,
-            user: data,
-          },
-        ]
+      actions.hosts.create({
+        name: 'netlify',
+        token,
+        user: data,
+      })
+      actions.sites.update({
+        id: $siteID,
+        props: {
+          host: 'netlify'
+        }
       })
     } else {
       window.alert('Could not connect to host')
     }
   }
 
+
+  async function connectGithub(token) {
+    const headers = { 'Authorization': `Bearer ${token}` }
+
+    const {data} = await axios.get(`https://api.github.com/user`, { 
+      headers: { ...headers, 'Accept': 'application/vnd.github.v3+json' } 
+    })
+
+    if (data) {
+      actions.hosts.create({
+        name: 'github',
+        token,
+        user: data,
+      })
+      actions.sites.update({
+        id: $siteID,
+        props: {
+          host: 'github'
+        }
+      })
+    }
+  }
+
   let showingHosts = false
   let errorMessage = null
-  let loading = false
 
   let hostBeingConnected = null
 
@@ -118,7 +149,7 @@
             id="g836"
             transform="matrix(0.96976481,0,0,0.96976481,1.4142375,0.90705594)">
             <path
-              style="fill:#0e1e25;fill-rule:nonzero;stroke:none;stroke-width:0.2506941"
+              style="fill:currentColor;fill-rule:nonzero;stroke:none;stroke-width:0.2506941"
               inkscape:connector-curvature="0"
               id="Shape"
               d="m 50.318924,25.028803 0.0839,1.501545 c 0.957072,-1.16134 2.213613,-1.74201 3.76894,-1.74201 2.695217,0 4.067043,1.549364 4.114792,4.648094 v 8.585721 h -2.906003 v -8.417668 c 0,-0.824552 -0.177364,-1.434597 -0.532086,-1.831503 -0.354724,-0.396222 -0.935244,-0.594333 -1.740875,-0.594333 -1.172634,0 -2.046483,0.532851 -2.619497,1.597185 v 9.246319 h -2.90737 v -12.99335 h 2.739558 z m 16.629715,13.233816 c -1.841834,0 -3.335766,-0.582036 -4.479748,-1.746793 -1.144667,-1.164756 -1.716999,-2.71617 -1.716999,-4.653559 v -0.360015 c 0,-1.296603 0.248987,-2.455894 0.747648,-3.476507 0.497976,-1.020613 1.198556,-1.815107 2.099691,-2.384164 0.901135,-0.56769 1.905957,-0.851877 3.01515,-0.851877 1.762021,0 3.124296,0.564275 4.08478,1.692824 0.961845,1.129233 1.442088,2.725735 1.442088,4.791554 v 1.177053 h -8.458795 c 0.08868,1.072532 0.444769,1.920994 1.070992,2.545385 0.626224,0.624391 1.414121,0.936587 2.363005,0.936587 1.33158,0 2.416215,-0.539682 3.253907,-1.621095 l 1.566923,1.501545 c -0.51844,0.776049 -1.210153,1.378579 -2.075133,1.806909 -0.865661,0.42833 -1.836377,0.642153 -2.912827,0.642153 z M 66.602102,27.131513 c -0.798127,0 -1.441406,0.280088 -1.931879,0.840264 -0.491157,0.560176 -0.803584,1.341006 -0.939335,2.341808 h 5.539146 V 30.09703 c -0.06412,-0.976893 -0.323345,-1.714685 -0.777663,-2.215428 -0.455002,-0.50006 -1.084636,-0.750089 -1.890269,-0.750089 z m 11.436427,-5.260189 v 3.158163 h 2.285237 v 2.161459 h -2.285237 v 7.252912 c 0,0.495961 0.09823,0.853927 0.29333,1.074582 0.195097,0.219971 0.544362,0.329957 1.047116,0.329957 0.342285,-9.52e-4 0.68333,-0.0413 1.016419,-0.120233 v 2.257783 c -0.661697,0.184448 -1.299518,0.275989 -1.914142,0.275989 -2.232714,0 -3.349411,-1.236486 -3.349411,-3.710141 v -7.361532 h -2.13107 v -2.16146 h 2.129706 v -3.158162 h 2.906688 z m 7.597224,16.151512 H 82.728384 V 19.578018 h 2.907369 z m 6.256779,0 h -2.90737 V 25.029487 h 2.90737 z M 88.805755,21.654768 c 0,-0.447458 0.141206,-0.81977 0.424303,-1.116253 0.28378,-0.2958 0.6883,-0.444042 1.214246,-0.444042 0.526629,0 0.933197,0.148242 1.221069,0.444042 0.286508,0.296483 0.429762,0.668795 0.429762,1.116936 0,0.439943 -0.143254,0.806107 -0.429762,1.098491 -0.287872,0.292385 -0.69444,0.438577 -1.221069,0.438577 -0.525946,0 -0.930466,-0.146192 -1.214246,-0.438577 -0.283097,-0.291701 -0.424303,-0.658548 -0.424303,-1.098491 z m 7.27388,16.368068 V 27.190263 h -1.974174 v -2.16146 h 1.974174 v -1.188666 c 0,-1.441428 0.398383,-2.553582 1.195828,-3.338512 0.79813,-0.784246 1.914145,-1.176369 3.349407,-1.176369 0.51094,0 1.05326,0.07173 1.62764,0.215872 l -0.0716,2.281693 c -0.36686,-0.06819 -0.73951,-0.100221 -1.1126,-0.09564 -1.388199,0 -2.081958,0.715932 -2.081958,2.149163 v 1.152459 h 2.631778 v 2.16146 h -2.631778 v 10.83189 h -2.906687 z m 12.190215,-4.178776 2.63177,-8.814573 H 114 l -5.14349,14.962846 c -0.78994,2.185371 -2.12971,3.278395 -4.01998,3.278395 -0.42294,0 -0.88953,-0.07241 -1.39979,-0.216555 v -2.257782 l 0.5505,0.03621 c 0.73333,0 1.28588,-0.133896 1.65697,-0.40237 0.37042,-0.267792 0.66374,-0.717982 0.87931,-1.350571 l 0.41816,-1.116936 -4.54592,-12.933233 h 3.13453 z" />
@@ -131,9 +162,11 @@
         </svg>
         `,
     },
+    {
+      id: 'github',
+      svg: `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" id="footer-sample-full" width="3.69em" height="1em" preserveAspectRatio="xMidYMid meet" viewBox="0 0 512 139" class="iconify iconify--logos"><path fill="currentColor" d="M98.696 59.312h-43.06a2.015 2.015 0 0 0-2.013 2.014v21.053c0 1.111.902 2.015 2.012 2.015h16.799v26.157s-3.772 1.286-14.2 1.286c-12.303 0-29.49-4.496-29.49-42.288c0-37.8 17.897-42.773 34.698-42.773c14.543 0 20.809 2.56 24.795 3.794c1.253.384 2.412-.863 2.412-1.975l4.803-20.342c0-.52-.176-1.146-.769-1.571C93.064 5.527 83.187 0 58.233 0C29.488 0 0 12.23 0 71.023c0 58.795 33.76 67.556 62.21 67.556c23.555 0 37.844-10.066 37.844-10.066c.59-.325.653-1.148.653-1.526V61.326c0-1.11-.9-2.014-2.01-2.014Zm221.8-51.953c0-1.12-.888-2.024-1.999-2.024h-24.246a2.016 2.016 0 0 0-2.008 2.024l.006 46.856h-37.792V7.36c0-1.12-.892-2.024-2.001-2.024H228.21a2.014 2.014 0 0 0-2.003 2.024v126.872c0 1.12.9 2.03 2.003 2.03h24.245c1.109 0 2-.91 2-2.03V79.964h37.793l-.066 54.267c0 1.12.9 2.03 2.008 2.03h24.304c1.11 0 1.998-.91 2-2.03V7.36ZM144.37 24.322c0-8.73-7-15.786-15.635-15.786c-8.627 0-15.632 7.055-15.632 15.786c0 8.72 7.005 15.795 15.632 15.795c8.635 0 15.635-7.075 15.635-15.795Zm-1.924 83.212V48.97a2.015 2.015 0 0 0-2.006-2.021h-24.169c-1.109 0-2.1 1.144-2.1 2.256v83.905c0 2.466 1.536 3.199 3.525 3.199h21.775c2.39 0 2.975-1.173 2.975-3.239v-25.536ZM413.162 46.95h-24.06c-1.104 0-2.002.909-2.002 2.028v62.21s-6.112 4.472-14.788 4.472c-8.675 0-10.977-3.937-10.977-12.431v-54.25c0-1.12-.897-2.03-2.001-2.03h-24.419c-1.102 0-2.005.91-2.005 2.03v58.358c0 25.23 14.063 31.403 33.408 31.403c15.87 0 28.665-8.767 28.665-8.767s.61 4.62.885 5.168c.276.547.994 1.098 1.77 1.098l15.535-.068c1.102 0 2.005-.911 2.005-2.025l-.008-85.168a2.02 2.02 0 0 0-2.008-2.028Zm55.435 68.758c-8.345-.254-14.006-4.041-14.006-4.041V71.488s5.585-3.423 12.436-4.035c8.664-.776 17.013 1.841 17.013 22.51c0 21.795-3.768 26.096-15.443 25.744Zm9.49-71.483c-13.665 0-22.96 6.097-22.96 6.097V7.359a2.01 2.01 0 0 0-2-2.024h-24.315a2.013 2.013 0 0 0-2.004 2.024v126.872c0 1.12.898 2.03 2.007 2.03h16.87c.76 0 1.335-.39 1.76-1.077c.419-.682 1.024-5.85 1.024-5.85s9.942 9.422 28.763 9.422c22.096 0 34.768-11.208 34.768-50.315s-20.238-44.217-33.913-44.217ZM212.229 46.73h-18.187l-.028-24.027c0-.909-.468-1.364-1.52-1.364H167.71c-.964 0-1.481.424-1.481 1.35v24.83s-12.42 2.998-13.26 3.24a2.013 2.013 0 0 0-1.452 1.934v15.603c0 1.122.896 2.027 2.005 2.027h12.707v37.536c0 27.88 19.556 30.619 32.753 30.619c6.03 0 13.243-1.937 14.434-2.376c.72-.265 1.138-1.01 1.138-1.82l.02-17.164c0-1.119-.945-2.025-2.01-2.025c-1.06 0-3.77.431-6.562.431c-8.933 0-11.96-4.154-11.96-9.53l-.001-35.67h18.188a2.014 2.014 0 0 0 2.006-2.028V48.753c0-1.12-.897-2.022-2.006-2.022Z"></path></svg>`
+    }
   ]
-
-  // $: getAccountData($user.tokens)
 
   let enteredToken
 </script>
@@ -144,13 +177,15 @@
       <div class="user">
         {@html _find(availableHosts, ['id', host.name])['svg']}
       </div>
-      <div class="host-user">
-        <button
-          on:click={() => {
-            actions.hosts.delete(host.name)
-          }}>Remove</button
-        >
-        <span class="sr-only">Go to host</span>
+      <div class="remove-option">
+        {#if !$sitePassword}
+          <!-- Hide option to remove for password users -->
+          <button
+            on:click={() => {
+              actions.hosts.delete(host.name)
+            }}>Remove</button
+          >
+        {/if}
       </div>
     </div>
   {/each}
@@ -222,6 +257,42 @@
         {/if}
       </form>
     </div>
+    {:else if hostBeingConnected === 'github'}
+    <div class="box connecting-host">
+      <button class="back" on:click={() => (hostBeingConnected = null)}
+        >Back to web hosts</button
+      >
+      <form
+        on:submit|preventDefault={async () => {
+          await connectGithub(enteredToken)
+          hostBeingConnected = null
+        }}
+        in:fade={{ duration: 200 }}
+      >
+        <TextField
+          bind:value={enteredToken}
+          placeholder="7diizPFerd0Isu33ex9aamjT"
+          button={{
+            label: 'Connect',
+            type: 'submit',
+          }}
+        >
+          <p class="title">Github</p>
+          <p class="subtitle">
+            Create and enter a <a
+              style="text-decoration:underline"
+              target="blank"
+              href="https://github.com/settings/tokens">Personal Access Token</a
+            > to finish connecting to your account
+          </p>
+        </TextField>
+        {#if errorMessage}
+          <div class="error-message" transition:slide>
+            {errorMessage}
+          </div>
+        {/if}
+      </form>
+    </div>
   {/if}
   {#if !showingHosts && $hosts.length === 0}
     <footer>
@@ -243,7 +314,7 @@
       <div class="buttons" in:fade={{ duration: 200 }}>
         {#each availableHosts as host}
           <button
-            class={host.id}
+            class="button {host.id}"
             on:click={() => (hostBeingConnected = host.id)}
           >
             {@html host.svg}
@@ -261,8 +332,8 @@
     transition: text-decoration-color 0.1s, color 0.1s;
     text-decoration: underline var(--primo-color-gray-4);
     &:hover {
-      text-decoration-color: var(--primo-color-primored);
-      color: var(--primo-color-primored);
+      text-decoration-color: var(--primo-color-primogreen);
+      color: var(--primo-color-primogreen);
     }
   }
   .heading {
@@ -284,7 +355,7 @@
     a {
       text-decoration: underline;
       &:hover {
-        color: var(--primo-color-primored);
+        color: var(--primo-color-primogreen);
       }
     }
   }
@@ -296,16 +367,9 @@
     padding: 1rem;
     background: var(--primo-color-codeblack);
     .icon-item {
-      i {
-        margin-right: 5px;
-      }
       a {
         text-decoration: underline;
       }
-    }
-    .box-footer {
-      font-size: 0.75rem;
-      color: var(--primo-color-gray-5);
     }
     .user {
       display: grid;
@@ -318,11 +382,6 @@
     }
     a {
       text-decoration: underline;
-    }
-    .hosts {
-      width: 100%;
-      display: grid;
-      gap: 0.5rem;
     }
     &.host-account {
       width: 100%;
@@ -342,22 +401,11 @@
         border-bottom: 1px solid var(--primo-color-gray-9);
         margin-bottom: 1rem;
       }
-      img {
-        width: 3rem;
-        height: 3rem;
-        object-fit: contain;
-        border-radius: 50%;
-      }
-      .user-details {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
 
-        .footer {
-          margin-top: 0.25rem;
-          font-size: 0.75rem;
-          color: var(--primo-color-gray-5);
-        }
+      .remove-option button {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--color-gray-8);
+        border-radius: var(--primo-border-radius);
       }
     }
     /* .deployment {
@@ -369,9 +417,6 @@
         color: var(--primo-color-gray-3);
       }
     } */
-    .link {
-      align-self: flex-end;
-    }
   }
 
   .boxes {
@@ -392,10 +437,10 @@
     grid-template-columns: 1fr 1fr;
     color: black;
 
-    button {
+    .button {
       background: white;
       padding: 1rem;
-      box-shadow: 0 0 0 0 var(--primo-color-primored);
+      box-shadow: 0 0 0 0 var(--primo-color-primogreen);
       border-radius: var(--primo-border-radius);
       transition: box-shadow 0.1s;
       overflow: visible;
@@ -403,52 +448,28 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      svg {
-        width: 6rem;
-        height: 100%;
-        padding: 1rem 0;
-      }
       &:not([disabled]):hover {
-        box-shadow: 0 0 0 3px var(--primo-color-primored);
+        box-shadow: 0 0 0 3px var(--primo-color-primogreen);
       }
-      &[disabled] {
-        cursor: initial;
-        opacity: 0.5;
-      }
+    }
+
+    .button.github {
+      padding: 2rem 0;
     }
   }
 
   .connecting-host {
     padding: 1rem;
-    box-shadow: 0 0 0 1px var(--primo-color-primored);
+    box-shadow: 0 0 0 1px var(--primo-color-primogreen);
     margin-top: 1rem;
     width: 100%;
     --space-y: 0;
 
     .back {
-      color: var(--primo-color-primored);
+      color: var(--primo-color-primogreen);
       font-size: 0.75rem;
       text-decoration: underline;
       margin-bottom: 0.5rem;
-    }
-
-    label {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      margin-bottom: 1rem;
-
-      input {
-        border: 0;
-        width: 100%;
-        background: var(--primo-color-gray-8);
-        color: var(--primo-color-gray-1);
-      }
-    }
-    .submit-button {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 1rem;
     }
   }
 </style>

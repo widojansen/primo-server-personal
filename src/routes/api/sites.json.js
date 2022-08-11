@@ -1,14 +1,16 @@
-import * as supabaseDB from '../../supabase/db'
-import * as supabaseStorage from '../../supabase/storage'
+import supabaseAdmin from '../../supabase/admin'
 import { authorizeRequest } from './_auth'
 
-export async function get(req) {
-  return await authorizeRequest(req, async () => {
+export async function GET(event) {
+  return await authorizeRequest(event, async () => {
     let finalSites = []
-    const sites = await supabaseDB.sites.get({query: `id, name, password`})
+    const {data:sites} = await supabaseAdmin.from('sites').select('*')
     await Promise.all(
       sites.map(async site => {
-        const data = await supabaseStorage.downloadSiteData(site.id)
+        const {data:res} = await supabaseAdmin.storage.from('sites').download(`${site.id}/site.json?${Date.now()}`) // bust the cache (i.e. prevent outdated data)
+        const json = await res.text()
+        const data = JSON.parse(json)
+      
         finalSites = [
           ...finalSites,
           {
@@ -24,4 +26,14 @@ export async function get(req) {
       }
     };
   })
+}
+
+export async function options() {
+  return {
+    headers: {
+			'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+    }
+  }
 }

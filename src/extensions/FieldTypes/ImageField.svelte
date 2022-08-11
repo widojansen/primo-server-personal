@@ -1,8 +1,11 @@
 <script>
   import { createEventDispatcher } from 'svelte'
-  import { uploadSiteImage } from '../../supabase/storage'
   const dispatch = createEventDispatcher()
+  import imageCompression from 'browser-image-compression'
+  import svgToMiniDataURI from 'mini-svg-data-uri'
+  import TextInput from '@primo-app/primo/src/components/inputs/TextInput.svelte';
   import Spinner from '$lib/ui/Spinner.svelte'
+  import {sites} from '../../actions'
   import { page } from '$app/stores'
 
   const siteID = $page.params.site
@@ -35,14 +38,19 @@
     loading = true
     const { files } = target
     if (files.length > 0) {
-      const file = files[0]
+      const image = files[0]
 
-      let size = new Blob([file]).size
-
-      const url = await uploadSiteImage({
-        id: siteID,
-        file,
+      const compressed = await imageCompression(image, {
+        maxSizeMB: 0.5,
       })
+      let size = new Blob([compressed]).size
+
+      let dataUri = await convertBlobToBase64(compressed)
+      const base64 = dataUri.replace(/data:.+?,/, "");
+      const url = await sites.uploadImage({ siteID, image: {
+        name: image.name,
+        base64
+      } })
 
       imagePreview = url
 
@@ -56,11 +64,73 @@
     }
   }
 
+  async function convertBlobToBase64(blob) {
+    return new Promise((resolve, _) => {
+      const reader = new FileReader()
+      reader.onloadend = () => resolve(reader.result)
+      reader.readAsDataURL(blob)
+    })
+  }
+
+  async function encodeImageFileAsURL({ target }) {
+    loading = true
+    const { files } = target
+    if (files.length > 0) {
+      const file = files[0]
+
+      let dataUri
+      let size
+      if (file.type === 'image/svg+xml') {
+        const contents = await file.text()
+        dataUri = svgToMiniDataURI(contents)
+        size = new Blob([file]).size
+      } else {
+        const compressed = await imageCompression(file, {
+          maxSizeMB: 0.25,
+        })
+        dataUri = await convertBlobToBase64(compressed)
+        size = new Blob([compressed]).size
+      }
+
+      imagePreview = dataUri
+      setValue({
+        url: dataUri,
+        size: Math.round(size / 1000),
+      })
+
+      loading = false
+      dispatch('input')
+
+      async function convertSvgToDataUri(file) {
+        const reader = new FileReader()
+        return new Promise((resolve, reject) => {
+          reader.readAsDataURL(file)
+          reader.addEventListener(
+            'load',
+            () => {
+              resolve(reader.result)
+            },
+            false
+          )
+        })
+      }
+    }
+  }
+
+  async function hydratePreview() {
+    // const imageKey = field.value.url.slice(12)
+    // const file = await downloadSiteImage(imageKey)
+    // const b64 = await convertBlobToBase64(file)
+    // imagePreview = b64
+  }
+
   let imagePreview = field.value.url || ''
   let loading = false
+
+  $: if (imagePreview.startsWith('primo:')) hydratePreview()
 </script>
 
-<div>
+<div class="image-field">
   <span class="field-label">{field.label}</span>
   <div class="image-info">
     {#if loading}
@@ -71,21 +141,6 @@
       <div class="image-preview">
         {#if field.value.size}
           <span class="field-size">
-            {#if field.value.size > 1000}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
-            {/if}
             {field.value.size}KB
           </span>
         {/if}
@@ -127,52 +182,56 @@
           {#if !field.value.url}
             <span>Upload</span>
           {/if}
-          <input on:change={uploadImage} type="file" accept="image/*" />
+          <input
+            on:change={uploadImage}
+            type="file"
+            accept="image/*"
+          />
         </label>
       </div>
     {/if}
     <div class="inputs">
-      <label class="image-input">
-        <span>URL</span>
-        <input
-          on:input={(e) => {
-            const { value } = e.target
-            imagePreview = value
-            setValue({
-              url: value,
-              size: null,
-            })
-            dispatch('input')
-          }}
-          value={field.value.url}
-          type="url"
-        />
-      </label>
-      <label class="image-input">
-        <span>Description</span>
-        <input type="text" bind:value={field.value.alt} />
-      </label>
+      <TextInput bind:value={field.value.alt} label="Description" />
+      <TextInput value={field.value.url} label="URL" on:input={({detail:value}) => {
+        imagePreview = value
+        setValue({
+          url: value,
+          size: null,
+        })
+        dispatch('input')
+      }} />
     </div>
   </div>
 </div>
 <slot />
 
 <style lang="postcss">
+  * {
+    --TextInput-label-font-size: 0.75rem;
+  }
+  .image-field {
+    display: grid;
+    gap: 1rem;
+  }
   .field-label {
     font-size: var(--font-size-1);
     font-weight: 600;
     display: inline-block;
-    padding-bottom: 0.25rem;
+
+    font-size: 0.875rem;
+    font-weight: 400;
+
+    font-size: var(--label-font-size, 10rem);
   }
   .image-info {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 9rem 4fr;
     overflow: hidden;
-    border: 1px solid var(--primo-color-primored);
-    padding: 0.5rem;
+    /* border: 1px solid var(--primo-color-primogreen); */
+    /* padding: 0.5rem; */
 
     .spinner-container {
-      background: var(--primo-color-primored);
+      background: var(--primo-color-primogreen);
       height: 100%;
       width: 100%;
       display: flex;
@@ -185,10 +244,14 @@
     background: var(--color-gray-8);
   }
   .image-preview {
-    width: 100%;
-    padding-top: 50%;
+    border: 1px dashed #3E4041;
+    border-radius: 4px;
+    aspect-ratio: 1 / 1;
+    /* width: 100%; */
+    height: 100%;
+    /* padding-top: 50%; */
     position: relative;
-    margin-bottom: 0.25rem;
+    /* margin-bottom: 0.25rem; */
 
     .image-upload {
       flex: 1 1 0%;
@@ -212,7 +275,7 @@
 
       &:hover {
         opacity: 0.95;
-        background: var(--primo-color-primored);
+        background: var(--primo-color-primogreen);
       }
 
       span {
@@ -232,8 +295,6 @@
     }
 
     .field-size {
-      display: flex;
-      gap: 0.25rem;
       background: var(--color-gray-8);
       color: var(--color-gray-3);
       position: absolute;
@@ -244,10 +305,6 @@
       font-size: var(--font-size-1);
       font-weight: 600;
       border-bottom-right-radius: 0.25rem;
-
-      svg {
-        width: 1rem;
-      }
     }
 
     img {
@@ -260,29 +317,9 @@
   }
 
   .inputs {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    gap: 1rem;
     width: 100%;
-
-    .image-input {
-      display: flex;
-      align-items: center;
-      font-size: var(--font-size-1);
-      width: 100%;
-      margin-bottom: 0.25rem;
-
-      span {
-        font-weight: 600;
-        padding: 0 0.5rem;
-      }
-
-      input {
-        font-size: inherit;
-        flex: 1;
-        padding: 0 0.25rem;
-        outline: 0;
-        border: 0;
-      }
-    }
+    padding: 0 1.3125rem;
   }
 </style>

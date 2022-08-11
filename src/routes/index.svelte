@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { goto } from '$app/navigation'
   import SignInNav from '$lib/components/SignInNav.svelte'
   import SiteFooter from '$lib/components/SiteFooter.svelte'
   import SiteThumbnail from '$lib/components/SiteThumbnail.svelte'
@@ -7,9 +6,6 @@
   import sites from '../stores/sites'
   import user from '../stores/user'
   import * as actions from '../actions'
-  // import mixpanel from 'mixpanel-browser'
-
-  // mixpanel.track('Dashboard')
 
   function beginInvitation(site): void {
     show({
@@ -43,8 +39,11 @@
   }
 
   async function editSite(site) {
-    actions.sites.update(site.id, {
-      name: site.name,
+    actions.sites.update({
+      id: site.id,
+      props: {
+        name: site.name
+      }
     })
   }
 
@@ -56,7 +55,6 @@
   let hoveredItem = null
 </script>
 
-<Modal />
 <main class="primo-reset">
   {#if $user.signedIn}
     <div class="container">
@@ -78,43 +76,43 @@
                 <SiteThumbnail {site} />
               </a>
               <div class="site-info">
-                <div>
-                  <div class="site-name">
-                    {#if siteBeingEdited === site.id}
-                      <form
-                        on:submit|preventDefault={() =>
-                          (siteBeingEdited = null)}
-                      >
-                        <input
-                          on:blur={() => (siteBeingEdited = null)}
-                          class="reset-input"
-                          type="text"
-                          bind:value={site.name}
-                        />
-                      </form>
-                    {:else}
-                      <a
-                        href={site.id}
-                        on:mouseenter={() => (hoveredItem = i)}
-                        on:mouseleave={() => (hoveredItem = null)}
-                      >
-                        <span>{site.name}</span>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
+                <div class="site-name">
+                  {#if siteBeingEdited === site.id}
+                    <form
+                      on:submit|preventDefault={() =>
+                        (siteBeingEdited = null)}
+                    >
+                      <input
+                        on:blur={() => (siteBeingEdited = null)}
+                        class="reset-input"
+                        type="text"
+                        bind:value={site.name}
+                      />
+                    </form>
+                  {:else}
+                    <a
+                      href={site.id}
+                      on:mouseenter={() => (hoveredItem = i)}
+                      on:mouseleave={() => (hoveredItem = null)}
+                    >
+                      <span>{site.name}</span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        class="s-Uap-jPRb-uiE"
+                        ><path
+                          fill-rule="evenodd"
+                          d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                          clip-rule="evenodd"
                           class="s-Uap-jPRb-uiE"
-                          ><path
-                            fill-rule="evenodd"
-                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                            clip-rule="evenodd"
-                            class="s-Uap-jPRb-uiE"
-                          /></svg
-                        >
-                      </a>
-                    {/if}
-                  </div>
-                  <span class="site-url">{site.id}</span>
+                        /></svg
+                      >
+                    </a>
+                  {/if}
+                </div>
+                <span class="site-url">{site.id}</span>
+                {#if !$user.sites}
                   <div class="buttons">
                     <button
                       on:click={() => beginInvitation(site)}
@@ -172,34 +170,36 @@
                       <span>Delete</span>
                     </button>
                   </div>
-                </div>
+                {/if}
               </div>
             </li>
           {/each}
-          <li
-            class:inactive={hoveredItem !== true && hoveredItem !== null}
-            class:active={hoveredItem === true}
-            on:mouseenter={() => (hoveredItem = true)}
-            on:mouseleave={() => (hoveredItem = null)}
-          >
-            <button class="create-site" on:click={createSite}>
-              {#if loading}
-                <!-- <Spinner /> -->
-              {:else}
-                <svg
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                  ><path
-                    fill-rule="evenodd"
-                    d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                    clip-rule="evenodd"
-                  /></svg
-                >
-              {/if}
-              create a site
-            </button>
-          </li>
+          {#if !$user.sites}
+            <li
+              class:inactive={hoveredItem !== true && hoveredItem !== null}
+              class:active={hoveredItem === true}
+              on:mouseenter={() => (hoveredItem = true)}
+              on:mouseleave={() => (hoveredItem = null)}
+            >
+              <button class="create-site" on:click={createSite}>
+                {#if loading}
+                  <!-- <Spinner /> -->
+                {:else}
+                  <svg
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                    ><path
+                      fill-rule="evenodd"
+                      d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                      clip-rule="evenodd"
+                    /></svg
+                  >
+                {/if}
+                create a site
+              </button>
+            </li>
+          {/if}
         </ul>
       </div>
       <SiteFooter />
@@ -223,26 +223,11 @@
       padding: 2rem;
       min-height: 100vh;
     }
-
-    hr {
-      margin: 2rem 0;
-      border-color: var(--color-gray-9);
-    }
-
     .sites-container {
       display: grid;
       gap: 1rem;
 
-      span.info {
-        padding: 1rem;
-        color: white;
-        background: var(--color-gray-9);
-      }
-
       header {
-        h2 {
-          color: white;
-        }
         a {
           text-decoration: underline;
           color: var(--color-gray-4);
@@ -280,29 +265,26 @@
 
           .site-info {
             color: var(--color-gray-1);
-            display: grid;
-            gap: 0.5rem;
-
-            & > div {
-              display: flex;
-              flex-direction: column;
-              justify-content: flex-start;
-              padding: 1.5rem;
-            }
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 1.5rem;
 
             .site-name {
-              display: flex;
 
               a {
-                display: flex;
+                display: grid;
+                grid-template-columns: auto auto;
+                place-items: center flex-start;
 
                 &:hover {
-                  color: var(--primo-color-primored);
+                  color: var(--primo-color-primogreen);
                 }
 
                 svg {
                   width: 1.5rem;
                   margin-top: 3px;
+                  justify-self: flex-end;
                 }
               }
 
@@ -318,7 +300,7 @@
                 padding: 0 0.5rem;
 
                 &:hover {
-                  color: var(--primo-color-primored);
+                  color: var(--primo-color-primogreen);
                 }
 
                 svg {
@@ -361,7 +343,7 @@
           font-weight: 600;
           color: var(--color-gray-2);
           border-radius: var(--primo-border-radius);
-          border: 2px solid var(--primo-color-primored);
+          border: 2px solid var(--primo-color-primogreen);
 
           svg {
             border-radius: 50%;
@@ -371,7 +353,7 @@
           }
 
           &:hover svg {
-            color: var(--primo-color-primored);
+            color: var(--primo-color-primogreen);
           }
         }
       }
@@ -390,14 +372,18 @@
       height: 1.25rem;
     }
     &:hover {
-      color: var(--primo-color-primored);
+      color: var(--primo-color-primogreen);
     }
   }
 
   button {
     transition: color 0.1s, background-color 0.1s;
     &:focus {
-      outline: 2px solid var(--primo-color-primored);
+      outline: 2px solid var(--primo-color-primogreen);
+    }
+    &:disabled {
+      opacity: 0.5;
+      pointer-events: none;
     }
   }
 

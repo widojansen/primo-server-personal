@@ -29,7 +29,6 @@ export async function getNumberOfUsers() {
 }
 
 export async function validateInvitationKey(key) {
-  console.log({key})
   const {data,error} = await supabaseAdmin
     .from('config')
     .select('*')
@@ -39,19 +38,21 @@ export async function validateInvitationKey(key) {
 }
 
 export async function saveSite(updatedSite) {
+  // TODO: make preview work from server (can't compile)
   const homepage = _find(updatedSite.pages, ['id', 'index'])
-  const preview = await buildStaticPage({ page: homepage, site: updatedSite })
-  const [ res1, res2 ] = await Promise.all([
+  // const preview = await buildStaticPage({ page: homepage, site: updatedSite })
+  const [ res1 ] = await Promise.all([
     updateSiteData({
       id: updatedSite.id,
       data: updatedSite
     }),
-    updatePagePreview({
-      path: `${updatedSite.id}/preview.html`,
-      preview
-    })
+    // updatePagePreview({
+    //   path: `${updatedSite.id}/preview.html`,
+    //   preview
+    // })
   ])
-  return res1.error || res2.error ? false : true
+  // return res1.error || res2.error ? false : true
+  return res1.error ? false : true
 
   async function updateSiteData({ id, data }) {
     const json = JSON.stringify(data)

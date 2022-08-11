@@ -1,9 +1,9 @@
-import * as idb from 'idb-keyval';
 import {clone as _cloneDeep} from 'lodash-es'
 import PromiseWorker from 'promise-worker';
 import svelteWorker from './workers/worker?worker'
 import {get} from 'svelte/store'
 import {site} from '@primo-app/primo/src/stores/data/draft'
+import {locale} from '@primo-app/primo/src/stores/app/misc'
 
 import postCSSWorker from './workers/postcss.worker?worker'
 const PostCSSWorker = new postCSSWorker
@@ -12,16 +12,21 @@ const cssPromiseWorker = new PromiseWorker(PostCSSWorker);
 const SvelteWorker = new svelteWorker()
 const htmlPromiseWorker = new PromiseWorker(SvelteWorker);
 
+const componentsMap = new Map();
+
 export async function html({ code, data, buildStatic = true, format = 'esm'}) {
 
-  let finalRequest = buildFinalRequest(data)
+  const finalRequest = buildFinalRequest(data)
 
-  const cached = await idb.get(JSON.stringify(finalRequest))
-  if (cached) {
-    return cached
+  let cacheKey
+  if (!buildStatic) {
+    cacheKey = JSON.stringify({
+      code, 
+      data: Object.keys(data),
+      format
+    })
+    if (componentsMap.has(cacheKey)) return componentsMap.get(cacheKey)
   }
-
-  finalRequest = buildFinalRequest(data)
 
   let res
   try {
@@ -36,6 +41,7 @@ export async function html({ code, data, buildStatic = true, format = 'esm'}) {
   let final 
 
   if (res.error) {
+    console.log(data, res.error)
     final = {
       error: escapeHtml(res.error)
     }
@@ -50,31 +56,33 @@ export async function html({ code, data, buildStatic = true, format = 'esm'}) {
   } else if (buildStatic) {   
     const blob = new Blob([res.ssr], { type: 'text/javascript' });
     const url = URL.createObjectURL(blob);
-
     const {default:App} = await import(url/* @vite-ignore */)
-    const rendered = App.render()
+    const rendered = App.render(data)
     final = {
       html: rendered.html || rendered.head,
       css: rendered.css.code,
       js: res.dom
     }
-    // console.log({final})
   } else {
     final = {
       js: res.dom
     }
   } 
 
-  await idb.set(JSON.stringify(finalRequest), final)
+  if (!buildStatic) {
+    componentsMap.set(cacheKey, final)
+  }
+
   return final
 
-  function buildFinalRequest(data) {
+  function buildFinalRequest(finalData) {
 
+    // export const primo = ${JSON.stringify(finalData)}
 
     const dataAsVariables = `\
-    ${Object.entries(data)
+    ${Object.entries(finalData)
       .filter(field => field[0])
-      .map(field => `export let ${field[0]} = ${JSON.stringify(field[1])};`)
+      .map(field => `export let ${field[0]};`)
       .join(` \n`)
     }
    `
@@ -97,13 +105,14 @@ export async function html({ code, data, buildStatic = true, format = 'esm'}) {
       hydrated,
       buildStatic,
       format,
-      site: get(site)
+      site: get(site),
+      locale: get(locale)
     }
   }
-
 }
 
 
+const cssMap = new Map()
 export async function css(raw) {
   const processed = await cssPromiseWorker.postMessage({
     css: raw
@@ -113,6 +122,8 @@ export async function css(raw) {
       error: processed.message
     }
   }
+  if (cssMap.has(raw)) return ({ css: cssMap.get(raw) })
+  cssMap.set(raw, processed)
   return {
     css: processed
   }

@@ -1,20 +1,22 @@
 import { authorizeRequest } from './_auth'
 import {signUp} from '../../supabase/auth'
 import {users, config} from '../../supabase/db'
-import {getNumberOfUsers} from '../../supabase/admin'
+import supabaseAdmin, {getNumberOfUsers} from '../../supabase/admin'
 
-export async function post(req) {
-  const nUsers = (await users.get()).length
+export async function POST(event) {
+  const payload = await event.request.json()
+  const nUsers = await getNumberOfUsers()
   if (nUsers === 0) {
-    await createUser(true)
+    const supabase = await createUser(true)
     return {
       body: {
-        success: true
+        success: true,
+        supabase
       }
     }
   }
 
-  return await authorizeRequest(req, async () => {
+  return await authorizeRequest(event, async () => {
     await createUser()
     await config.update('invitation-key', '')
     return {
@@ -25,16 +27,16 @@ export async function post(req) {
   })
 
   async function createUser(admin = false) {
-    await signUp(req.body)
-    await users.create( admin ? 
-    {
-      ...req.body,
-      role: 'admin'
-    } : req.body)
+    const supabase = await signUp(payload)
+    await supabaseAdmin.from('users').insert([{
+      email: payload.email,
+      role: payload.role || (admin ? 'admin' : 'developer')
+    }])
+    return supabase
   }
 }
 
-export async function get(req) {
+export async function GET() {
   const nUsers = await getNumberOfUsers()
   return {
     body: {

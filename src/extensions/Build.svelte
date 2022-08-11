@@ -1,20 +1,18 @@
 <script>
-  import axios from 'axios'
-  import { flattenDeep, uniqBy } from 'lodash-es'
+  import { flattenDeep, uniqBy, find } from 'lodash-es'
   import JSZip from 'jszip'
   import fileSaver from 'file-saver'
   import beautify from 'js-beautify'
+  import { format } from 'timeago.js'
   import Hosting from '$lib/components/Hosting.svelte'
   import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
   import { site, modal } from '@primo-app/primo'
   import { buildStaticPage } from '@primo-app/primo/src/stores/helpers'
   import hosts from '../stores/hosts'
+  import allSites from '../stores/sites'
+  import {sites} from '../actions'
   import ModalHeader from '@primo-app/primo/src/views/modal/ModalHeader.svelte'
   import { page } from '$app/stores'
-  // import { addDeploymentToSite } from '$lib/actions'
-
-  // TimeAgo.addDefaultLocale(en)
-  // const timeAgo = new TimeAgo('en-US')
 
   const siteID = $page.params.site
 
@@ -22,7 +20,7 @@
 
   async function createSiteZip() {
     const zip = new JSZip()
-    const files = await buildSiteBundle($site, siteID)
+    const files = await buildSiteBundle($site)
     files.forEach((file) => {
       zip.file(file.path, file.content)
     })
@@ -36,150 +34,43 @@
     modal.hide()
   }
 
-  let deployment
-  let activeDeployment
+  let lastDeployment = find($allSites, ['id', siteID])?.['active_deployment']
+  let newDeployment
+
   async function publishToHosts() {
     loading = true
-
-    // const name = window.location.pathname.split('/')[2]
-    const files = (await buildSiteBundle($site, siteID)).map((file) => {
+    const files = (await buildSiteBundle($site)).map((file) => {
       return {
         file: file.path,
         data: file.content,
       }
     })
     const uniqueFiles = uniqBy(files, 'file') // modules are duplicated
+    sites.save($site)
+    const activeHost = $hosts[0]
+    const {deployment, error} = await sites.publish({
+      siteID,
+      host: activeHost,
+      files: uniqueFiles
+    })
 
-    await Promise.allSettled(
-      $hosts.map(async ({ token, name, siteDeploymentID }) => {
-        if (name === 'vercel') {
-          const { data } = await axios
-            .post(
-              'https://api.vercel.com/v12/now/deployments',
-              {
-                name: siteID,
-                files: uniqueFiles,
-                projectSettings: {
-                  framework: null,
-                },
-                target: 'production',
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            )
-            .catch((e) => ({ data: null }))
-
-          deployment = {
-            id: data.id,
-            url: `https://${data.alias[0]}`,
-            created: data.createdAt,
-          }
-        } else if (name === 'netlify') {
-          // if deploymentID does not exists, create new site
-
-          let data
-
-          if (!siteDeploymentID) {
-            const zipFile = await createSiteZip()
-            const res = await axios
-              .post('https://api.netlify.com/api/v1/sites', zipFile, {
-                headers: {
-                  'Content-Type': 'application/zip',
-                  Authorization: `Bearer ${token}`,
-                },
-              })
-              .catch((e) => ({ data: null }))
-
-            data = res.data
-          } else {
-            const zipFile = await createSiteZip()
-            const res = await axios
-              .put(
-                `https://api.netlify.com/api/v1/sites/${siteDeploymentID}`,
-                zipFile,
-                {
-                  headers: {
-                    'Content-Type': 'application/zip',
-                    Authorization: `Bearer ${token}`,
-                  },
-                }
-              )
-              .catch((e) => ({ data: null }))
-
-            data = res.data
-          }
-
-          // check for null data before continuing if null then handle this error else continue
-          if (!data) {
-            console.log({ data })
-            throw new Error('Error creating site')
-          } else {
-            deployment = {
-              id: data.deploy_id,
-              url: `https://${data.subdomain}.netlify.app`,
-              created: Date.now(),
-            }
-          }
-        }
-      })
-    )
+    if (error) {
+      alert(error)
+    } else {
+      newDeployment = deployment
+    }
 
     loading = false
-
-    pages = []
   }
 
-  async function buildSiteBundle(site, siteName) {
-    const primoPage = `
-        <!doctype html>
-        <html lang="en">
-          <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          </head>
-
-          <body class="primo-page">   
-            <iframe allow="clipboard-read; clipboard-write self ${window.location.origin}" border="0" src="${window.location.origin}/${siteName}" style="height:100vh;width:100vw;position:absolute;top:0;left:0;border:0;"></iframe>
-          </body>
-        </html>
-      `
-
+  async function buildSiteBundle(site) {
     const pages = await Promise.all([
       ...site.pages.map((page) => buildPageTree({ page, site })),
-      {
-        path: `primo.json`,
-        content: JSON.stringify(site),
-      },
       // ...Object.entries(site.content).map((item) => ({
       //   path: `${item[0]}.json`,
       //   content: JSON.stringify(item[1]),
       // })),
-      {
-        path: `primo.json`,
-        content: JSON.stringify(site),
-      },
-      {
-        path: `edit/index.html`,
-        content: primoPage,
-      },
-      // [
-      //   {
-      //     path: `primo/index.html`,
-      //     content: primoPage,
-      //   },
-      //   // {
-      //   //   path: 'robots.txt',
-      //   //   content: `
-      //   //   # Example 3: Block all but AdsBot crawlers
-      //   //   User-agent: *
-      //   //   Disallow: /`
-      //   // },
-      // ],
     ])
-
     return buildSiteTree(pages, site)
 
     async function buildPageTree({ page, site }) {
@@ -197,7 +88,7 @@
           content: formattedHTML,
         },
         ...modules.map((module) => ({
-          path: `_modules/${module.id}.js`,
+          path: `_modules/${module.symbol}.js`,
           content: module.content,
         })),
         ...(page.pages
@@ -211,23 +102,31 @@
 
       return [
         ...flattenDeep(pages),
-        // {
-        //   path: `styles.css`,
-        //   content: styles
-        // },
-        // {
-        //   path: `primo.json`,
-        //   content: json,
-        // },
-        // {
-        //   path: 'README.md',
-        //   content: `# Built with [primo](https://primo.af)`,
-        // },
+        ...Object.entries(site.content).map(([locale, content]) => ({
+          path: `${locale}.json`,
+          content: JSON.stringify(content)
+        })),
+        {
+          path: `primo.json`,
+          content: json,
+        },
+        {
+          path: 'robots.txt',
+          content: `User-agent: *`
+        }
       ]
     }
   }
 
-  let pages = []
+  function disconnectSite() {
+    lastDeployment = null
+    sites.update({
+      id: siteID,
+      props: {
+        active_deployment: null,
+      }
+    })
+  }
 </script>
 
 <ModalHeader icon="fas fa-globe" title="Publish" variants="mb-4" />
@@ -245,51 +144,40 @@
       />
     </div>
     <div>
-      {#if deployment}
-        <div class="boxes">
-          <div class="box">
-            <div class="deployment">
-              Published to
-              <a href={deployment.url} rel="external" target="blank"
-                >{deployment.url}</a
-              >
-            </div>
-          </div>
-        </div>
-      {/if}
-      <!-- show activeDeployment from addDeploymentToSite-->
       <header class="review">
         <div>
-          {#if activeDeployment && deployment}
+          {#if newDeployment}
             <div class="boxes">
               <div class="box">
-                <div class="deployment">
-                  Active Deployment
-                  <a href={activeDeployment.url} rel="external" target="blank"
-                    >{activeDeployment.url}</a
+                <div class="newDeployment">
+                  Published to
+                  <a href={newDeployment.url} rel="external" target="blank"
+                    >{newDeployment.url}</a
                   >
                 </div>
               </div>
             </div>
+          {:else if lastDeployment}
+            <div class="boxes">
+              <div class="box">
+                <div class="newDeployment">
+                  Published {format(lastDeployment.created)} to
+                  <a href={lastDeployment.url} rel="external" target="blank"
+                    >{lastDeployment.url}</a
+                  >
+                </div>
+                <button on:click={disconnectSite}>Disconnect</button>
+              </div>
+            </div>
           {/if}
-          {#if pages.length > 0 && !deployment}
-            <p class="title">Review and Publish</p>
-            <p class="subtitle">
-              Here are the changes that you're making to your site
-            </p>
-            <PrimaryButton
-              on:click={publishToHosts}
-              label="Save and Publish"
-              {loading}
-            />
-          {:else if $hosts.length > 0 && !deployment}
+          {#if $hosts.length > 0 && !newDeployment}
             <p class="title">Publish Changes</p>
             <PrimaryButton
               on:click={publishToHosts}
-              label="Save and Publish"
+              label="Publish"
               {loading}
             />
-          {:else if !deployment}
+          {:else if !newDeployment}
             <p class="title">Download your website</p>
             <p class="subtitle">
               You can connect a web host to publish your website directly from
@@ -313,9 +201,6 @@
     color: var(--color-gray-1);
     font-weight: 600;
     transition: color 0.1s;
-    a {
-      text-decoration: underline;
-    }
   }
 
   .subtitle {
@@ -344,13 +229,10 @@
         background: var(--color-gray-9);
         color: var(--color-gray-2);
         display: flex;
-        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
 
-        &:not(:last-child) {
-          border-bottom: 1px solid var(--color-gray-8);
-        }
-
-        .deployment {
+        .newDeployment {
           padding: 0.5rem 0;
           display: flex;
           flex-direction: column;
@@ -362,10 +244,12 @@
               color: var(--color-primored);
             }
           }
+        }
 
-          &:not(:last-child) {
-            border-bottom: 1px solid var(--color-gray-8);
-          }
+        button {
+          padding: 0.5rem 1rem;
+          border: 1px solid var(--color-gray-8);
+          border-radius: var(--primo-border-radius);
         }
       }
     }

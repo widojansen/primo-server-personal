@@ -5,6 +5,7 @@
   import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
   import { makeValidUrl } from '$lib/utils'
   import { Site } from '@primo-app/primo/src/const'
+  import {validateSiteStructure} from '@primo-app/primo/src/utils'
 
   export let onSuccess = (newSite) => {}
   let loading
@@ -40,12 +41,18 @@
   let duplicatingSite = false
   let duplicateFileIsValid = true
   function readJsonFile({ target }) {
-    console.log('reading')
     var reader = new window.FileReader()
     reader.onload = async function ({ target }) {
-      console.log('loaded')
       if (typeof target.result !== 'string') return
-      siteData = JSON.parse(target.result)
+
+      const uploaded = JSON.parse(target.result)
+      const converted = validateSiteStructure(uploaded)
+
+      if (converted) siteData = converted
+      else {
+        duplicateFileIsValid = false
+      }
+
       duplicatingSite = true
     }
     reader.readAsText(target.files[0])
@@ -97,19 +104,17 @@
           <span>Duplicate from primo.json</span>
         </label>
       </div>
-      {#if duplicateFileIsValid}
-        <div class="submit">
-          <PrimaryButton
-            type="submit"
-            label={duplicatingSite ? 'Duplicate' : 'Create'}
-            disabled={!canCreateSite}
-          />
-        </div>
-      {/if}
+      <div class="submit">
+        <PrimaryButton
+          type="submit"
+          label={duplicatingSite ? 'Duplicate' : 'Create'}
+          disabled={!canCreateSite && duplicateFileIsValid}
+        />
+      </div>
     </form>
   {:else}
     <div class="creating-site">
-      <span>{duplicatingSite ? 'Creating' : 'Duplicating'} {siteName}</span>
+      <span>{duplicatingSite ? 'Duplicating' : 'Creating'} {siteName}</span>
       {#key message}
         <p>{message}</p>
       {/key}
@@ -129,19 +134,6 @@
 
       .submit {
         --color-link: var(--color-primored);
-      }
-    }
-
-    details {
-      margin-bottom: 1.5rem;
-
-      summary {
-        margin-bottom: 0.5rem;
-        &:focus {
-          outline: 0;
-          cursor: pointer;
-          font-size: var(--font-size-2);
-        }
       }
     }
   }

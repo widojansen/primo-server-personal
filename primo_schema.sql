@@ -6,6 +6,8 @@ CREATE TABLE public.sites (
     name text,
     password text,
     active_editor text,
+    host text,
+    active_deployment text,
     created_at timestamp with time zone DEFAULT now()
 );
 
@@ -83,8 +85,8 @@ ALTER TABLE public.config ENABLE ROW LEVEL SECURITY;
 -- Set RLS Policy
 CREATE POLICY "Authenticated users can access sites" ON public.sites FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 CREATE POLICY "Authenticated users can access users" ON public.users FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
-CREATE POLICY "Authenticated users can access hosts" ON public.hosts FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 CREATE POLICY "Authenticated users can access config" ON public.config FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+-- No users can access Hosts (to secure Tokens)
 
 -- Set permissions for tables
 GRANT ALL ON TABLE public.sites TO postgres;
