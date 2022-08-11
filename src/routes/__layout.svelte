@@ -39,7 +39,7 @@
         email,
         signedIn: true,
         admin: userData.role === 'admin',
-        role: userData.role,
+        role: userData.role === 'admin' ? 'developer' : userData.role,
         sites: userData.sites,
       }))
     } else if (event === 'SIGNED_OUT') {
