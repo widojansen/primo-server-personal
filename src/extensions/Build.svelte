@@ -6,11 +6,10 @@
   import { format } from 'timeago.js'
   import Hosting from '$lib/components/Hosting.svelte'
   import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
-  import { site, modal } from '@primo-app/primo'
-  import { buildStaticPage } from '@primo-app/primo/src/stores/helpers'
+  import { site, modal, buildStaticPage } from '@primo-app/primo'
   import hosts from '../stores/hosts'
   import allSites from '../stores/sites'
-  import {sites} from '../actions'
+  import { sites } from '../actions'
   import ModalHeader from '@primo-app/primo/src/views/modal/ModalHeader.svelte'
   import { page } from '$app/stores'
 
@@ -48,10 +47,10 @@
     const uniqueFiles = uniqBy(files, 'file') // modules are duplicated
     sites.save($site)
     const activeHost = $hosts[0]
-    const {deployment, error} = await sites.publish({
+    const { deployment, error } = await sites.publish({
       siteID,
       host: activeHost,
-      files: uniqueFiles
+      files: uniqueFiles,
     })
 
     if (error) {
@@ -104,7 +103,7 @@
         ...flattenDeep(pages),
         ...Object.entries(site.content).map(([locale, content]) => ({
           path: `${locale}.json`,
-          content: JSON.stringify(content)
+          content: JSON.stringify(content),
         })),
         {
           path: `primo.json`,
@@ -112,8 +111,8 @@
         },
         {
           path: 'robots.txt',
-          content: `User-agent: *`
-        }
+          content: `User-agent: *`,
+        },
       ]
     }
   }
@@ -124,7 +123,7 @@
       id: siteID,
       props: {
         active_deployment: null,
-      }
+      },
     })
   }
 </script>
