@@ -104,7 +104,7 @@ export const sites = {
   },
   addUser: async ({ site, password, user }) => {
     // send server adduser request
-    const { data: success } = await axios.post(`http://localhost:5173/api/${site}.json?password=${password}`, {
+    const { data: success } = await axios.post(`/api/${site}.json?password=${password}`, {
       action: 'ADD_USER',
       payload: user
     })
@@ -113,7 +113,7 @@ export const sites = {
   removeUser: async ({ site, user }) => {
     // send server adduser request
     const session = supabase.auth.session()
-    const { data: success } = await axios.post(`http://localhost:5173/api/${site.id}.json`, {
+    const { data: success } = await axios.post(`/api/${site.id}.json`, {
       action: 'REMOVE_USER',
       payload: user
     }, {
