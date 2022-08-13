@@ -42,7 +42,7 @@ export async function POST(event) {
           password: payload.password,
           email_confirm: true
         })
-        if (error) { // ignore 'email already used' error
+        if (error) { 
           return { body: false }
         }
         // create user in database for site row and user row, give site permission
@@ -59,7 +59,7 @@ export async function POST(event) {
       }).match({ id: event.params.site })
 
       return {
-        body: 'true'
+        body: true
       }
     } else if (action === 'REMOVE_USER') {
       // create user (email, password) in auth
@@ -75,7 +75,7 @@ export async function POST(event) {
         body: 'true'
       }
     } else if (action === 'SET_ACTIVE_EDITOR') {
-      const res = await Promise.all([
+      await Promise.all([
         supabaseAdmin.from('sites').update({ active_editor: payload.userID }).eq('id', payload.siteID),
         supabaseAdmin.rpc('remove_active_editor', { site: payload.siteID })
       ])

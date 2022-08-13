@@ -72,12 +72,7 @@
 
     // on success, sign in
     if (valid) {
-      user.update((u) => ({
-        ...u,
-        role: collaboratorRole,
-        signedIn: true,
-        sites: [siteID],
-      }))
+      auth.signIn({ email, password })
       replaceStateWithQuery({
         signup: null,
         role: null,

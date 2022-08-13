@@ -32,7 +32,7 @@
             title: 'Build to Github',
             icon: 'fab fa-github',
           },
-          hideLocaleSelector: true
+          hideLocaleSelector: true,
         },
       },
     ])
@@ -41,7 +41,7 @@
         id: 'image',
         label: 'Image',
         component: ImageField,
-      }
+      },
     ])
   }
 
@@ -51,24 +51,21 @@
   async function fetchSite(fullPath) {
     if (currentPath === fullPath) return
     currentPath = fullPath
-    const res = await actions.sites.get(siteID, $sitePassword)
+    const res = await actions.sites.get(siteID)
     if (res?.active_editor && res.active_editor !== $user.email) {
       siteLocked = true
       modal.show('DIALOG', {
         component: LockAlert,
         componentProps: {
           email: res.active_editor,
-          canGoToDashboard: false
+          canGoToDashboard: false,
         },
         options: {
           disableClose: true,
         },
       })
     } else if (res) {
-      actions.setActiveEditor({
-        siteID,
-        password: $sitePassword
-      })
+      actions.setActiveEditor({ siteID })
       data = res
     }
   }
@@ -91,10 +88,7 @@
   }
 
   onDestroy(() => {
-    if (browser && !siteLocked) actions.setActiveEditor({
-      siteID,
-      lock: false
-    })
+    if (browser && !siteLocked) actions.setActiveEditor({ siteID, lock: false })
     else if (siteLocked) modal.hide()
   })
 </script>

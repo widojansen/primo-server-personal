@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '@iconify/svelte'
   import SignInNav from '$lib/components/SignInNav.svelte'
   import SiteFooter from '$lib/components/SiteFooter.svelte'
   import SiteThumbnail from '$lib/components/SiteThumbnail.svelte'
@@ -42,8 +43,8 @@
     actions.sites.update({
       id: site.id,
       props: {
-        name: site.name
-      }
+        name: site.name,
+      },
     })
   }
 
@@ -79,8 +80,7 @@
                 <div class="site-name">
                   {#if siteBeingEdited === site.id}
                     <form
-                      on:submit|preventDefault={() =>
-                        (siteBeingEdited = null)}
+                      on:submit|preventDefault={() => (siteBeingEdited = null)}
                     >
                       <input
                         on:blur={() => (siteBeingEdited = null)}
@@ -118,20 +118,8 @@
                       on:click={() => beginInvitation(site)}
                       class="site-button"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                        />
-                      </svg>
-                      <span>Invite</span>
+                      <Icon icon="clarity:users-solid" />
+                      <span>Site Collaborators</span>
                     </button>
                     <button
                       class="site-button"
@@ -271,7 +259,6 @@
             padding: 1.5rem;
 
             .site-name {
-
               a {
                 display: grid;
                 grid-template-columns: auto auto;
@@ -326,6 +313,10 @@
 
               button {
                 margin-right: 0.75rem;
+
+                span {
+                  margin-left: 0.25rem;
+                }
               }
             }
           }

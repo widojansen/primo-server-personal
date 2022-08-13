@@ -11,26 +11,15 @@ import { sitePassword } from './stores/misc'
 
 export const sites = {
   get: async (siteID, password) => {
-    if (password) {
-      const [dbRes, apiRes] = await Promise.all([
-        dbSites.get({ id: siteID }),
-        axios.get(`/api/${siteID}.json?password=${password}`)
-      ])
-      return {
-        ...dbRes,
-        ...JSON.parse(apiRes.data)
-      }
-    } else {
-      // const res = await dbSites.get({id: siteID})
-      const [dbRes, storageRes] = await Promise.all([
-        dbSites.get({ id: siteID }),
-        supabaseStorage.downloadSiteData(siteID)
-      ])
+    // const res = await dbSites.get({id: siteID})
+    const [dbRes, storageRes] = await Promise.all([
+      dbSites.get({ id: siteID }),
+      supabaseStorage.downloadSiteData(siteID)
+    ])
 
-      return {
-        ...dbRes,
-        ...storageRes
-      }
+    return {
+      ...dbRes,
+      ...storageRes
     }
   },
   initialize: async () => {
@@ -72,28 +61,22 @@ export const sites = {
   },
   save: async (updatedSite) => {
     stores.sites.update(sites => sites.map(site => site.id === updatedSite.id ? updatedSite : site))
-    const password = get(sitePassword)
-    if (password) {
-      const { data } = await axios.post(`/api/${updatedSite.id}.json?password=${password}`, {
-        action: 'SAVE_SITE',
-        payload: updatedSite
+    const homepage = find(updatedSite.pages, ['id', 'index'])
+    console.log(1, homepage, updatedSite)
+    const preview = await buildStaticPage({ page: homepage, site: updatedSite })
+    console.log(2)
+    const [res1, res2] = await Promise.all([
+      supabaseStorage.updateSiteData({
+        id: updatedSite.id,
+        data: updatedSite
+      }),
+      supabaseStorage.updatePagePreview({
+        path: `${updatedSite.id}/preview.html`,
+        preview
       })
-      return data
-    } else {
-      const homepage = find(updatedSite.pages, ['id', 'index'])
-      const preview = await buildStaticPage({ page: homepage, site: updatedSite })
-      const [res1, res2] = await Promise.all([
-        supabaseStorage.updateSiteData({
-          id: updatedSite.id,
-          data: updatedSite
-        }),
-        supabaseStorage.updatePagePreview({
-          path: `${updatedSite.id}/preview.html`,
-          preview
-        })
-      ])
-      return res1.error || res2.error ? false : true
-    }
+    ])
+    console.log({ res1, res2 })
+    return res1.error || res2.error ? false : true
   },
   delete: async (id) => {
     stores.sites.update(sites => sites.filter(s => s.id !== id))
@@ -211,30 +194,22 @@ export async function setActiveEditor({ siteID, lock = true, password = null }) 
   if (lock) {
     if (siteBeingEdited === siteID) return
     siteBeingEdited = siteID
-    if (password) {
-      await axios.post(`/api/${siteID}.json?password=${password}`, { action: 'SET_ACTIVE_EDITOR', payload: { siteID, userID: 'an invited user' } })
-    } else {
-      await Promise.all([
-        supabaseDB.sites.update(siteID, {
-          'active_editor': get(stores.user).email
-        }),
-        supabase.rpc('remove_active_editor', {
-          site: siteID,
-        })
-      ])
-    }
+    await Promise.all([
+      supabaseDB.sites.update(siteID, {
+        'active_editor': get(stores.user).email
+      }),
+      supabase.rpc('remove_active_editor', {
+        site: siteID,
+      })
+    ])
     if (siteBeingEdited === siteID) {
       siteBeingEdited = null
       setActiveEditor({ siteID, lock, password })
     }
   } else {
     siteBeingEdited = null
-    if (password) {
-      axios.post(`/api/${siteID}.json?password=${password}`, { action: 'REMOVE_ACTIVE_EDITOR', payload: { siteID } })
-    } else {
-      supabaseDB.sites.update(siteID, {
-        'active_editor': ''
-      })
-    }
+    supabaseDB.sites.update(siteID, {
+      'active_editor': ''
+    })
   }
 }

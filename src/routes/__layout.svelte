@@ -59,10 +59,12 @@
         disableClose: true,
       },
       props: {
-        onSignIn: () => {
+        onSignIn: async () => {
+          await Promise.all([
+            actions.sites.initialize(),
+            actions.hosts.initialize(),
+          ])
           hide()
-          actions.sites.initialize()
-          actions.hosts.initialize()
         },
       },
     })

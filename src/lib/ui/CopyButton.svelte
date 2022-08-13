@@ -1,31 +1,31 @@
 <script>
-  import { onMount } from "svelte";
-  import { fade } from "svelte/transition";
+  import { onMount } from 'svelte'
+  import { fade } from 'svelte/transition'
 
-  export let label;
+  export let label
 
-  let copied = false;
+  let copied = false
   async function copyLabel() {
     if (!navigator.clipboard) {
       alert(
-        "Unable to copy item because your browser does not support copying. Please copy manually."
-      );
-      return;
+        'Unable to copy item because your browser does not support copying. Please copy manually.'
+      )
+      return
     }
-    copied = true;
-    await navigator.clipboard.writeText(label);
+    copied = true
+    await navigator.clipboard.writeText(label)
   }
 
   let clipboardEnabled = false
   onMount(async () => {
     if (navigator.clipboard.readText) {
       clipboardEnabled = true
-      const currentlyCopied = await navigator.clipboard.readText();
+      const currentlyCopied = await navigator.clipboard.readText()
       if (currentlyCopied === label) {
-        copied = true;
+        copied = true
       }
     }
-  });
+  })
 </script>
 
 <div class="copy-button">
@@ -62,6 +62,7 @@
 
 <style lang="postcss">
   .copy-button {
+    font-weight: 600;
     display: flex;
     align-items: center;
 

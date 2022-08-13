@@ -16,10 +16,7 @@
       )
       e.preventDefault()
     } else {
-      setActiveEditor({
-        siteID: site.id,
-        lock: false
-      })
+      setActiveEditor({ siteID: site.id, lock: false })
       dispatch('toggle')
     }
   }

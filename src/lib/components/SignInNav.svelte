@@ -12,9 +12,10 @@
   <nav>
     {#if !$user.sites}
       <button class="link" on:click={() => show('INVITE_COLLABORATORS')}
-        >Invite Collaborators</button
+        >Members</button
       >
-      <button class="link" on:click={() => show('USER_SETTINGS')}>Settings</button
+      <button class="link" on:click={() => show('USER_SETTINGS')}
+        >Settings</button
       >
     {/if}
     <a class="link with-icon" href="https://docs.primo.so">

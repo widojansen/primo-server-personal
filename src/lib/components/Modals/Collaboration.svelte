@@ -39,22 +39,24 @@
     sites.update(site.id, { password })
   }
 
-  let collaborators = [];
+  let collaborators = []
 
   $: if (site) setCollaborators()
   async function setCollaborators() {
     const allUsers = await users.get(null, '*', null)
-    collaborators = allUsers.filter(u => u.sites && u.sites.includes(site.id)).map(u => ({
-      ...u,
-      created_at: u.created_at.substring(0, 7)
-    }))
+    collaborators = allUsers
+      .filter((u) => u.sites && u.sites.includes(site.id))
+      .map((u) => ({
+        ...u,
+        created_at: u.created_at.substring(0, 7),
+      }))
   }
 
   function removeCollaborator(collaborator) {
-    collaborators = collaborators.filter(c => c.id !== collaborator.id)
+    collaborators = collaborators.filter((c) => c.id !== collaborator.id)
     actions.sites.removeUser({
       site,
-      user: collaborator
+      user: collaborator,
     })
   }
 </script>
@@ -64,7 +66,10 @@
   {#if !loading}
     <div class="link-description">
       {#if showingLink}
-        <div class="share-link">Share this link with one collaborator to give them access to this site.</div>
+        <div class="share-link">
+          Share this link with one collaborator to give them access to this
+          site.
+        </div>
         <CopyButton label={link} />
       {:else}
         <form class="role-selection" on:submit|preventDefault={showLink}>
@@ -84,9 +89,9 @@
           <div class="description">
             {#if role === 'content'}
               <p>
-                Content Editors only have access to the site's content, so
-                they'll never accidentally run into its code and break
-                something.
+                Content Editors write the site's content, lay out and build
+                pages with component and content sections, and select design
+                variations - all without seeing a line of code.
               </p>
             {:else if role === 'developer'}
               <p>
@@ -194,7 +199,8 @@
       border-bottom: 1px solid var(--color-gray-8);
     }
 
-    td, th {
+    td,
+    th {
       padding: 0.25rem;
     }
 
@@ -205,6 +211,7 @@
 
   .link-description {
     .share-link {
+      font-weight: 600;
       margin: 1rem 0;
     }
   }
