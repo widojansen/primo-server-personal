@@ -15,6 +15,7 @@ CREATE TABLE public.users (
     id bigint NOT NULL,
     email text,
     role text,
+    sites text,
     created_at timestamp with time zone DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now()
 );

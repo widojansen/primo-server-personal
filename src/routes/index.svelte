@@ -119,7 +119,7 @@
                       class="site-button"
                     >
                       <Icon icon="clarity:users-solid" />
-                      <span>Site Collaborators</span>
+                      <span>Site Members</span>
                     </button>
                     <button
                       class="site-button"

@@ -140,7 +140,7 @@
     </ul>
     {#if site_collaborators.length > 0}
       <hr />
-      <h2>Site Collaborators</h2>
+      <h2>Site Members</h2>
       <ul>
         {#each site_collaborators as collaborator}
           <li>
