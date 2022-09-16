@@ -1,6 +1,6 @@
 <script>
   import { onDestroy, setContext } from 'svelte'
-  import { browser } from '$app/env'
+  import { browser } from '$app/environment'
   import Primo, {
     modal as primoModal,
     PrimoFieldTypes,

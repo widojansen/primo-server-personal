@@ -1,11 +1,12 @@
 <script>
   import { setContext } from 'svelte'
   import '$lib/assets/reset.css'
-  import { browser } from '$app/env'
+  import { browser } from '$app/environment'
   import { goto } from '$app/navigation'
   import { registerProcessors, dropdown } from '@primo-app/primo'
   import user from '../stores/user'
-  import { watchForAutoLogin, signOut } from '../supabase/auth'
+  import supabase from '../supabase/core'
+  import { watchForAutoLogin } from '../supabase/auth'
   import { users } from '../supabase/db'
   import Modal, { show, hide } from '$lib/components/Modal.svelte'
   import * as actions from '../actions'
@@ -42,6 +43,21 @@
         role: userData.role === 'admin' ? 'developer' : userData.role,
         sites: userData.sites,
       }))
+
+      const channel = supabase.channel('chikano')
+      channel
+        .on('presence', { event: 'sync' }, () => {
+          console.log('currently online users', channel.presenceState())
+        })
+        .on('presence', { event: 'join' }, ({ newUser }) => {
+          console.log('a new user has joined', newUser)
+        })
+        .on('presence', { event: 'leave' }, ({ leftUser }) =>
+          console.log('a user has left', leftUser)
+        )
+        .subscribe(async (status) => {
+          console.log('status', status)
+        })
     } else if (event === 'SIGNED_OUT') {
       user.reset()
       goto('/')

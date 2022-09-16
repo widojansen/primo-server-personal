@@ -1,7 +1,7 @@
-import { authorizeRequest } from './_auth'
-import {signUp} from '../../supabase/auth'
-import {users, config} from '../../supabase/db'
-import supabaseAdmin, {getNumberOfUsers} from '../../supabase/admin'
+import { authorizeRequest } from '../_auth'
+import {signUp} from '../../../supabase/auth'
+import {users, config} from '../../../supabase/db'
+import supabaseAdmin, {getNumberOfUsers} from '../../../supabase/admin'
 
 export async function POST(event) {
   const payload = await event.request.json()
@@ -19,11 +19,7 @@ export async function POST(event) {
   return await authorizeRequest(event, async () => {
     await createUser()
     await config.update('invitation-key', '')
-    return {
-      body: {
-        success: true
-      }
-    }
+    return new Response(JSON.stringify({success: true}))
   })
 
   async function createUser(admin = false) {
@@ -38,9 +34,5 @@ export async function POST(event) {
 
 export async function GET() {
   const nUsers = await getNumberOfUsers()
-  return {
-    body: {
-      initialized: nUsers > 0 ? true : false
-    }
-  }
+  return new Response(JSON.stringify({initialized: nUsers > 0 ? true : false}));
 }

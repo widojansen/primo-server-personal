@@ -118,9 +118,8 @@ export const sites = {
   },
   publish: async ({ siteID, host, files }) => {
     const session = supabase.auth.session()
-    const password = get(sitePassword)
 
-    const { data } = await axios.post(`/api/${siteID}.json?password=${password || ''}`, {
+    const { data } = await axios.post(`/api/${siteID}.json`, {
       action: 'PUBLISH',
       payload: {
         siteID,
@@ -129,7 +128,7 @@ export const sites = {
       }
     }, {
       headers: {
-        authorization: `Bearer ${session?.access_token}`
+        authorization: `Bearer ${session.access_token}`
       }
     })
     if (data) {
@@ -140,6 +139,8 @@ export const sites = {
             : ({ ...s, active_deployment: data.deployment })
         )
       )
+    } else {
+      alert('Could not publish site')
     }
 
     return data
@@ -166,7 +167,7 @@ export const sites = {
 
 export const hosts = {
   initialize: async () => {
-    const { data: hosts } = await axios.get('/api/hosts.json')
+    const { data: hosts } = await axios.get('/api/hosts')
     if (hosts) {
       stores.hosts.set(hosts)
     }

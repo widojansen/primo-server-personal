@@ -8,7 +8,7 @@
   import * as actions from '../../../actions'
   import { createUser } from '../../../supabase/helpers'
   import { page } from '$app/stores'
-  import { browser } from '$app/env'
+  import { browser } from '$app/environment'
 
   import Spinner from '$lib/ui/Spinner.svelte'
   import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
@@ -21,9 +21,10 @@
   let loading = true
   if (browser) {
     axios
-      .get('/api/auth.json')
+      .get('/api/auth')
       .then(({ data }) => {
         loading = false
+        console.log({ data })
         if (!data.initialized) {
           signingUp = true
           smallMessage = `Welcome to your new Primo Server! Enter the email address & password you'll use to administrate this server`
