@@ -117,6 +117,7 @@ export const sites = {
       .insert([
         { id, name }
       ])
+      .select()
     if (error) {
       console.error(error)
       return null

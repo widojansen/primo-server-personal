@@ -20,7 +20,15 @@
   let site_collaborators = []
 
   fetchServerUsers()
-  supabase.from('users').on('*', fetchServerUsers).subscribe()
+  supabase
+    .channel('*')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', tables: 'users' },
+      fetchServerUsers
+    )
+    .subscribe()
+
   async function fetchServerUsers() {
     const data = await users.get()
     collaborators = data.filter((u) => u.sites === null) // only show users w/ access to all sites

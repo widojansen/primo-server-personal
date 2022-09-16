@@ -95,13 +95,13 @@ export const sites = {
   },
   removeUser: async ({ site, user }) => {
     // send server adduser request
-    const session = supabase.auth.session()
+    const { data, error } = await supabase.auth.getSession()
     const { data: success } = await axios.post(`/api/${site.id}.json`, {
       action: 'REMOVE_USER',
       payload: user
     }, {
       headers: {
-        authorization: `Bearer ${session?.access_token}`
+        authorization: `Bearer ${data.session.access_token}`
       }
     })
     return success
@@ -117,7 +117,7 @@ export const sites = {
     // return !!data.id
   },
   publish: async ({ siteID, host, files }) => {
-    const session = supabase.auth.session()
+    const { data: auth } = await supabase.auth.getSession()
 
     const { data } = await axios.post(`/api/${siteID}.json`, {
       action: 'PUBLISH',
@@ -128,7 +128,7 @@ export const sites = {
       }
     }, {
       headers: {
-        authorization: `Bearer ${session.access_token}`
+        authorization: `Bearer ${auth.session.access_token}`
       }
     })
     if (data) {
@@ -146,7 +146,7 @@ export const sites = {
     return data
   },
   uploadImage: async ({ siteID, image }) => {
-    const session = supabase.auth.session()
+    const { data: auth } = await supabase.auth.getSession()
     const password = get(sitePassword)
 
     const { data: url } = await axios.post(`/api/${siteID}.json?password=${password || ''}`, {
@@ -157,7 +157,7 @@ export const sites = {
       }
     }, {
       headers: {
-        authorization: `Bearer ${session?.access_token}`,
+        authorization: `Bearer ${auth.session.access_token}`,
         'Content-Type': 'multipart/form-data'
       }
     })
