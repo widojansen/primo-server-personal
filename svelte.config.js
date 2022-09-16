@@ -14,13 +14,17 @@ const config = {
   }),
 	kit: {
 		adapter: adapter(),
-    // ssr: false,
+		vite: {
+			server: {
+				proxy: {}
+			}
+		}
 	},
 	vitePlugin: {
 		experimental: {
 			inspector: true,
 		}
-	}
+	},
 };
 
 export default config;
