@@ -61,12 +61,16 @@
     font-size: 14px;
     box-shadow: var(--primo-ring-primored);
     color: var(--primo-color-white);
-    /* background: var(--primo-color-link); */
-    transition: background 0.1s, color 0.1s;
+    transition: box-shadow 0.1s, background 0.1s, color 0.1s;
     margin: var(--space-y, 0) var(--space-x, 0);
 
     &:hover {
+      box-shadow: var(--primo-ring-primored-thick);
+    }
+
+    &:active {
       background: var(--primo-color-primogreen);
+      color: var(--primo-color-black);
     }
   }
 

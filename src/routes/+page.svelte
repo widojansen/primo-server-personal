@@ -52,8 +52,6 @@
   function showCollaborators(site) {
     // modal.show("COLLABORATORS", { site });
   }
-
-  let hoveredItem = null
 </script>
 
 <main class="primo-reset">
@@ -63,17 +61,8 @@
       <div class="sites-container">
         <ul class="sites" xyz="fade stagger stagger-1">
           {#each $sites as site, i (site.id)}
-            <li
-              class="xyz-in"
-              class:active={hoveredItem === i}
-              class:inactive={hoveredItem !== null && hoveredItem !== i}
-            >
-              <a
-                class="site-link"
-                href={site.id}
-                on:mouseenter={() => (hoveredItem = i)}
-                on:mouseleave={() => (hoveredItem = null)}
-              >
+            <li class="xyz-in">
+              <a class="site-link" href={site.id}>
                 <SiteThumbnail {site} />
               </a>
               <div class="site-info">
@@ -90,11 +79,7 @@
                       />
                     </form>
                   {:else}
-                    <a
-                      href={site.id}
-                      on:mouseenter={() => (hoveredItem = i)}
-                      on:mouseleave={() => (hoveredItem = null)}
-                    >
+                    <a href={site.id}>
                       <span>{site.name}</span>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -163,12 +148,7 @@
             </li>
           {/each}
           {#if !$user.sites}
-            <li
-              class:inactive={hoveredItem !== true && hoveredItem !== null}
-              class:active={hoveredItem === true}
-              on:mouseenter={() => (hoveredItem = true)}
-              on:mouseleave={() => (hoveredItem = null)}
-            >
+            <li>
               <button class="create-site" on:click={createSite}>
                 {#if loading}
                   <!-- <Spinner /> -->
@@ -231,18 +211,22 @@
           border-radius: var(--primo-border-radius);
           overflow: hidden;
           font-size: var(--font-size-4);
-          box-shadow: var(--box-shadow-md);
+          transition: 0.1s box-shadow;
           display: flex;
           flex-direction: column;
           justify-content: flex-start;
-          transition: opacity 0.1s, filter 0.1s;
+          transition: 0.1s box-shadow;
 
-          &.active {
-            filter: brightness(1.1);
+          &:has(a:hover) {
+            box-shadow: var(--primo-ring-primored-thick);
+
+            & ~ li:last-child {
+              box-shadow: var(--primo-ring-primored-thin);
+            }
           }
 
-          &.inactive {
-            opacity: 0.5;
+          &:last-child {
+            box-shadow: var(--primo-ring-primored);
           }
 
           .site-link {
@@ -333,8 +317,6 @@
           background: var(--primo-color-black);
           font-weight: 600;
           color: var(--color-gray-2);
-          border-radius: var(--primo-border-radius);
-          border: 2px solid var(--primo-color-primogreen);
 
           svg {
             border-radius: 50%;
@@ -343,8 +325,9 @@
             width: 2rem;
           }
 
-          &:hover svg {
-            color: var(--primo-color-primogreen);
+          &:active {
+            background: var(--primo-color-primogreen);
+            color: var(--primo-color-black);
           }
         }
       }
