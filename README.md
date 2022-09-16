@@ -36,8 +36,11 @@ Before deploying your Primo Server, you'll need to sign up for [Supabase](https:
 1. Start a new Vercel project
 1. Select your forked repository
 1. For the environment variables, enter your Supabase project **URL**, **Public Key (anon public)**, and **Admin Key (service_role secret)** (which you can find in the Supabase project dashboard > Settings > API https://app.supabase.io/project/---yourprojectid---/settings/api)
-1. Click 'Deploy'
-1. Navigate to your new Primo Server. Sign up with an email address and password (this will be the admin account). 
+* VITE_SUPABASE_URL
+* VITE_SUPABASE_PUBLIC_KEY
+* VITE_SUPABASE_ADMIN_KEY
+4. Click 'Deploy'
+5. Navigate to your new Primo Server. Sign up with an email address and password (this will be the admin account). 
 
 ### Updating
 
