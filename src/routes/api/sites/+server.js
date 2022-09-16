@@ -1,5 +1,5 @@
-import supabaseAdmin from '../../supabase/admin';
-import { authorizeRequest } from './_auth';
+import supabaseAdmin from '../../../supabase/admin';
+import { authorizeRequest } from '../_auth';
 
 export async function GET(event) {
 	return await authorizeRequest(event, async () => {
