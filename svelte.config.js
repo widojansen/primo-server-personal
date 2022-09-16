@@ -15,6 +15,11 @@ const config = {
 	kit: {
 		adapter: adapter(),
     // ssr: false,
+	},
+	vitePlugin: {
+		experimental: {
+			inspector: true,
+		}
 	}
 };
 
