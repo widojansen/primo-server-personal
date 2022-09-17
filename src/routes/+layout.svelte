@@ -33,6 +33,7 @@
     if (event === 'SIGNED_IN') {
       const { id, email } = session.user
       const [userData] = await users.get(null, 'role, sites', email)
+      if (!userData) return
       user.update((u) => ({
         ...u,
         uid: id,
@@ -43,21 +44,6 @@
         role: userData.role === 'admin' ? 'developer' : userData.role,
         sites: userData.sites,
       }))
-
-      const channel = supabase.channel('chikano')
-      channel
-        .on('presence', { event: 'sync' }, () => {
-          console.log('currently online users', channel.presenceState())
-        })
-        .on('presence', { event: 'join' }, ({ newUser }) => {
-          console.log('a new user has joined', newUser)
-        })
-        .on('presence', { event: 'leave' }, ({ leftUser }) =>
-          console.log('a user has left', leftUser)
-        )
-        .subscribe(async (status) => {
-          console.log('status', status)
-        })
     } else if (event === 'SIGNED_OUT') {
       user.reset()
       goto('/')

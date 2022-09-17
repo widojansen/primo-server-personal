@@ -134,25 +134,23 @@
       role: collaboratorRole,
       invitationKey,
     })
+    const {
+      success,
+      supabase: { data, error },
+    } = res
+    const user_creation_successful = success && data && !error
+
     if (!res) {
       largeMessage =
         'Could not sign up. Ask the server Admin to send you a new invitation link.'
-    } else if (
-      res.success &&
-      !res.supabase &&
-      !res.supabase.error &&
-      res.supabase.session
-    ) {
+    } else if (user_creation_successful) {
       window.history.pushState('', document.title, window.location.origin) // remove query params from url
       signIn()
-    } else if (res.supabase.error) {
-      largeMessage = res.supabase.error
-    } else if (!res.supabase.session) {
-      largeMessage =
-        'It looks like email confirmations are still on for this Supabase instance.<br><br>Turn it off (Authentication > Settings) & refresh to continue.'
+    } else if (error) {
+      largeMessage = res.supabase.error.message
     } else {
       largeMessage =
-        'Something strange happened. Please let us know about it in a Github issue or in our Discord'
+        'Something strange happened. Feel free to file a <a href="https://github.com/primodotso/primo/issues/new?assignees=&labels=&template=bug_report.md&title=">bug report</a> or ask for help in the Discord'
     }
     loadingEmail = false
   }

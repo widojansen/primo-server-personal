@@ -8,12 +8,7 @@ export async function POST(event) {
   const nUsers = await getNumberOfUsers()
   if (nUsers === 0) {
     const supabase = await createUser(true)
-    return {
-      body: {
-        success: true,
-        supabase
-      }
-    }
+    return new Response(JSON.stringify({success: true, supabase}))
   }
 
   return await authorizeRequest(event, async () => {
