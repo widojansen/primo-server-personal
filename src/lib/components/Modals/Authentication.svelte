@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
-  import { find } from 'lodash'
+  import { find } from 'lodash-es'
   import axios from 'axios'
   import auth from '../../../supabase/auth'
   import { users } from '../../../supabase/db'
