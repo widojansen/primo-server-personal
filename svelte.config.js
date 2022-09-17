@@ -13,12 +13,7 @@ const config = {
     postcss: true
   }),
 	kit: {
-		adapter: adapter(),
-		vite: {
-			server: {
-				proxy: {}
-			}
-		}
+		adapter: adapter()
 	},
 	vitePlugin: {
 		experimental: {
