@@ -159,9 +159,17 @@
     smallMessage = ''
     loadingEmail = true
     if (!$user.signedIn) {
-      const { error, user: res } = await auth.signIn({ email, password })
+      const { error } = await auth.signIn({ email, password })
       if (error) {
         smallMessage = error.message
+      } else {
+        // kick out if user doesn't have access to site
+        const [u] = await users.get(null, '*', email)
+        const sites = JSON.parse(u.sites)
+        if (Array.isArray(sites) && !sites.includes($page.params.site)) {
+          await auth.signOut()
+          window.location.reload()
+        }
       }
     }
     loadingEmail = false
