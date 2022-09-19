@@ -211,11 +211,9 @@ export const users = {
     return data
   },
   create: async ({ email, role = 'developer' }) => {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('users')
-      .insert([ { email, role } ], {
-        returning: 'minimal'
-      })
+      .insert([ { email, role } ])
     if (error) {
       console.error(error)
       return false
@@ -263,7 +261,7 @@ export const hosts = {
       .from('hosts')
       .insert([
         { name, token }
-      ])
+      ]).select()
     if (error) {
       console.error(error)
       return null

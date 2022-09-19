@@ -87,7 +87,7 @@ export const sites = {
   },
   addUser: async ({ site, password, user }) => {
     // send server adduser request
-    const { data: success } = await axios.post(`/api/${site}.json?password=${password}`, {
+    const { data: success } = await axios.post(`/api/${site}?password=${password}`, {
       action: 'ADD_USER',
       payload: user
     })
@@ -96,7 +96,7 @@ export const sites = {
   removeUser: async ({ site, user }) => {
     // send server adduser request
     const { data, error } = await supabase.auth.getSession()
-    const { data: success } = await axios.post(`/api/${site.id}.json`, {
+    const { data: success } = await axios.post(`/api/${site.id}`, {
       action: 'REMOVE_USER',
       payload: user
     }, {
@@ -108,7 +108,7 @@ export const sites = {
   },
   validatePassword: async (siteID, password) => {
     try {
-      const { data: json } = await axios.get(`/api/${siteID}.json?password=${password}`)
+      const { data: json } = await axios.get(`/api/${siteID}?password=${password}`)
       const data = JSON.parse(json)
       return data ? true : false
     } catch (e) {
@@ -119,7 +119,7 @@ export const sites = {
   publish: async ({ siteID, host, files }) => {
     const { data: auth } = await supabase.auth.getSession()
 
-    const { data } = await axios.post(`/api/${siteID}.json`, {
+    const { data: { body } } = await axios.post(`/api/${siteID}`, {
       action: 'PUBLISH',
       payload: {
         siteID,
@@ -131,25 +131,26 @@ export const sites = {
         authorization: `Bearer ${auth.session.access_token}`
       }
     })
-    if (data) {
+
+    if (body) {
       stores.sites.update(
         sites => sites.map(
           s => s.id !== siteID
             ? s
-            : ({ ...s, active_deployment: data.deployment })
+            : ({ ...s, active_deployment: body.deployment })
         )
       )
     } else {
       alert('Could not publish site')
     }
 
-    return data
+    return body
   },
   uploadImage: async ({ siteID, image }) => {
     const { data: auth } = await supabase.auth.getSession()
     const password = get(sitePassword)
 
-    const { data: url } = await axios.post(`/api/${siteID}.json?password=${password || ''}`, {
+    const { data: { body: url } } = await axios.post(`/api/${siteID}?password=${password || ''}`, {
       action: 'UPLOAD_IMAGE',
       payload: {
         siteID,

@@ -7,14 +7,14 @@ export async function authorizeRequest(event, callback) {
 
   if (key) {
     const valid = await validateInvitationKey(key)
-    return valid ? callback() : {
+    return valid ? callback() : new Response(JSON.stringify({
       body: null
-    }
+    }))
   } else if (password) {
     const valid = await validateSitePassword(event.params.site, password)
-    return valid ? callback() : {
+    return valid ? callback() : new Response(JSON.stringify({
       body: null
-    }
+    }))
   } 
 
   const authorization = event.request.headers.get('authorization')
@@ -33,13 +33,15 @@ export async function authorizeRequest(event, callback) {
       },
       ...(await callback())
     }
-    else return {
+    else return new Response(JSON.stringify({
       body: null
-    }
+    }))
   } else if (authorization.includes('Bearer')) { // Server auth (logged-in)
-    const { user } = await supabaseAdmin.auth.api.getUser(token)
+    const { data: {user} } = await supabaseAdmin.auth.getUser(token)
     if (user) return callback() 
-    else return { body: null }
+    else return new Response(JSON.stringify({
+      body: null
+    }))
   }
 
 }

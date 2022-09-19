@@ -1,19 +1,43 @@
 import axios from 'axios'
 import {chain, find} from 'lodash-es'
-import crypto from 'node:crypto'
+import {createHash} from 'node:crypto'
+import {Blob} from 'node:buffer';
 
 // pass in site
 export async function publishSite({ siteID, host, files, activeDeployment }) {
   let deployment
   let error
+
   try {
     if (host.name === 'vercel') {
+
+      const uploaded = await Promise.all(
+        files.map(async file => {
+          const sha = hash(file.data)
+          const {data} = await axios.post('https://api.vercel.com/v2/now/files', file.data, {
+            headers: {
+              'x-vercel-digest': sha,
+              'Authorization': `Bearer ${host.token}`,
+              'Content-Type': 'text/plain',
+            }
+          }).catch(e => ({data:null}))
+
+          if (data) return {
+            sha,
+            file: file.file,
+            size: new Blob([file.data]).size
+          }
+        })
+      )
+
+      console.log(uploaded, 'here')
+
       const { data } = await axios
         .post(
           'https://api.vercel.com/v12/now/deployments',
           {
             name: siteID,
-            files,
+            files: uploaded,
             projectSettings: {
               framework: null,
             },
@@ -24,8 +48,12 @@ export async function publishSite({ siteID, host, files, activeDeployment }) {
               Authorization: `Bearer ${host.token}`,
             },
           }
-        )
+        ).catch(e => {
+          console.log(e.message)
+          return {data:null}
+        })
   
+        console.log({data})
       deployment = {
         id: data.projectId,
         url: `https://${data.alias.pop()}`,
@@ -97,7 +125,7 @@ export async function publishSite({ siteID, host, files, activeDeployment }) {
   async function uploadFiles({ endpoint, files }) {
     let error = 'Could not upload files to Netlify'
     const filesToUpload = chain(files.map(f => {
-      var shasum = crypto.createHash('sha1')
+      var shasum = createHash('sha1')
       shasum.update(f.data)
       return ({ 
         hash: shasum.digest('hex'), 
@@ -193,4 +221,9 @@ async function createRepo({ token, name }) {
     auto_init: true
   }, { headers })
   return data
+}
+
+
+function hash(string) {
+  return createHash('sha1').update(string).digest('hex');
 }

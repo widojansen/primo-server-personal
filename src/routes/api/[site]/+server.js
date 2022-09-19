@@ -1,16 +1,16 @@
 import supabaseAdmin, { saveSite } from '../../../supabase/admin';
 import { users } from '../../../supabase/db';
 import { authorizeRequest } from '../_auth';
-import { publishSite } from '../_utils';
+import { publishSite } from '../_hosts';
 import { decode } from 'base64-arraybuffer';
 
 export async function GET(event) {
 	return await authorizeRequest(event, async () => {
 		const { data } = await supabaseAdmin.storage.from('sites').download(`${event.params.site}/site.json?${Date.now()}`);
 		const json = JSON.stringify(await data.text());
-		return {
+		return new Response(JSON.stringify({
 			body: json,
-		};
+		}))
 	});
 }
 
@@ -41,13 +41,14 @@ export async function POST(event) {
 						.match({ email: payload.email });
 				}
 			} else {
-				const { data: user, error } = await supabaseAdmin.auth.api.createUser({
+				const { data: user, error } = await supabaseAdmin.auth.signUp({
 					email: payload.email,
-					password: payload.password,
-					email_confirm: true,
+					password: payload.password
 				});
 				if (error) {
-					return { body: false };
+					return new Response(JSON.stringify({
+						body: false,
+					}))
 				}
 				// create user in database for site row and user row, give site permission
 				await supabaseAdmin.from('users').insert({
@@ -65,25 +66,27 @@ export async function POST(event) {
 				})
 				.match({ id: event.params.site });
 
-			return {
+			return new Response(JSON.stringify({
 				body: true,
-			};
+			}))
 		} else if (action === 'REMOVE_USER') {
 			// create user (email, password) in auth
 			const { error } = await supabaseAdmin
 				.from('users')
 				.update({
-					sites: payload.sites.filter(s => s !== event.params.site),
+					sites: (JSON.parse(payload.sites)).filter(s => s !== event.params.site), // not sure why array comes through as JSON
 				})
 				.match({ email: payload.email });
 
 			if (error) {
-				return { body: false };
+				return new Response(JSON.stringify({
+					body: false,
+				}))
 			}
 
-			return {
-				body: 'true',
-			};
+			return new Response(JSON.stringify({
+				body: true,
+			}))
 		} else if (action === 'SET_ACTIVE_EDITOR') {
 			await Promise.all([
 				supabaseAdmin
@@ -92,33 +95,33 @@ export async function POST(event) {
 					.eq('id', payload.siteID),
 				supabaseAdmin.rpc('remove_active_editor', { site: payload.siteID }),
 			]);
-			return {
-				body: 'true',
-			};
+			return new Response(JSON.stringify({
+				body: true,
+			}))
 		} else if (action === 'REMOVE_ACTIVE_EDITOR') {
 			await supabaseAdmin
 				.from('sites')
 				.update({ active_editor: '' })
 				.eq('id', payload.siteID);
-			return {
-				body: 'true',
-			};
+			return new Response(JSON.stringify({
+				body: true,
+			}))
 		} else if (action === 'UPLOAD_IMAGE') {
 			const { siteID, image } = payload;
 			await supabaseAdmin.storage.from('sites').upload(`${siteID}/assets/${image.name}`, decode(image.base64), {
 				contentType: 'image/png',
 			});
 
-			const { publicURL } = await supabaseAdmin.storage.from('sites').getPublicUrl(`${siteID}/assets/${image.name}`);
+			const { data: {publicUrl} } = await supabaseAdmin.storage.from('sites').getPublicUrl(`${siteID}/assets/${image.name}`);
 
-			return {
-				body: publicURL,
-			};
+			return new Response(JSON.stringify({
+				body: publicUrl,
+			}))
 		} else if (action === 'SAVE_SITE') {
 			const res = await saveSite(payload);
-			return {
-				body: res ? 'true' : 'false',
-			};
+			return new Response(JSON.stringify({
+				body: !!res,
+			}))
 		} else if (action === 'PUBLISH') {
 			const { siteID, files, host } = payload;
 			// get active_deployment from db
@@ -147,34 +150,34 @@ export async function POST(event) {
 					})
 					.eq('id', siteID);
 				if (error) console.error(error);
-				return {
+				return new Response(JSON.stringify({
 					body: {
 						deployment,
 						error: null,
 					},
-				};
+				}))
 			} else {
-				return {
+				return new Response(JSON.stringify({
 					body: {
 						deployment: null,
-						error,
+						error: null,
 					},
-				};
+				}))
 			}
 		} else {
-			return {
-				body: 'event undefined',
-			};
+			return new Response(JSON.stringify({
+				body: 'Event undefined',
+			}))
 		}
 	});
 }
 
 export async function options() {
-	return {
+	return new Response(JSON.stringify({
 		headers: {
 			'Access-Control-Allow-Origin': '*',
 			'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
 			'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 		},
-	};
+	}))
 }
