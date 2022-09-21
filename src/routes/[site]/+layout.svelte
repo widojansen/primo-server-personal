@@ -13,6 +13,7 @@
   import * as actions from '../../actions'
   import user from '../../stores/user'
   import { sitePassword } from '../../stores/misc'
+  import { activeSite } from '../../stores/site'
   import { page } from '$app/stores'
   import * as primo from '@primo-app/primo/package.json'
   import LockAlert from '$lib/components/LockAlert.svelte'
@@ -67,6 +68,7 @@
     } else if (res) {
       actions.setActiveEditor({ siteID })
       data = res
+      $activeSite = res
     }
   }
 
@@ -93,9 +95,9 @@
   })
 </script>
 
-{#if browser}
+{#if browser && $activeSite}
   <Primo
-    {data}
+    data={$activeSite}
     role={$user.role}
     {saving}
     on:save={async ({ detail: data }) => saveData(data)}
