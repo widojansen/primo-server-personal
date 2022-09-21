@@ -298,6 +298,7 @@ export const config = {
       .from('config')
       .update({ value })
       .eq('id', id)
+      .select()
     if (error) {
       console.error(error)
       return null

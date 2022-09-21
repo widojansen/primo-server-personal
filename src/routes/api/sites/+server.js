@@ -7,33 +7,39 @@ export async function GET(event) {
 		const { data: sites } = await supabaseAdmin.from('sites').select('*');
 		await Promise.all(
 			sites.map(async site => {
-				const { data: res } = await supabaseAdmin.storage.from('sites').download(`${site.id}/site.json?${Date.now()}`); // bust the cache (i.e. prevent outdated data)
-				const json = await res.text();
-				const data = JSON.parse(json);
+
+				const [ data, preview ] = await Promise.all([
+					downloadFile(`${site.id}/site.json`),
+					downloadFile(`${site.id}/preview.html`)
+				])
 
 				finalSites = [
 					...finalSites,
 					{
 						...site,
-						data,
+						data: JSON.parse(data),
+						preview
 					},
 				];
 			})
 		);
-		return {
-			body: {
-				sites: finalSites,
-			},
-		};
+		return new Response(JSON.stringify(finalSites));
 	});
+
+	async function downloadFile(location) {
+		const {data} = await supabaseAdmin.storage.from('sites').download(`${location}?${Date.now()}`) // bust the cache (i.e. prevent outdated data)
+		return await data.text()
+	}
 }
 
-export async function options() {
-	return {
-		headers: {
-			'Access-Control-Allow-Origin': '*',
-			'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
-			'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-		},
-	};
-}
+// export async function OPTIONS() {
+// 	return new Response(new Blob(), {
+//     status: 201,
+// 		statusText: 'no DATA!',
+// 		headers: {
+// 			'Access-Control-Allow-Origin': '*',
+// 			'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+// 			'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+// 		},
+// 	});
+// }

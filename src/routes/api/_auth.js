@@ -19,23 +19,16 @@ export async function authorizeRequest(event, callback) {
 
   const authorization = event.request.headers.get('authorization')
 
-  if (!authorization) return { body: 'Must authorize request' }
+  if (!authorization) return new Response(JSON.stringify({ body: 'Must authorize request' }))
   
   const token = authorization.replace(/Basic |Bearer /gi, '')
 
   if (authorization.includes('Basic')) { // Desktop auth
     const storedToken = await getServerToken()
-    if (token === storedToken) return {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-      },
-      ...(await callback())
-    }
-    else return new Response(JSON.stringify({
-      body: null
-    }))
+    if (token === storedToken) return await callback()
+    else return new Response(new Blob(), {
+      status: 401 // unauthorized 
+    })
   } else if (authorization.includes('Bearer')) { // Server auth (logged-in)
     const { data: {user} } = await supabaseAdmin.auth.getUser(token)
     if (user) return callback() 
