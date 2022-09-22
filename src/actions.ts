@@ -62,9 +62,7 @@ export const sites = {
   save: async (updatedSite) => {
     stores.sites.update(sites => sites.map(site => site.id === updatedSite.id ? updatedSite : site))
     const homepage = find(updatedSite.pages, ['id', 'index'])
-    console.log(1, homepage, updatedSite)
     const preview = await buildStaticPage({ page: homepage, site: updatedSite })
-    console.log(2)
     const [res1, res2] = await Promise.all([
       supabaseStorage.updateSiteData({
         id: updatedSite.id,
@@ -75,7 +73,6 @@ export const sites = {
         preview
       })
     ])
-    console.log({ res1, res2 })
     return res1.error || res2.error ? false : true
   },
   delete: async (id) => {
