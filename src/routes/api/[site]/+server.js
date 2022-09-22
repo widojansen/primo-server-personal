@@ -1,4 +1,4 @@
-import supabaseAdmin, { saveSite } from '../../../supabase/admin';
+import supabaseAdmin, { saveSite, savePreview } from '../../../supabase/admin';
 import { users } from '../../../supabase/db';
 import { authorizeRequest } from '../_auth';
 import { publishSite } from '../_hosts';
@@ -118,7 +118,7 @@ export async function POST(event) {
 				body: publicUrl,
 			}))
 		} else if (action === 'SAVE_SITE') {
-			const res = await saveSite(payload);
+			const res = await saveSite(payload.site, payload.preview)
 			return new Response(JSON.stringify({
 				body: !!res,
 			}))
@@ -172,12 +172,12 @@ export async function POST(event) {
 	});
 }
 
-export async function options() {
-	return new Response(JSON.stringify({
-		headers: {
-			'Access-Control-Allow-Origin': '*',
-			'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
-			'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-		},
-	}))
-}
+// export async function OPTIONS() {
+// 	return new Response(JSON.stringify({
+// 		headers: {
+// 			'Access-Control-Allow-Origin': '*',
+// 			'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+// 			'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+// 		},
+// 	}))
+// }

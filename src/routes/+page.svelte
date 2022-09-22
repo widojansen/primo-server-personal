@@ -79,7 +79,7 @@
                       />
                     </form>
                   {:else}
-                    <a href={site.id}>
+                    <a data-sveltekit-prefetch href={site.id}>
                       <span>{site.name}</span>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
