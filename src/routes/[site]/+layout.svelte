@@ -18,6 +18,8 @@
   import * as primo from '@primo-app/primo/package.json'
   import LockAlert from '$lib/components/LockAlert.svelte'
 
+  $: siteID = $page.params.site
+
   if (browser) {
     primoModal.register([
       {
@@ -81,8 +83,6 @@
 
   let saving = false
 
-  $: siteID = $page.params.site
-
   $: if ($user.signedIn && browser) fetchSite($page.url.pathname)
 
   $: if (browser && $sitePassword) {
@@ -95,13 +95,14 @@
   })
 </script>
 
-{#if browser && $activeSite}
+{#if browser}
   <Primo
     data={$activeSite}
     role={$user.role}
     {saving}
     on:save={async ({ detail: data }) => saveData(data)}
   />
+  <slot />
   <div id="app-version">
     <span>primo v{primo.version}</span>
     <span>server v{__SERVER_VERSION__}</span>

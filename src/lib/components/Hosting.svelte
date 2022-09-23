@@ -376,9 +376,6 @@
       place-items: center;
       gap: 1rem;
     }
-    span:first-child {
-      font-weight: 700;
-    }
     a {
       text-decoration: underline;
     }

@@ -193,20 +193,6 @@
         }
       }
     }
-
-    tr:first-child {
-      padding: 0.25rem 0;
-      border-bottom: 1px solid var(--color-gray-8);
-    }
-
-    td,
-    th {
-      padding: 0.25rem;
-    }
-
-    th {
-      text-align: left;
-    }
   }
 
   .link-description {
