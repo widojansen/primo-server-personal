@@ -162,7 +162,7 @@
       const { error } = await auth.signIn({ email, password })
       if (error) {
         smallMessage = error.message
-      } else {
+      } else if ($page.params.site) {
         // kick out if user doesn't have access to site
         const [u] = await users.get(null, '*', email)
         const sites = JSON.parse(u.sites)
