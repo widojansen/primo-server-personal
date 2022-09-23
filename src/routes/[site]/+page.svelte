@@ -3,4 +3,4 @@
   import { page } from '$app/stores'
 </script>
 
-<Page id={$page.params.page} />
+<Page id="index" />
