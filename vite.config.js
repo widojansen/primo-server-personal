@@ -8,7 +8,8 @@ const config = {
       // throws an error without this when importing Fira font
       allow: ['..', 'node_modules/@fontsource/fira-code']
     },
-    proxy: {}
+    proxy: {},
+    port: 5174
   },
   define: {
     '__SERVER_VERSION__': JSON.stringify(process.env.npm_package_version),
