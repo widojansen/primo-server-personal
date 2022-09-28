@@ -1,12 +1,16 @@
 <script lang="ts">
   import Icon from '@iconify/svelte'
-  import SignInNav from '$lib/components/SignInNav.svelte'
+  import DashboardToolbar from '$lib/components/DashboardToolbar.svelte'
   import SiteFooter from '$lib/components/SiteFooter.svelte'
   import SiteThumbnail from '$lib/components/SiteThumbnail.svelte'
   import Modal, { show, hide } from '$lib/components/Modal.svelte'
   import sites from '../stores/sites'
   import user from '../stores/user'
   import * as actions from '../actions'
+
+  export let data
+
+  actions.setCustomization(data)
 
   function beginInvitation(site): void {
     show({
@@ -57,7 +61,7 @@
 <main class="primo-reset">
   {#if $user.signedIn}
     <div class="container">
-      <SignInNav />
+      <DashboardToolbar />
       <div class="sites-container">
         <ul class="sites" xyz="fade stagger stagger-1">
           {#each $sites as site, i (site.id)}
@@ -218,15 +222,15 @@
           transition: 0.1s box-shadow;
 
           &:has(a:hover) {
-            box-shadow: var(--primo-ring-primored-thick);
+            box-shadow: var(--primo-ring-brand-thick);
 
             & ~ li:last-child {
-              box-shadow: var(--primo-ring-primored-thin);
+              box-shadow: var(--primo-ring-brand-thin);
             }
           }
 
           &:last-child {
-            box-shadow: var(--primo-ring-primored);
+            box-shadow: var(--primo-ring-brand);
           }
 
           .site-link {
@@ -249,7 +253,7 @@
                 place-items: center flex-start;
 
                 &:hover {
-                  color: var(--primo-color-primogreen);
+                  color: var(--primo-color-brand);
                 }
 
                 svg {
@@ -271,7 +275,7 @@
                 padding: 0 0.5rem;
 
                 &:hover {
-                  color: var(--primo-color-primogreen);
+                  color: var(--primo-color-brand);
                 }
 
                 svg {
@@ -326,7 +330,7 @@
           }
 
           &:active {
-            background: var(--primo-color-primogreen);
+            background: var(--primo-color-brand);
             color: var(--primo-color-black);
           }
         }
@@ -346,14 +350,14 @@
       height: 1.25rem;
     }
     &:hover {
-      color: var(--primo-color-primogreen);
+      color: var(--primo-color-brand);
     }
   }
 
   button {
     transition: color 0.1s, background-color 0.1s;
     &:focus {
-      outline: 2px solid var(--primo-color-primogreen);
+      outline: 2px solid var(--primo-color-brand);
     }
     &:disabled {
       opacity: 0.5;

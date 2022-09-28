@@ -212,3 +212,18 @@ export async function setActiveEditor({ siteID, lock = true, password = null }) 
     })
   }
 }
+
+
+export async function setCustomization(options) {
+  stores.config.update(c => ({
+    ...c,
+    customization: {
+      ...c.customization,
+      ...options
+    }
+  }))
+  supabaseDB.config.update({
+    id: 'customization',
+    options: get(stores.config)['customization']
+  })
+}

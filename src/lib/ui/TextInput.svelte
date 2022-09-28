@@ -1,15 +1,15 @@
 <script>
-  import { createEventDispatcher } from "svelte";
-  const dispatch = createEventDispatcher();
+  import { createEventDispatcher } from 'svelte'
+  const dispatch = createEventDispatcher()
 
-  export let id = null;
-  export let label = null;
-  export let prefix = "";
-  export let value;
-  export let placeholder = "";
-  export let variants = "";
-  export let autofocus = false;
-  export let type = "text";
+  export let id = null
+  export let label = null
+  export let prefix = ''
+  export let value
+  export let placeholder = ''
+  export let variants = ''
+  export let autofocus = false
+  export let type = 'text'
 
   // Note: Svelte seems to have some issues with two-way binding, so if this is acting up it's probably that
 </script>
@@ -24,8 +24,8 @@
       {type}
       {placeholder}
       on:input={({ target }) => {
-        value = target.value;
-        dispatch("input", value);
+        value = target.value
+        dispatch('input', value)
       }}
     />
   </div>
@@ -63,7 +63,7 @@
         width: 100%;
         background: var(--color-gray-8);
         color: var(--color-gray-1);
-        outline-color: var(--primo-color-primogreen);
+        outline-color: var(--primo-color-brand);
         font-weight: 500;
         border-radius: var(--input-border-radius);
         padding: 0.5rem 0.75rem;

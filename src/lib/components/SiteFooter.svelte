@@ -1,5 +1,6 @@
 <script>
   import * as primo from '@primo-app/primo/package.json'
+  import { config } from '../../stores'
 
   const date = new Date()
   const month = date.toLocaleString('default', { month: 'long' })
@@ -12,23 +13,9 @@
   </span>
   <div class="footer-links">
     <div>
-      <a href="https://discord.gg/vzSFTS9" rel="external" target="blank"
-        >Community</a
-      >
-      |
-      <a
-        href="https://primo.af/terms-of-service"
-        title="Terms and Conditions"
-        rel="external"
-        target="blank">Terms</a
-      >
-      |
-      <a
-        href="https://primo.af/privacy-policy"
-        title="Privacy Policy"
-        rel="external"
-        target="blank">Privacy</a
-      >
+      {#each $config.customization.links as link}
+        <a href={link.url} rel="external" target="blank">{link.label}</a>
+      {/each}
     </div>
     <span class="copyright primo">©</span>
   </div>

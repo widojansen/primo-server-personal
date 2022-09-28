@@ -3,9 +3,9 @@
   const dispatch = createEventDispatcher()
   import imageCompression from 'browser-image-compression'
   import svgToMiniDataURI from 'mini-svg-data-uri'
-  import TextInput from '@primo-app/primo/src/components/inputs/TextInput.svelte';
+  import TextInput from '@primo-app/primo/src/components/inputs/TextInput.svelte'
   import Spinner from '$lib/ui/Spinner.svelte'
-  import {sites} from '../../actions'
+  import { sites } from '../../actions'
   import { page } from '$app/stores'
 
   const siteID = $page.params.site
@@ -46,11 +46,14 @@
       let size = new Blob([compressed]).size
 
       let dataUri = await convertBlobToBase64(compressed)
-      const base64 = dataUri.replace(/data:.+?,/, "");
-      const url = await sites.uploadImage({ siteID, image: {
-        name: image.name,
-        base64
-      } })
+      const base64 = dataUri.replace(/data:.+?,/, '')
+      const url = await sites.uploadImage({
+        siteID,
+        image: {
+          name: image.name,
+          base64,
+        },
+      })
 
       imagePreview = url
 
@@ -60,7 +63,7 @@
       })
 
       loading = false
-      dispatch('input')
+      dispatch('input', field)
     }
   }
 
@@ -99,7 +102,7 @@
       })
 
       loading = false
-      dispatch('input')
+      dispatch('input', field)
 
       async function convertSvgToDataUri(file) {
         const reader = new FileReader()
@@ -182,24 +185,24 @@
           {#if !field.value.url}
             <span>Upload</span>
           {/if}
-          <input
-            on:change={uploadImage}
-            type="file"
-            accept="image/*"
-          />
+          <input on:change={uploadImage} type="file" accept="image/*" />
         </label>
       </div>
     {/if}
     <div class="inputs">
       <TextInput bind:value={field.value.alt} label="Description" />
-      <TextInput value={field.value.url} label="URL" on:input={({detail:value}) => {
-        imagePreview = value
-        setValue({
-          url: value,
-          size: null,
-        })
-        dispatch('input')
-      }} />
+      <TextInput
+        value={field.value.url}
+        label="URL"
+        on:input={({ detail: value }) => {
+          imagePreview = value
+          setValue({
+            url: value,
+            size: null,
+          })
+          dispatch('input', field)
+        }}
+      />
     </div>
   </div>
 </div>
@@ -227,11 +230,11 @@
     display: grid;
     grid-template-columns: 9rem 4fr;
     overflow: hidden;
-    /* border: 1px solid var(--primo-color-primogreen); */
+    /* border: 1px solid var(--primo-color-brand); */
     /* padding: 0.5rem; */
 
     .spinner-container {
-      background: var(--primo-color-primogreen);
+      background: var(--primo-color-brand);
       height: 100%;
       width: 100%;
       display: flex;
@@ -244,7 +247,7 @@
     background: var(--color-gray-8);
   }
   .image-preview {
-    border: 1px dashed #3E4041;
+    border: 1px dashed #3e4041;
     border-radius: 4px;
     aspect-ratio: 1 / 1;
     /* width: 100%; */
@@ -275,7 +278,7 @@
 
       &:hover {
         opacity: 0.95;
-        background: var(--primo-color-primogreen);
+        background: var(--primo-color-brand);
       }
 
       span {
@@ -310,7 +313,7 @@
     img {
       position: absolute;
       inset: 0;
-      object-fit: cover;
+      object-fit: contain;
       height: 100%;
       width: 100%;
     }

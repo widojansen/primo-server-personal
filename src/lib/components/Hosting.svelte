@@ -331,8 +331,8 @@
     transition: text-decoration-color 0.1s, color 0.1s;
     text-decoration: underline var(--primo-color-gray-4);
     &:hover {
-      text-decoration-color: var(--primo-color-primogreen);
-      color: var(--primo-color-primogreen);
+      text-decoration-color: var(--primo-color-brand);
+      color: var(--primo-color-brand);
     }
   }
   .heading {
@@ -354,7 +354,7 @@
     a {
       text-decoration: underline;
       &:hover {
-        color: var(--primo-color-primogreen);
+        color: var(--primo-color-brand);
       }
     }
   }
@@ -390,7 +390,7 @@
       margin-bottom: 0.5rem;
 
       &:hover {
-        /* box-shadow: var(--primo-ring-primored); */
+        /* box-shadow: var(--primo-ring-brand); */
       }
       &:not(:last-child) {
         padding-bottom: 1rem;
@@ -436,7 +436,7 @@
     .button {
       background: white;
       padding: 1rem;
-      box-shadow: 0 0 0 0 var(--primo-color-primogreen);
+      box-shadow: 0 0 0 0 var(--primo-color-brand);
       border-radius: var(--primo-border-radius);
       transition: box-shadow 0.1s;
       overflow: visible;
@@ -445,7 +445,7 @@
       align-items: center;
       justify-content: center;
       &:not([disabled]):hover {
-        box-shadow: 0 0 0 3px var(--primo-color-primogreen);
+        box-shadow: 0 0 0 3px var(--primo-color-brand);
       }
     }
 
@@ -456,13 +456,13 @@
 
   .connecting-host {
     padding: 1rem;
-    box-shadow: 0 0 0 1px var(--primo-color-primogreen);
+    box-shadow: 0 0 0 1px var(--primo-color-brand);
     margin-top: 1rem;
     width: 100%;
     --space-y: 0;
 
     .back {
-      color: var(--primo-color-primogreen);
+      color: var(--primo-color-brand);
       font-size: 0.75rem;
       text-decoration: underline;
       margin-bottom: 0.5rem;

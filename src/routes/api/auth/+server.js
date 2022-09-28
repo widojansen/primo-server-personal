@@ -13,7 +13,10 @@ export async function POST(event) {
 
   return await authorizeRequest(event, async () => {
     await createUser()
-    await config.update('invitation-key', '')
+    await config.update({
+      id: 'invitation-key', 
+      value: ''
+    })
     return new Response(JSON.stringify({success: true}))
   })
 

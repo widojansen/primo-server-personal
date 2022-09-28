@@ -12,7 +12,7 @@
 
   import Spinner from '$lib/ui/Spinner.svelte'
   import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
-  import Logo from '$lib/ui/Logo.svelte'
+  import { config } from '../../../stores'
   import user from '../../../stores/user'
   import { sitePassword } from '../../../stores/misc'
 
@@ -192,10 +192,11 @@
 
 {#key signingUp}
   <main class="primo-modal primo-reset" in:fade>
-    <div class="logo">
-      <a href="https://primo.af" target="blank" xyz="fade">
-        <Logo />
-      </a>
+    <div class="logo" xyz="fade">
+      <img
+        src={$config.customization.logo.url}
+        alt={$config.customization.logo.alt}
+      />
     </div>
 
     {#if largeMessage}
@@ -326,15 +327,8 @@
       display: flex;
       justify-content: center;
 
-      a {
-        width: 16rem;
-        padding: 0 2rem;
-        opacity: 1;
-        transition: opacity 0.2s;
-
-        &:hover {
-          opacity: 0.75;
-        }
+      img {
+        max-width: 200px;
       }
     }
 

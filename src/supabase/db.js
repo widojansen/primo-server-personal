@@ -291,13 +291,12 @@ export const config = {
       console.error(error)
       return null
     }
-    return data[0]['value']
+    return data?.[0]['value']
   },
-  update: async (id, value) => {
+  update: async ({id, value = '', options = null}) => {
     const { data, error } = await supabase
       .from('config')
-      .update({ value })
-      .eq('id', id)
+      .upsert({ id, value, options })
       .select()
     if (error) {
       console.error(error)

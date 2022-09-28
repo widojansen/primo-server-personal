@@ -45,7 +45,10 @@
 
   async function resetKey() {
     key = createUniqueID(15)
-    config.update('invitation-key', key)
+    config.update({
+      id: 'invitation-key',
+      value: key,
+    })
     copied = false
   }
 
@@ -233,7 +236,7 @@
 
       button {
         padding: 0.5rem 1rem;
-        background: var(--primo-color-primogreen);
+        background: var(--primo-color-brand);
         border-radius: 0.25rem;
         margin-left: 0.5rem;
 

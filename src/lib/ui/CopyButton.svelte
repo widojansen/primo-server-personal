@@ -74,14 +74,14 @@
       max-width: 28rem;
       padding: 0.5rem 0.75rem;
       border-radius: var(--primo-border-radius);
-      box-shadow: var(--primo-ring-primored);
+      box-shadow: var(--primo-ring-brand);
 
       &:hover {
-        background: var(--primo-color-primogreen);
+        background: var(--primo-color-brand);
       }
 
       &.selected {
-        outline-color: var(--primo-color-primogreen);
+        outline-color: var(--primo-color-brand);
         pointer-events: none;
         cursor: default;
         background: var(--primo-color-gray-7);

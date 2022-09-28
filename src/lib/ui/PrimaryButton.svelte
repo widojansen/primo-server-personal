@@ -59,17 +59,17 @@
     border-radius: 0.25rem;
     font-weight: 400;
     font-size: 14px;
-    box-shadow: var(--primo-ring-primored);
+    box-shadow: var(--primo-ring-brand);
     color: var(--primo-color-white);
     transition: box-shadow 0.1s, background 0.1s, color 0.1s;
     margin: var(--space-y, 0) var(--space-x, 0);
 
     &:hover {
-      box-shadow: var(--primo-ring-primored-thick);
+      box-shadow: var(--primo-ring-brand-thick);
     }
 
     &:active {
-      background: var(--primo-color-primogreen);
+      background: var(--primo-color-brand);
       color: var(--primo-color-black);
     }
   }

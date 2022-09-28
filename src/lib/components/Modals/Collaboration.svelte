@@ -143,8 +143,8 @@
   }
 
   .role-selection {
-    --color-link: var(--primo-color-primogreen);
-    --color-link-hover: var(--primo-color-primogreen-dark);
+    --color-link: var(--primo-color-brand);
+    --color-link-hover: var(--primo-color-brand-dark);
     margin: 1rem 0;
 
     --TextInput-mb: 1rem;
