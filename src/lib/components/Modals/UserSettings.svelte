@@ -134,12 +134,10 @@
             label: 'Brand Color',
             value: $config.customization.color,
           }}
-          on:input={({ detail }) => {
-            console.log({ detail })
+          on:input={({ detail }) =>
             setCustomization({
               color: detail.value,
-            })
-          }}
+            })}
         />
       </div>
     {/if}
