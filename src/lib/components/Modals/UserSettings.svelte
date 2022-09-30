@@ -1,4 +1,5 @@
 <script>
+  import { cloneDeep as _cloneDeep } from 'lodash-es'
   import { onMount } from 'svelte'
   import { createUniqueID } from '@primo-app/primo/src/utilities'
   import Tabs from '$lib/ui/Tabs.svelte'
@@ -130,10 +131,10 @@
         />
         <br /><br />
         <TextField
-          field={{
+          field={_cloneDeep({
             label: 'Brand Color',
             value: $config.customization.color,
-          }}
+          })}
           on:input={({ detail }) =>
             setCustomization({
               color: detail.value,

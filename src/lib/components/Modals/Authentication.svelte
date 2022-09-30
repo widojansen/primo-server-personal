@@ -1,7 +1,6 @@
 <script>
   import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
-  import { find } from 'lodash-es'
   import axios from 'axios'
   import auth from '../../../supabase/auth'
   import { users } from '../../../supabase/db'
@@ -24,7 +23,6 @@
       .get('/api/auth')
       .then(({ data }) => {
         loading = false
-        console.log({ data })
         if (!data.initialized) {
           signingUp = true
           smallMessage = `Welcome to your new Primo Server! Enter the email address & password you'll use to administrate this server`

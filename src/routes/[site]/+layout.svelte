@@ -1,3 +1,7 @@
+<script context="module">
+  export const prerender = true
+</script>
+
 <script>
   import { onDestroy, setContext } from 'svelte'
   import { browser } from '$app/environment'
@@ -16,6 +20,7 @@
   import { activeSite } from '../../stores/site'
   import { page } from '$app/stores'
   import * as primo from '@primo-app/primo/package.json'
+  import config from '../../stores/config'
   import LockAlert from '$lib/components/LockAlert.svelte'
 
   $: siteID = $page.params.site
@@ -49,7 +54,6 @@
   }
 
   let currentPath
-  let data
   let siteLocked = false
   async function fetchSite(fullPath) {
     if (currentPath === fullPath) return
@@ -69,7 +73,6 @@
       })
     } else if (res) {
       actions.setActiveEditor({ siteID })
-      data = res
       $activeSite = res
     }
   }
@@ -95,19 +98,20 @@
   })
 </script>
 
-{#if browser}
-  <Primo
-    data={$activeSite}
-    role={$user.role}
-    {saving}
-    on:save={async ({ detail: data }) => saveData(data)}
-  />
-  <slot />
-  <div id="app-version">
-    <span>primo v{primo.version}</span>
-    <span>server v{__SERVER_VERSION__}</span>
-  </div>
-{/if}
+<Primo
+  data={$activeSite}
+  role={$user.role}
+  options={{
+    logo: $config.customization.logo.url,
+  }}
+  {saving}
+  on:save={async ({ detail: data }) => saveData(data)}
+/>
+<slot />
+<div id="app-version">
+  <span>primo v{primo.version}</span>
+  <span>server v{__SERVER_VERSION__}</span>
+</div>
 
 <style global lang="postcss">
   .primo-reset {
