@@ -74,14 +74,7 @@
   }
 </script>
 
-<div
-  style={`
-  --primo-color-brand: ${$config.customization.color};
-  --primo-ring-brand: 0px 0px 0px 2px var(--primo-color-brand);
-  --primo-ring-brand-thin: 0px 0px 0px 1px var(--primo-color-brand);
-  --primo-ring-brand-thick: 0px 0px 0px 3px var(--primo-color-brand);
-`}
->
+<div style:--primo-color-brand={$config.customization.color}>
   <Modal />
   <slot />
 </div>
@@ -128,5 +121,8 @@
     --primo-max-width-max: 1200px;
 
     --primo-border-radius: 5px;
+    --primo-ring-brand: 0px 0px 0px 2px var(--primo-color-brand);
+    --primo-ring-brand-thin: 0px 0px 0px 1px var(--primo-color-brand);
+    --primo-ring-brand-thick: 0px 0px 0px 3px var(--primo-color-brand);
   }
 </style>

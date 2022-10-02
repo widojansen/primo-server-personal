@@ -217,14 +217,10 @@
     gap: 1rem;
   }
   .field-label {
-    font-size: var(--font-size-1);
     font-weight: 600;
     display: inline-block;
-
-    font-size: 0.875rem;
-    font-weight: 400;
-
-    font-size: var(--label-font-size, 10rem);
+    font-weight: 500;
+    font-size: var(--label-font-size, 1rem);
   }
   .image-info {
     display: grid;
