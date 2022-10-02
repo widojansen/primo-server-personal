@@ -7,26 +7,28 @@ export async function POST(event) {
   const payload = await event.request.json()
   const nUsers = await getNumberOfUsers()
   if (nUsers === 0) {
-    const supabase = await createUser(true)
-    return new Response(JSON.stringify({success: true, supabase}))
+    const {error} = await createUser(true)
+    return new Response(JSON.stringify({success: !!error}))
   }
 
   return await authorizeRequest(event, async () => {
-    await createUser()
-    await config.update({
-      id: 'invitation-key', 
-      value: ''
-    })
-    return new Response(JSON.stringify({success: true}))
+    const {error} = await createUser()
+    if (!error) {
+      await supabaseAdmin.from('config').upsert({
+        id: 'invitation-key', 
+        value: ''
+      })
+      return new Response(JSON.stringify({success: true}))
+    } else return new Response(JSON.stringify({success: false}))
   })
 
   async function createUser(admin = false) {
-    const supabase = await signUp(payload)
-    await supabaseAdmin.from('users').insert([{
+    const { error } = await signUp(payload)
+    const res = await supabaseAdmin.from('users').insert({
       email: payload.email,
       role: payload.role || (admin ? 'admin' : 'developer')
-    }])
-    return supabase
+    })
+    return { error }
   }
 }
 

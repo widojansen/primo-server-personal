@@ -132,20 +132,13 @@
       role: collaboratorRole,
       invitationKey,
     })
-    const {
-      success,
-      supabase: { data, error },
-    } = res
-    const user_creation_successful = success && data && !error
 
     if (!res) {
       largeMessage =
         'Could not sign up. Ask the server Admin to send you a new invitation link.'
-    } else if (user_creation_successful) {
+    } else if (res.success) {
       window.history.pushState('', document.title, window.location.origin) // remove query params from url
       signIn()
-    } else if (error) {
-      largeMessage = res.supabase.error.message
     } else {
       largeMessage =
         'Something strange happened. Feel free to file a <a href="https://github.com/primodotso/primo/issues/new?assignees=&labels=&template=bug_report.md&title=">bug report</a> or ask for help in the Discord'

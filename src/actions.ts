@@ -214,7 +214,7 @@ export async function setActiveEditor({ siteID, lock = true, password = null }) 
 }
 
 
-export async function setCustomization(options) {
+export async function setCustomization(options, update_on_server = true) {
   stores.config.update(c => ({
     ...c,
     customization: {
@@ -222,8 +222,10 @@ export async function setCustomization(options) {
       ...options
     }
   }))
-  supabaseDB.config.update({
-    id: 'customization',
-    options: get(stores.config)['customization']
-  })
+  if (update_on_server) {
+    supabaseDB.config.update({
+      id: 'customization',
+      options: get(stores.config)['customization']
+    })
+  }
 }
