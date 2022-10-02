@@ -30,8 +30,6 @@ export async function publishSite({ siteID, host, files, activeDeployment }) {
         })
       )
 
-      console.log(uploaded, 'here')
-
       const { data } = await axios
         .post(
           'https://api.vercel.com/v12/now/deployments',
@@ -124,17 +122,16 @@ export async function publishSite({ siteID, host, files, activeDeployment }) {
 
   async function uploadFiles({ endpoint, files }) {
     let error = 'Could not upload files to Netlify'
-    const filesToUpload = chain(files.map(f => {
-      var shasum = createHash('sha1')
-      shasum.update(f.data)
+    const filesToUpload = await Promise.all(chain(files.map(async f => {
+      const hash = await digestMessage(f.data);
       return ({ 
-        hash: shasum.digest('hex'), 
+        hash, 
         file: `/${f.file}`
       })
     }))
       .keyBy('file')
       .mapValues('hash')
-      .value()
+      .value())
 
     // upload hashes to netlify
     const res = await axios
@@ -169,6 +166,15 @@ export async function publishSite({ siteID, host, files, activeDeployment }) {
       )
       return { data: res.data, error: null }
     } else return { data: null, error }
+  }
+
+  // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
+  async function digestMessage(message) {
+    const msgUint8 = new TextEncoder().encode(message);                           // encode as (utf-8) Uint8Array
+    const hashBuffer = await crypto.subtle.digest('SHA-1', msgUint8);           // hash the message
+    const hashArray = Array.from(new Uint8Array(hashBuffer));                     // convert buffer to byte array
+    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+    return hashHex;
   }
 }
 
