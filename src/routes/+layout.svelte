@@ -79,8 +79,8 @@
   <slot />
 </div>
 
-<style global>
-  body {
+<style>
+  div {
     --primo-color-brand: #35d994;
     --primo-color-brand-dark: #097548;
     --primo-color-white: white;
