@@ -203,6 +203,10 @@
         <TextField
           bind:value={enteredToken}
           placeholder="7diizPFerd0Isu33ex9aamjT"
+          on:change={() => {
+            connectVercel(enteredToken)
+            hostBeingConnected = null
+          }}
         >
           <p class="title">Vercel</p>
           <p class="subtitle">
@@ -234,6 +238,10 @@
       >
         <TextField
           bind:value={enteredToken}
+          on:change={() => {
+            connectNetlify(enteredToken)
+            hostBeingConnected = null
+          }}
           placeholder="7diizPFerd0Isu33ex9aamjT"
           button={{
             label: 'Connect',
@@ -270,6 +278,10 @@
       >
         <TextField
           bind:value={enteredToken}
+          on:change={() => {
+            connectGithub(enteredToken)
+            hostBeingConnected = null
+          }}
           placeholder="7diizPFerd0Isu33ex9aamjT"
           button={{
             label: 'Connect',
