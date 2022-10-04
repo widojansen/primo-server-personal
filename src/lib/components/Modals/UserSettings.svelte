@@ -43,8 +43,8 @@
   }
 
   onMount(async () => {
-    const [res] = await supabaseDB.config.get('server-token')
-    token = res.value
+    const res = await supabaseDB.config.get('server-token')
+    token = res
   })
 </script>
 
