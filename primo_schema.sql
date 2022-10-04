@@ -31,14 +31,15 @@ CREATE TABLE public.hosts (
 CREATE TABLE public.config (
     id text NOT NULL,
     value text,
+    options jsonb,
     created_at timestamp with time zone DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now()
 );
 
-INSERT INTO public.config (id, value, created_at, updated_at) VALUES
-    ('server-token', null, now(), now());
-INSERT INTO public.config (id, value, created_at, updated_at) VALUES
-    ('invitation-key', null, now(), now());
+INSERT INTO public.config (id, value, options, created_at, updated_at) VALUES
+    ('server-token', null, null, now(), now());
+INSERT INTO public.config (id, value, options, created_at, updated_at) VALUES
+    ('invitation-key', null, null, now(), now());
 
 -- Set owner
 ALTER TABLE public.sites OWNER TO supabase_admin;
