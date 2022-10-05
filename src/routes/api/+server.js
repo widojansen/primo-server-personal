@@ -8,7 +8,7 @@ export async function GET(event) {
 
 export async function OPTIONS() {
   return new Response(JSON.stringify({
-    // status: 201,
+    status: 201,
 		headers: {
 			'Access-Control-Allow-Origin': '*',
 			'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
