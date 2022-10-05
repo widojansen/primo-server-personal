@@ -27,6 +27,7 @@ export async function authorizeRequest(event, callback) {
 
   if (authorization.includes('Basic')) { // Desktop auth
     const storedToken = await getServerToken()
+    console.log(storedToken, token, storedToken === token)
     if (token === storedToken) return await callback()
     else return new Response(new Blob(), {
       status: 401 // unauthorized 

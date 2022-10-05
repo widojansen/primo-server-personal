@@ -7,7 +7,7 @@ const supabaseAdmin = createClient(import.meta.env.VITE_SUPABASE_URL, import.met
 export async function getServerToken() {
   const {data,error} = await supabaseAdmin
     .from('config')
-    .select('*')
+    .select()
     .eq('id', 'server-token')
   return data[0]['value']
 }
