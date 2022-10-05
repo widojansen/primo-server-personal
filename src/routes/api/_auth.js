@@ -19,6 +19,8 @@ export async function authorizeRequest(event, callback) {
 
   const authorization = event.request.headers.get('authorization')
 
+  console.log(authorization)
+
   if (!authorization) return new Response(JSON.stringify({ body: 'Must authorize request' }))
   
   const token = authorization.replace(/Basic |Bearer /gi, '')
