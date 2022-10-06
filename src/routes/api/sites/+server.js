@@ -31,15 +31,3 @@ export async function GET(event) {
 		return await data.text()
 	}
 }
-
-// export async function OPTIONS() {
-// 	return new Response(new Blob(), {
-//     status: 201,
-// 		statusText: 'no DATA!',
-// 		headers: {
-// 			'Access-Control-Allow-Origin': '*',
-// 			'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
-// 			'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-// 		},
-// 	});
-// }
