@@ -43,7 +43,8 @@
     margin-bottom: 1rem;
 
     .logo {
-      width: 7rem;
+      max-height: 4rem;
+      max-width: 7rem;
     }
 
     .link {

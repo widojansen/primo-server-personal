@@ -319,14 +319,15 @@
       justify-content: center;
 
       img {
+        max-height: 4rem;
         max-width: 200px;
+        object-fit: contain;
       }
     }
 
     .login-message {
       border-radius: 0.25rem;
       padding: 1.5rem;
-      margin-bottom: 1.5rem;
       font-size: 0.875rem;
       line-height: 1.25rem;
       text-align: center;

@@ -10,7 +10,7 @@
 
   export let data
 
-  actions.setCustomization(data, false)
+  if (data) actions.setCustomization(data, false)
 
   function beginInvitation(site): void {
     show({
