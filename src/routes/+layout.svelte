@@ -3,7 +3,7 @@
   import '$lib/assets/reset.css'
   import { browser } from '$app/environment'
   import { goto } from '$app/navigation'
-  import { registerProcessors, dropdown } from '@primo-app/primo'
+  import { registerProcessors, dropdown, stores } from '@primo-app/primo'
   import user from '../stores/user'
   import { config } from '../stores'
   import supabase from '../supabase/core'
@@ -12,6 +12,8 @@
   import Modal, { show, hide } from '$lib/components/Modal.svelte'
   import * as actions from '../actions'
   import SiteButtons from '$lib/components/SiteButtons.svelte'
+
+  const { saved } = stores
 
   if (browser) {
     import('../compiler/processors').then(({ html, css }) => {
@@ -22,6 +24,14 @@
         label: 'Back to Dashboard',
         icon: 'fas fa-arrow-left',
         href: '/',
+        onClick: (e) => {
+          if (!$saved) {
+            e.preventDefault()
+            window.alert(
+              `Save your site before navigating away so you don't lose your changes`
+            )
+          }
+        },
       },
       {
         component: SiteButtons,
