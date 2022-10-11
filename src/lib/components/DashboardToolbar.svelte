@@ -42,9 +42,10 @@
     color: var(--color-gray-3);
     margin-bottom: 1rem;
 
-    .logo {
-      max-height: 4rem;
-      max-width: 7rem;
+    .logo img {
+      height: 4rem;
+      width: 7rem;
+      object-fit: contain;
     }
 
     .link {
