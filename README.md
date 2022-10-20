@@ -11,7 +11,7 @@ This is a base repository for Primo Server that you can fork to host your own Se
 * Use from anywhere
 
 ## Project Status
-Primo Server is in late Alpha. Features may break from version to version, but likely not enough to cause loss of data. Until we ge to Beta, we can't recommend using Primo in production, but it's stable enough for personal projects.
+Primo Server is in Beta. It is stable enough for personal and commercial projects, but there will still be some non-breaking issues. 
 
 ## How it works
 This repo deploys primo to [Vercel](https://vercel.com) and uses [Supabase](https://supabase.co) for authentication, database (PostgreSQL), and storage. 
