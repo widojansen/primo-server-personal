@@ -7,7 +7,7 @@ CREATE TABLE public.sites (
     password text,
     active_editor text,
     host text,
-    active_deployment text,
+    active_deployment jsonb,
     created_at timestamp with time zone DEFAULT now()
 );
 
