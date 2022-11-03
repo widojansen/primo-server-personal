@@ -13,10 +13,7 @@ const config = {
     postcss: true
   }),
 	kit: {
-		adapter: adapter(),
-		csrf: {
-			checkOrigin: false,
-		}
+		adapter: adapter()
 	},
 	vitePlugin: {
 		experimental: {
