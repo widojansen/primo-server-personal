@@ -8,8 +8,16 @@ import * as svelte from 'svelte/compiler'
 
 const CDN_URL = "https://cdn.jsdelivr.net/npm";
 
+const cached_packages = new Map()
+
 async function fetch_package(url) {
-    return (await fetch(url)).text();
+    if (cached_packages.has(url)) {
+        return cached_packages.get(url)
+    } else {
+        const pck = await (await fetch(url)).text()
+        cached_packages.set(url, pck)
+        return pck;
+    }
 }
 
 registerPromiseWorker(async function ({ code, site, locale, hydrated, buildStatic = true, format = 'esm' }) {
