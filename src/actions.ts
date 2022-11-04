@@ -116,6 +116,14 @@ export const sites = {
   publish: async ({ siteID, host, files }) => {
     const { data: auth } = await supabase.auth.getSession()
 
+    // upload files to supabase storage for later retrieval from server
+    files = await Promise.all(
+      files.map(file => supabaseStorage.uploadSiteFile({
+        id: siteID,
+        file
+      }))
+    )
+
     const { data: { body } } = await axios.post(`/api/${siteID}`, {
       action: 'PUBLISH',
       payload: {

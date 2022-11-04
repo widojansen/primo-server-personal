@@ -1,5 +1,4 @@
-import supabaseAdmin, { saveSite, savePreview } from '../../../supabase/admin';
-import { users } from '../../../supabase/db';
+import supabaseAdmin, { saveSite } from '../../../supabase/admin';
 import { authorizeRequest } from '../_auth';
 import { publishSite } from '../_hosts';
 import { decode } from 'base64-arraybuffer';
@@ -124,6 +123,19 @@ export async function POST(event) {
 			}))
 		} else if (action === 'PUBLISH') {
 			const { siteID, files, host } = payload;
+
+			// fetch file data from Supabase
+			const fetched_files = await Promise.all(
+				files.map(async file => {
+					const {data} = await supabaseAdmin.storage.from('sites').download(`${siteID}/site-files/${file.hash}`)
+					const file_data = await data.text()
+					return {
+						file: file.file,
+						data: file_data
+					}
+				})
+			)
+
 			// get active_deployment from db
 			const [{ data: hosts }, { data: siteData }] = await Promise.all([
 				supabaseAdmin
@@ -139,7 +151,7 @@ export async function POST(event) {
 			const { deployment, error } = await publishSite({
 				siteID,
 				host: hosts[0],
-				files,
+				files: fetched_files,
 				activeDeployment: active_deployment,
 			});
 			if (deployment) {
@@ -171,13 +183,3 @@ export async function POST(event) {
 		}
 	});
 }
-
-// export async function OPTIONS() {
-// 	return new Response(JSON.stringify({
-// 		headers: {
-// 			'Access-Control-Allow-Origin': '*',
-// 			'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
-// 			'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-// 		},
-// 	}))
-// }
