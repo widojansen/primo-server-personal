@@ -44,16 +44,14 @@ export async function uploadSiteData({ id, data }) {
 }
 
 export async function uploadSiteFile({ id, file }) {
-  const hash = await generateHash(file.data)
-  const path = `${id}/site-files/${hash}`
-  const exists = await check_if_file_exists(path)
-  if (!exists) {
-    await supabase
-      .storage
-      .from(bucketID)
-      .upload(path, file.data)
-  }
-  return { file: file.file, hash }
+  const path = `${id}/site-files/${file.file}`
+  await supabase
+    .storage
+    .from(bucketID)
+    .upload(path, file.data, {
+      upsert: true
+    })
+  return file.file
 }
 
 export async function updateSiteData({ id, data }) {
@@ -108,31 +106,4 @@ export async function deleteSiteData(id) {
   .from(bucketID)
   .remove([id])
   return data ? true : false
-}
-
-// workaround for checking if file exists in Supabase storage
-// TODO: do this with a pg function that queries storage.objects
-async function check_if_file_exists(path) {
-  const {error} = await supabase
-    .storage
-    .from(bucketID)
-    .upload(path, '')
-
-  if (error?.statusCode === '23505') { // 'duplicate key' error
-    return true
-  } else {
-    const res = await supabase // delete empty uploaded file
-      .storage
-      .from(bucketID)
-      .remove(path)
-    return false
-  }
-}
-
-async function generateHash(string) {
-	const msgUint8 = new TextEncoder().encode(string);                           // encode as (utf-8) Uint8Array
-	const hashBuffer = await crypto.subtle.digest('SHA-1', msgUint8);           // hash the message
-	const hashArray = Array.from(new Uint8Array(hashBuffer));                     // convert buffer to byte array
-	const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
-	return hashHex;
 }

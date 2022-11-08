@@ -127,10 +127,10 @@ export async function POST(event) {
 			// fetch file data from Supabase
 			const fetched_files = await Promise.all(
 				files.map(async file => {
-					const {data} = await supabaseAdmin.storage.from('sites').download(`${siteID}/site-files/${file.hash}`)
+					const {data} = await supabaseAdmin.storage.from('sites').download(`${siteID}/site-files/${file}`)
 					const file_data = await data.text()
 					return {
-						file: file.file,
+						file: file,
 						data: file_data
 					}
 				})
