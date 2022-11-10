@@ -1,5 +1,6 @@
 import supabaseAdmin from '../../../supabase/admin';
 import { authorizeRequest } from '../_auth';
+import {json} from '@sveltejs/kit'
 
 export async function GET(event) {
 	return await authorizeRequest(event, async () => {
@@ -23,7 +24,7 @@ export async function GET(event) {
 				];
 			})
 		);
-		return new Response(JSON.stringify(finalSites));
+		return json(finalSites)
 	});
 
 	async function downloadFile(location) {

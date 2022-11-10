@@ -2,14 +2,13 @@ import supabaseAdmin, { saveSite } from '../../../supabase/admin';
 import { authorizeRequest } from '../_auth';
 import { publishSite } from '../_hosts';
 import { decode } from 'base64-arraybuffer';
+import {json} from '@sveltejs/kit'
 
 export async function GET(event) {
 	return await authorizeRequest(event, async () => {
 		const { data } = await supabaseAdmin.storage.from('sites').download(`${event.params.site}/site.json?${Date.now()}`);
-		const json = JSON.stringify(await data.text());
-		return new Response(JSON.stringify({
-			body: json,
-		}))
+		const body = JSON.stringify(await data.text());
+		return json({ body })
 	});
 }
 
@@ -45,9 +44,9 @@ export async function POST(event) {
 					password: payload.password
 				});
 				if (error) {
-					return new Response(JSON.stringify({
+					return json({
 						body: false,
-					}))
+					})
 				}
 				// create user in database for site row and user row, give site permission
 				await supabaseAdmin.from('users').insert({
@@ -65,9 +64,9 @@ export async function POST(event) {
 				})
 				.match({ id: event.params.site });
 
-			return new Response(JSON.stringify({
+			return json({
 				body: true,
-			}))
+			})
 		} else if (action === 'REMOVE_USER') {
 			// create user (email, password) in auth
 			const { error } = await supabaseAdmin
@@ -78,14 +77,14 @@ export async function POST(event) {
 				.match({ email: payload.email });
 
 			if (error) {
-				return new Response(JSON.stringify({
+				return json({
 					body: false,
-				}))
+				})
 			}
 
-			return new Response(JSON.stringify({
+			return json({
 				body: true,
-			}))
+			})
 		} else if (action === 'SET_ACTIVE_EDITOR') {
 			await Promise.all([
 				supabaseAdmin
@@ -94,17 +93,17 @@ export async function POST(event) {
 					.eq('id', payload.siteID),
 				supabaseAdmin.rpc('remove_active_editor', { site: payload.siteID }),
 			]);
-			return new Response(JSON.stringify({
+			return json({
 				body: true,
-			}))
+			})
 		} else if (action === 'REMOVE_ACTIVE_EDITOR') {
 			await supabaseAdmin
 				.from('sites')
 				.update({ active_editor: '' })
 				.eq('id', payload.siteID);
-			return new Response(JSON.stringify({
+			return json({
 				body: true,
-			}))
+			})
 		} else if (action === 'UPLOAD_IMAGE') {
 			const { siteID, image } = payload;
 			await supabaseAdmin.storage.from('sites').upload(`${siteID}/assets/${image.name}`, decode(image.base64), {
@@ -113,14 +112,14 @@ export async function POST(event) {
 
 			const { data: {publicUrl} } = await supabaseAdmin.storage.from('sites').getPublicUrl(`${siteID}/assets/${image.name}`);
 
-			return new Response(JSON.stringify({
+			return json({
 				body: publicUrl,
-			}))
+			})
 		} else if (action === 'SAVE_SITE') {
 			const res = await saveSite(payload.site, payload.preview)
-			return new Response(JSON.stringify({
+			return json({
 				body: !!res,
-			}))
+			})
 		} else if (action === 'PUBLISH') {
 			const { siteID, files, host } = payload;
 
@@ -162,24 +161,24 @@ export async function POST(event) {
 					})
 					.eq('id', siteID);
 				if (error) console.error(error);
-				return new Response(JSON.stringify({
+				return json({
 					body: {
 						deployment,
 						error: null,
 					},
-				}))
+				})
 			} else {
-				return new Response(JSON.stringify({
+				return json({
 					body: {
 						deployment: null,
 						error: null,
 					},
-				}))
+				})
 			}
 		} else {
-			return new Response(JSON.stringify({
+			return json({
 				body: 'Event undefined',
-			}))
+			})
 		}
 	});
 }

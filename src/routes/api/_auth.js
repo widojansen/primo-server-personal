@@ -1,5 +1,6 @@
 import supabaseAdmin from '../../supabase/admin'
 import {getServerToken, validateSitePassword, validateInvitationKey} from '../../supabase/admin'
+import {json} from '@sveltejs/kit'
 
 export async function authorizeRequest(event, callback) {
   const key = event.url?.searchParams.get('key') // authenticating from Desktop
@@ -7,34 +8,34 @@ export async function authorizeRequest(event, callback) {
 
   if (key) {
     const valid = await validateInvitationKey(key)
-    return valid ? callback() : new Response(JSON.stringify({
+    return valid ? callback() : json({
       body: null
-    }))
+    })
   } else if (password) {
     const valid = await validateSitePassword(event.params.site, password)
-    return valid ? callback() : new Response(JSON.stringify({
+    return valid ? callback() : json({
       body: null
-    }))
+    })
   } 
 
   const authorization = event.request.headers.get('authorization')
 
-  if (!authorization) return new Response(JSON.stringify({ body: 'Must authorize request' }))
+  if (!authorization) return json({ body: 'Must authorize request' })
   
   const token = authorization.replace(/Basic |Bearer /gi, '')
 
   if (authorization.includes('Basic')) { // Desktop auth
     const storedToken = await getServerToken()
     if (token === storedToken) return await callback()
-    else return new Response(new Blob(), {
+    else return json({}, {
       status: 401 // unauthorized 
     })
   } else if (authorization.includes('Bearer')) { // Server auth (logged-in)
     const { data: {user} } = await supabaseAdmin.auth.getUser(token)
     if (user) return callback() 
-    else return new Response(JSON.stringify({
+    else return json({
       body: null
-    }))
+    })
   }
 
 }
