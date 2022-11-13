@@ -81,9 +81,16 @@
       })
       const formattedHTML = await beautify.html(html)
 
+      let path
+      if (page.id === 'index' || page.id === '404') {
+        path = `${page.id}.html`
+      } else {
+        path = `${page.id}/index.html`
+      }
+
       return await Promise.all([
         {
-          path: `${id === 'index' ? `index.html` : `${id}/index.html`}`,
+          path,
           content: formattedHTML,
         },
         ...modules.map((module) => ({
