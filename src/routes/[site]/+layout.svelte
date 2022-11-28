@@ -5,15 +5,8 @@
 <script>
   import { onDestroy, setContext } from 'svelte'
   import { browser } from '$app/environment'
-  import Primo, {
-    modal as primoModal,
-    PrimoFieldTypes,
-    fieldTypes,
-    stores,
-  } from '@primo-app/primo'
+  import Primo, { stores } from '@primo-app/primo'
   import modal from '@primo-app/primo/src/stores/app/modal'
-  import Build from '../../extensions/Build.svelte'
-  import ImageField from '../../extensions/FieldTypes/ImageField.svelte'
   import * as actions from '../../actions'
   import user from '../../stores/user'
   import { sitePassword } from '../../stores/misc'
@@ -24,34 +17,6 @@
   import LockAlert from '$lib/components/LockAlert.svelte'
 
   $: siteID = $page.params.site
-
-  if (browser) {
-    primoModal.register([
-      {
-        id: 'BUILD',
-        component: Build,
-        componentProps: {
-          siteName: 'Website', // TODO - change
-        },
-        options: {
-          route: 'build',
-          width: 'md',
-          header: {
-            title: 'Build to Github',
-            icon: 'fab fa-github',
-          },
-          hideLocaleSelector: true,
-        },
-      },
-    ])
-    fieldTypes.register([
-      {
-        id: 'image',
-        label: 'Image',
-        component: ImageField,
-      },
-    ])
-  }
 
   let currentPath
   let siteLocked = false

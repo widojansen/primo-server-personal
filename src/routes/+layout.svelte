@@ -3,13 +3,21 @@
   import '$lib/assets/reset.css'
   import { browser } from '$app/environment'
   import { goto } from '$app/navigation'
-  import { registerProcessors, dropdown, stores } from '@primo-app/primo'
+  import {
+    modal as primoModal,
+    fieldTypes,
+    registerProcessors,
+    dropdown,
+    stores,
+  } from '@primo-app/primo'
   import user from '../stores/user'
   import { config } from '../stores'
   import supabase from '../supabase/core'
   import { watchForAutoLogin } from '../supabase/auth'
   import { users } from '../supabase/db'
   import Modal, { show, hide } from '$lib/components/Modal.svelte'
+  import Build from '../extensions/Build.svelte'
+  import ImageField from '../extensions/FieldTypes/ImageField.svelte'
   import * as actions from '../actions'
   import SiteButtons from '$lib/components/SiteButtons.svelte'
 
@@ -19,6 +27,31 @@
     import('../compiler/processors').then(({ html, css }) => {
       registerProcessors({ html, css })
     })
+    primoModal.register([
+      {
+        id: 'BUILD',
+        component: Build,
+        componentProps: {
+          siteName: 'Website', // TODO - change
+        },
+        options: {
+          route: 'build',
+          width: 'md',
+          header: {
+            title: 'Build to Github',
+            icon: 'fab fa-github',
+          },
+          hideLocaleSelector: true,
+        },
+      },
+    ])
+    fieldTypes.register([
+      {
+        id: 'image',
+        label: 'Image',
+        component: ImageField,
+      },
+    ])
     dropdown.set([
       {
         label: 'Back to Dashboard',
