@@ -190,7 +190,7 @@
       </div>
     {/if}
     <div class="inputs">
-      <TextInput bind:value={field.value.alt} label="Description" />
+      <TextInput bind:value={field.value.alt} on:input label="Description" />
       <TextInput
         value={field.value.url}
         label="URL"
