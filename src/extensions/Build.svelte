@@ -74,7 +74,7 @@
 
     async function buildPageTree({ page, site }) {
       const { id } = page
-      const { html, modules } = await buildStaticPage({
+      const { html, js } = await buildStaticPage({
         page,
         site,
         separateModules: true,
@@ -93,10 +93,10 @@
           path,
           content: formattedHTML,
         },
-        ...modules.map((module) => ({
-          path: `_modules/${module.symbol}.js`,
-          content: module.content,
-        })),
+        {
+          path: `_module.js`,
+          content: js,
+        },
         ...(page.pages
           ? page.pages.map((subpage) => buildPageTree({ page: subpage, site }))
           : []),

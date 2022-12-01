@@ -1,4 +1,3 @@
-import PromiseWorker from 'promise-worker';
 import { find as _find } from 'lodash-es'
 import { rollup } from "../lib/rollup-browser";
 import registerPromiseWorker from 'promise-worker/register'
@@ -20,7 +19,50 @@ async function fetch_package(url) {
     }
 }
 
-registerPromiseWorker(async function ({ code, site, locale, hydrated, buildStatic = true, format = 'esm' }) {
+const component_lookup = new Map();
+
+const Component_Code = (component) => {
+    const dataAsVariables = `\
+      ${Object.entries(component.data)
+            .filter(field => field[0])
+            .map(field => `export let ${field[0]};`)
+            .join(`\n`)
+        }`
+    return `
+      <script>
+          ${dataAsVariables}
+          ${component.js}
+      </script>
+      <style>${component.css}</style>
+      ${component.html}`
+}
+
+function generate_lookup(component) {
+    if (Array.isArray(component)) { // build page (sections as components)
+        component.forEach((section, i) => {
+            const code = Component_Code(section)
+            component_lookup.set(`./Component_${i}.svelte`, code);
+        })
+        component_lookup.set(`./App.svelte`, `
+          <script>
+          ${component.map((_, i) => `import Component_${i} from './Component_${i}.svelte';`).join('')}
+          </script>
+          ${component.map((section, i) => {
+            const props = `\
+                  ${Object.entries(section.data)
+                    .filter(field => field[0])
+                    .map(field => `${field[0]}={${JSON.stringify(field[1])}}`)
+                    .join(` \n`)}`
+            return `<Component_${i} ${props} /> \n`
+        }).join('')}
+      `);
+    } else { // build individual component
+        const code = Component_Code(component)
+        component_lookup.set(`./App.svelte`, code);
+    }
+}
+
+registerPromiseWorker(async function ({ component, hydrated, buildStatic = true, format = 'esm' }) {
 
     const final = {
         ssr: '',
@@ -28,48 +70,7 @@ registerPromiseWorker(async function ({ code, site, locale, hydrated, buildStati
         error: null
     }
 
-    const component_lookup = new Map();
-
-    function generate_lookup(code) {
-        component_lookup.set(`./App.svelte`, code);
-        component_lookup.set(`./H.svelte`, `
-            <script>
-                import {onMount} from 'svelte'
-                let className = '';
-                export { className as class };
-
-                let heading;
-                let currentLevel = 1;
-                let headingLevel = 1
-                onMount(() => {
-                    document.body.querySelectorAll('h1,h2,h3,h4,h5,h6').forEach(h => {
-                        if (h.isSameNode(heading)) {
-                            headingLevel = currentLevel
-                        } else if (currentLevel < 6) {
-                            currentLevel = currentLevel + 1;
-                        } else {
-                            headingLevel = 6
-                        }
-                    })
-                })
-            </script>
-            {#if headingLevel === 1}
-                <h1 bind:this={heading} class={className}><slot>Empty H1</slot></h1>
-            {:else if headingLevel === 2}
-                <h2 bind:this={heading} class={className}><slot>Empty h2</slot></h2>
-            {:else if headingLevel === 3}
-                <h3 bind:this={heading} class={className}><slot>Empty h3</slot></h3>
-            {:else if headingLevel === 4}
-                <h4 bind:this={heading} class={className}><slot>Empty h4</slot></h4>
-            {:else if headingLevel === 5}
-                <h5 bind:this={heading} class={className}><slot>Empty h5</slot></h5>
-            {:else if headingLevel === 6}
-                <h6 bind:this={heading} class={className}><slot>Empty h6</slot></h6>
-            {/if}
-        `);
-    }
-
-    generate_lookup(code);
+    generate_lookup(component);
 
     if (buildStatic) {
 
