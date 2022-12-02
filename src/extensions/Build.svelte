@@ -10,7 +10,7 @@
   import hosts from '../stores/hosts'
   import allSites from '../stores/sites'
   import { sites } from '../actions'
-  import ModalHeader from '@primo-app/primo/src/views/modal/ModalHeader.svelte'
+  import ModalHeader from '@primo-app/primo/views/modal/ModalHeader.svelte'
   import { page } from '$app/stores'
 
   const siteID = $page.params.site
@@ -94,7 +94,7 @@
           content: formattedHTML,
         },
         {
-          path: `_module.js`,
+          path: `${page.id}/_module.js`,
           content: js,
         },
         ...(page.pages
