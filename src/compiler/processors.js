@@ -2,8 +2,8 @@ import {clone as _cloneDeep} from 'lodash-es'
 import PromiseWorker from 'promise-worker';
 import svelteWorker from './workers/worker?worker'
 import {get} from 'svelte/store'
-import {site} from '@primo-app/primo/src/stores/data/draft'
-import {locale} from '@primo-app/primo/src/stores/app/misc'
+import {site} from '@primo-app/primo/stores/data/draft'
+import {locale} from '@primo-app/primo/stores/app/misc'
 
 import postCSSWorker from './workers/postcss.worker?worker'
 const PostCSSWorker = new postCSSWorker

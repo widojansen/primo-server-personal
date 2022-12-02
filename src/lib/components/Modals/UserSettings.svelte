@@ -1,7 +1,7 @@
 <script>
   import { cloneDeep as _cloneDeep } from 'lodash-es'
   import { onMount } from 'svelte'
-  import { createUniqueID } from '@primo-app/primo/src/utilities'
+  import { createUniqueID } from '@primo-app/primo/utilities'
   import Tabs from '$lib/ui/Tabs.svelte'
   import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
   import CopyButton from '$lib/ui/CopyButton.svelte'
@@ -10,9 +10,9 @@
   import { setCustomization } from '../../../actions'
   import config from '../../../stores/config'
   import ImageField from '../../../extensions/FieldTypes/ImageField.svelte'
-  import RepeaterField from '@primo-app/primo/src/field-types/RepeaterField.svelte'
-  import Link from '@primo-app/primo/src/field-types/Link.svelte'
-  import TextField from '@primo-app/primo/src/field-types/ContentField.svelte'
+  import RepeaterField from '@primo-app/primo/field-types/RepeaterField.svelte'
+  import Link from '@primo-app/primo/field-types/Link.svelte'
+  import TextField from '@primo-app/primo/field-types/ContentField.svelte'
 
   const tabs = [
     {

@@ -6,7 +6,7 @@
   import { onDestroy, setContext } from 'svelte'
   import { browser } from '$app/environment'
   import Primo, { stores } from '@primo-app/primo'
-  import modal from '@primo-app/primo/src/stores/app/modal'
+  import modal from '@primo-app/primo/stores/app/modal'
   import * as actions from '../../actions'
   import user from '../../stores/user'
   import { sitePassword } from '../../stores/misc'

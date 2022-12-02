@@ -82,29 +82,57 @@
       const formattedHTML = await beautify.html(html)
 
       let path
-      if (page.id === 'index' || page.id === '404') {
-        path = `${page.id}.html`
+      if (id === 'index' || id === '404') {
+        path = `${id}.html`
       } else {
-        path = `${page.id}/index.html`
+        path = `${id}/index.html`
       }
 
-      return await Promise.all([
+      const page_tree = [
         {
           path,
           content: formattedHTML,
         },
-        {
-          path: `${page.id}/_module.js`,
+      ]
+
+      if (js) {
+        page_tree.push({
+          path: `${id === 'index' ? '' : id}/_module.js`,
           content: js,
-        },
-        ...(page.pages
-          ? page.pages.map((subpage) => buildPageTree({ page: subpage, site }))
-          : []),
-      ])
+        })
+      }
+
+      if (page.pages) {
+        const child_pages = await Promise.all(
+          page.pages.map((subpage) => buildPageTree({ page: subpage, site }))
+        )
+        console.log({ child_pages })
+        page_tree.push(...child_pages)
+      }
+
+      return page_tree
+
+      // return await Promise.all([
+      //   {
+      //     path,
+      //     content: formattedHTML,
+      //   },
+      //   js
+      //     ? {
+      //         path: `${page.id === 'index' ? '' : page.id}/_module.js`,
+      //         content: js,
+      //       }
+      //     : {},
+      //   ...(page.pages
+      //     ? page.pages.map((subpage) => buildPageTree({ page: subpage, site }))
+      //     : []),
+      // ])
     }
 
     async function buildSiteTree(pages, site) {
       const json = JSON.stringify(site)
+
+      console.log(pages)
 
       return [
         ...flattenDeep(pages),

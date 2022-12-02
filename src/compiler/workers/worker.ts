@@ -19,49 +19,6 @@ async function fetch_package(url) {
     }
 }
 
-const component_lookup = new Map();
-
-const Component_Code = (component) => {
-    const dataAsVariables = `\
-      ${Object.entries(component.data)
-            .filter(field => field[0])
-            .map(field => `export let ${field[0]};`)
-            .join(`\n`)
-        }`
-    return `
-      <script>
-          ${dataAsVariables}
-          ${component.js}
-      </script>
-      <style>${component.css}</style>
-      ${component.html}`
-}
-
-function generate_lookup(component) {
-    if (Array.isArray(component)) { // build page (sections as components)
-        component.forEach((section, i) => {
-            const code = Component_Code(section)
-            component_lookup.set(`./Component_${i}.svelte`, code);
-        })
-        component_lookup.set(`./App.svelte`, `
-          <script>
-          ${component.map((_, i) => `import Component_${i} from './Component_${i}.svelte';`).join('')}
-          </script>
-          ${component.map((section, i) => {
-            const props = `\
-                  ${Object.entries(section.data)
-                    .filter(field => field[0])
-                    .map(field => `${field[0]}={${JSON.stringify(field[1])}}`)
-                    .join(` \n`)}`
-            return `<Component_${i} ${props} /> \n`
-        }).join('')}
-      `);
-    } else { // build individual component
-        const code = Component_Code(component)
-        component_lookup.set(`./App.svelte`, code);
-    }
-}
-
 registerPromiseWorker(async function ({ component, hydrated, buildStatic = true, format = 'esm' }) {
 
     const final = {
@@ -70,7 +27,53 @@ registerPromiseWorker(async function ({ component, hydrated, buildStatic = true,
         error: null
     }
 
+    const component_lookup = new Map();
+
+    const Component_Code = (component) => {
+        const dataAsVariables = `\
+          ${Object.entries(component.data)
+                .filter(field => field[0])
+                .map(field => `export let ${field[0]};`)
+                .join(`\n`)
+            }`
+        return `
+          <script>
+              ${dataAsVariables}
+              ${component.js}
+          </script>
+          <style>${component.css}</style>
+          ${component.html}`
+    }
+
+    function generate_lookup(component) {
+        if (Array.isArray(component)) { // build page (sections as components)
+            component.forEach((section, i) => {
+                const code = Component_Code(section)
+                console.log(i, { code })
+                component_lookup.set(`./Component_${i}.svelte`, code);
+            })
+            component_lookup.set(`./App.svelte`, `
+              <script>
+              ${component.map((_, i) => `import Component_${i} from './Component_${i}.svelte';`).join('')}
+              </script>
+              ${component.map((section, i) => {
+                const props = `\
+                      ${Object.entries(section.data)
+                        .filter(field => field[0])
+                        .map(field => `${field[0]}={${JSON.stringify(field[1])}}`)
+                        .join(` \n`)}`
+                return `<Component_${i} ${props} /> \n`
+            }).join('')}
+          `);
+        } else { // build individual component
+            const code = Component_Code(component)
+            component_lookup.set(`./App.svelte`, code);
+        }
+    }
+
     generate_lookup(component);
+
+    console.log({ component_lookup })
 
     if (buildStatic) {
 

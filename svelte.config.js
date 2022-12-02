@@ -1,25 +1,16 @@
-import preprocess from 'svelte-preprocess';
-// import adapter from '@sveltejs/adapter-static';
 import adapter from '@sveltejs/adapter-auto';
-
-const IGNORED_WARNINGS = [`'__SERVER_VERSION__' is not defined`];
+import preprocess from 'svelte-preprocess';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-	onwarn: (warning, handler) => {
-		if (!IGNORED_WARNINGS.includes(warning.message)) handler(warning);
-	},
+	// Consult https://github.com/sveltejs/svelte-preprocess
+	// for more information about preprocessors
 	preprocess: preprocess({
     postcss: true
-  }),
+	}),
 	kit: {
 		adapter: adapter()
-	},
-	vitePlugin: {
-		experimental: {
-			inspector: true,
-		}
-	},
+	}
 };
 
 export default config;

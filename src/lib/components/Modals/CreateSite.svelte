@@ -4,8 +4,8 @@
   import TextField from '$lib/ui/TextField.svelte'
   import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
   import { makeValidUrl } from '$lib/utils'
-  import { Site } from '@primo-app/primo/src/const'
-  import {validateSiteStructure} from '@primo-app/primo/src/utils'
+  import { Site } from '@primo-app/primo/const'
+  import { validateSiteStructure } from '@primo-app/primo/utils'
 
   export let onSuccess = (newSite) => {}
   let loading

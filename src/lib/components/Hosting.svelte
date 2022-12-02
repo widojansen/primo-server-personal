@@ -7,7 +7,7 @@
   import * as actions from '../../actions'
   import TextField from '$lib/ui/TextField.svelte'
   import { sitePassword } from '../../stores/misc'
-  import { id as siteID, site } from '@primo-app/primo/src/stores/data/draft'
+  import { id as siteID, site } from '@primo-app/primo/stores/data/draft'
 
   export let buttons = []
 
