@@ -65,6 +65,7 @@
 
 <Primo
   data={$activeSite}
+  page_id={$page.params.page}
   role={$user.role}
   options={{
     logo: $config.customization.logo.url,
