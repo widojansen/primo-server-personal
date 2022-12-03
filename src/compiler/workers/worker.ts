@@ -49,7 +49,6 @@ registerPromiseWorker(async function ({ component, hydrated, buildStatic = true,
         if (Array.isArray(component)) { // build page (sections as components)
             component.forEach((section, i) => {
                 const code = Component_Code(section)
-                console.log(i, { code })
                 component_lookup.set(`./Component_${i}.svelte`, code);
             })
             component_lookup.set(`./App.svelte`, `
@@ -157,10 +156,13 @@ registerPromiseWorker(async function ({ component, hydrated, buildStatic = true,
                                 // TODO: find cause & remove workaround
                                 if (res.vars?.[0]?.['name'] === 'undefined') {
                                     console.warn('Used temporary workaround to hide component')
-                                    const newRes = svelte.compile('<div></div>', svelteOptions)
+                                    let newRes = svelte.compile('<div></div>', svelteOptions)
                                     return newRes.js.code
                                 }
-                                const warnings = res.warnings.filter(w => !w.message.startsWith(`Component has unused export`)).filter(w => !w.message.startsWith(`A11y: <img> element should have an alt attribute`))
+                                const warnings = res.warnings
+                                    .filter(w => !w.message.startsWith(`Component has unused export`))
+                                    .filter(w => !w.message.startsWith(`A11y: <img> element should have an alt attribute`))
+                                    .filter(w => w.code !== `a11y-missing-content`)
                                 if (warnings[0]) {
                                     final.error = warnings[0].toString()
                                     return ''
