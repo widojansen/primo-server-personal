@@ -29,20 +29,28 @@ registerPromiseWorker(async function ({ component, hydrated, buildStatic = true,
 
     const component_lookup = new Map();
 
-    const Component_Code = (component) => {
+    const Component_Code = ({ html, css, js, data }) => {
         const dataAsVariables = `\
-          ${Object.entries(component.data)
+          ${Object.entries(data)
                 .filter(field => field[0])
                 .map(field => `export let ${field[0]};`)
                 .join(`\n`)
             }`
+
+        // Move <svelte:window> to the end of the component to prevent 'can't nest' error
+        if (html.includes('<svelte:window')) {
+            let [svelteWindowTag] = html.match(/<svelte:window(.*?)\/>/);
+            html = html.replace(svelteWindowTag, '')
+            html = html + svelteWindowTag
+        }
+
         return `
           <script>
               ${dataAsVariables}
-              ${component.js}
+              ${js}
           </script>
-          <style>${component.css}</style>
-          ${component.html}`
+          ${css ? `<style>${css}</style>` : ``}
+          ${html}`
     }
 
     function generate_lookup(component) {
@@ -185,6 +193,7 @@ registerPromiseWorker(async function ({ component, hydrated, buildStatic = true,
                                     return res.js.code;
                                 }
                             } catch (e) {
+                                console.log({ e })
                                 final.error = e.toString()
                                 return ''
                             }
