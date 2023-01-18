@@ -97,7 +97,7 @@
 
       if (js) {
         page_tree.push({
-          path: `${id === 'index' ? '' : id}/_module.js`,
+          path: id === 'index' ? '_module.js' : `${id}/_module.js`,
           content: js,
         })
       }
