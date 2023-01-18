@@ -29,7 +29,8 @@ registerPromiseWorker(async function ({ component, hydrated, buildStatic = true,
 
     const component_lookup = new Map();
 
-    const Component_Code = ({ html, css, js, data }) => {
+    const Component_Code = (component) => {
+        let { html, css, js, data } = component
         const dataAsVariables = `\
           ${Object.entries(data)
                 .filter(field => field[0])

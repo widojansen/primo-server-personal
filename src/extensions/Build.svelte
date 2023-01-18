@@ -106,7 +106,6 @@
         const child_pages = await Promise.all(
           page.pages.map((subpage) => buildPageTree({ page: subpage, site }))
         )
-        console.log({ child_pages })
         page_tree.push(...child_pages)
       }
 
@@ -131,8 +130,6 @@
 
     async function buildSiteTree(pages, site) {
       const json = JSON.stringify(site)
-
-      console.log(pages)
 
       return [
         ...flattenDeep(pages),

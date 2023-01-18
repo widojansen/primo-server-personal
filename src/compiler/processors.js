@@ -93,6 +93,9 @@ export async function html({ component, buildStatic = true, format = 'esm'}) {
 
 const cssMap = new Map()
 export async function css(raw) {
+  if (cssMap.has(raw)) {
+    return ({ css: cssMap.get(raw) })
+  }
   const processed = await cssPromiseWorker.postMessage({
     css: raw
   })
@@ -101,7 +104,6 @@ export async function css(raw) {
       error: processed.message
     }
   }
-  if (cssMap.has(raw)) return ({ css: cssMap.get(raw) })
   cssMap.set(raw, processed)
   return {
     css: processed
