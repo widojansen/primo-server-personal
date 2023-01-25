@@ -8,7 +8,7 @@ export async function POST(event) {
   const nUsers = await getNumberOfUsers()
   if (nUsers === 0) {
     const {error} = await createUser(true)
-    return json({success: !!error})
+    return json({success: !error})
   }
 
   return await authorizeRequest(event, async () => {
