@@ -5,6 +5,7 @@
   import PrimaryButton from '$lib/ui/PrimaryButton.svelte'
   import { makeValidUrl } from '$lib/utils'
   import { Site } from '@primo-app/primo/const'
+  import Icon from '@iconify/svelte'
   import { validateSiteStructure } from '@primo-app/primo/utils'
 
   export let onSuccess = (newSite) => {}
@@ -82,28 +83,24 @@
           <SiteThumbnail bind:valid={duplicateFileIsValid} site={siteData} />
         </div>
       {/if}
-      <div id="upload-json">
-        <label>
-          <input
-            on:change={readJsonFile}
-            type="file"
-            id="primo-json"
-            accept=".json"
-          />
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
-              clip-rule="evenodd"
+      <footer>
+        <div id="upload-json">
+          <label class="container">
+            <input
+              on:change={readJsonFile}
+              type="file"
+              id="primo-json"
+              accept=".json"
             />
-          </svg>
-          <span>Duplicate from primo.json</span>
-        </label>
-      </div>
+            <Icon icon="carbon:upload" />
+            <span>Duplicate from primo.json</span>
+          </label>
+        </div>
+        <a class="container" href="https://primo.so/marketplace" target="blank">
+          <Icon icon="gridicons:themes" />
+          <span>Primo Themes</span>
+        </a>
+      </footer>
       <div class="submit">
         <PrimaryButton
           type="submit"
@@ -137,6 +134,22 @@
       }
     }
   }
+  footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .container {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    span {
+      color: var(--color-gray-3);
+      font-size: 0.75rem;
+      text-decoration: underline;
+    }
+  }
   #upload-json {
     margin-bottom: 0.5rem;
     display: flex;
@@ -144,10 +157,6 @@
 
     label {
       cursor: pointer;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
 
       input {
         display: none;
