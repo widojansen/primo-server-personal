@@ -11,7 +11,7 @@ This is a base repository for Primo Server that you can fork to host your own Se
 * Use from anywhere
 
 ## Project Status
-Primo Server is in Beta. It is stable enough for personal and commercial projects, but there will still be some non-breaking issues. 
+Primo Server is in Beta. It is stable enough for personal projects.
 
 ## How it works
 This repo deploys primo to [Vercel](https://vercel.com) and uses [Supabase](https://supabase.co) for authentication, database (PostgreSQL), and storage. 
@@ -27,21 +27,25 @@ Before deploying your Primo Server, you'll need to sign up for [Supabase](https:
 ### 2. Deploy Backend (Supabase)
 1. Create a [Supabase](https://supabase.co) account or sign in with Github
 1. Create a new project
-1. Disable email confirmations (Authentication > Settings > disable 'Confirm email')
+1. Disable email confirmations (Authentication > Providers > expand Email and uncheck 'Confirm email')
 1. Select 'SQL' from the sidebar navigation
 1. Click **+ New query** 
 1. Paste in the contents of [`./primo_schema.sql`](https://raw.githubusercontent.com/primo-af/primo-server/master/primo_schema.sql) and click 'RUN' ![query](./setup-query.png)
 
 ### 3. Deploy Frontend (Vercel)
 
-1. Start a new Vercel project
+1. Start a [new Vercel project](https://vercel.com/new)
 1. Select your forked repository
 1. For the environment variables, enter your Supabase project **URL**, **Public Key (anon public)**, and **Admin Key (service_role secret)** (which you can find in the Supabase project dashboard > Settings > API https://app.supabase.io/project/---yourprojectid---/settings/api)
 * VITE_SUPABASE_URL
 * VITE_SUPABASE_PUBLIC_KEY
 * VITE_SUPABASE_ADMIN_KEY
+<img width="816" alt="image" src="https://user-images.githubusercontent.com/39444813/214706015-4b0a0aaf-a2d0-4202-948c-416489ba1a16.png">
+
 4. Click 'Deploy'
 5. Navigate to your new Primo Server. Sign up with an email address and password (this will be the admin account). 
+<img width="964" alt="image" src="https://user-images.githubusercontent.com/39444813/214706470-92724d9d-cf34-4351-9a7e-7fce9554b9e3.png">
+
 
 ### Updating
 
