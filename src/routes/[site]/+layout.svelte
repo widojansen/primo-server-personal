@@ -1,7 +1,3 @@
-<script context="module">
-  export const prerender = true
-</script>
-
 <script>
   import { onDestroy, setContext } from 'svelte'
   import { browser } from '$app/environment'

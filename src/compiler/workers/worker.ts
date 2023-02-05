@@ -81,8 +81,6 @@ registerPromiseWorker(async function ({ component, hydrated, buildStatic = true,
 
     generate_lookup(component);
 
-    console.log({ component_lookup })
-
     if (buildStatic) {
 
         const bundle = await compile({

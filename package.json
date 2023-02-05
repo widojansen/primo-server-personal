@@ -14,7 +14,7 @@
 	},
 	"dependencies": {
 		"@iconify/svelte": "^2.2.1",
-		"@primo-app/primo": "^1.7.11",
+		"@primo-app/primo": "^1.7.12",
 		"@supabase/supabase-js": "^2.0.0-rc.3",
 		"@sveltejs/kit": "^1.0.0",
 		"axios": "^0.26.0",
@@ -22,11 +22,13 @@
 		"browser-image-compression": "^1.0.17",
 		"file-saver": "^2.0.5",
 		"idb-keyval": "^6.1.0",
+		"intl-messageformat": "^10.3.0",
 		"javascript-time-ago": "^2.3.8",
 		"js-beautify": "^1.14.0",
 		"jszip": "^3.7.1",
 		"lodash-es": "^4.17.21",
 		"mini-svg-data-uri": "^1.4.4",
+		"mousetrap": "^1.6.5",
 		"promise-worker": "^2.0.1",
 		"timeago.js": "^4.0.2",
 		"vite": "^4.0.1"
