@@ -1,7 +1,7 @@
 import axios from 'axios'
 import {chain, find} from 'lodash-es'
-import {createHash} from 'node:crypto'
-import {Blob} from 'node:buffer';
+import CryptoJS from 'crypto-js'
+import Blob from "cross-blob"
 
 // pass in site
 export async function publishSite({ siteID, host, files, activeDeployment }) {
@@ -231,5 +231,5 @@ async function createRepo({ token, name }) {
 
 
 function hash(string) {
-  return createHash('sha1').update(string).digest('hex');
+  return CryptoJS.SHA1(string).toString(CryptoJS.enc.Hex);
 }
