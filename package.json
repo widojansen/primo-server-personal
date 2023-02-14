@@ -14,7 +14,7 @@
 	},
 	"dependencies": {
 		"@iconify/svelte": "^2.2.1",
-		"@primo-app/primo": "^1.7.12",
+		"@primo-app/primo": "^1.7.13",
 		"@supabase/supabase-js": "^2.0.0-rc.3",
 		"@sveltejs/kit": "^1.0.0",
 		"axios": "^0.26.0",
