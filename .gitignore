@@ -1,7 +1,7 @@
-.env 
+.env
 .DS_Store
 .vercel_build_output
-
+.idea
 node_modules
 
 .svelte-kit
